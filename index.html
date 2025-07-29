@@ -462,6 +462,27 @@
             background: #c7d2fe;
         }
 
+        /* Calendar task status colors */
+        .calendar-task-completed {
+            background: #d1fae5 !important;
+            color: #065f46 !important;
+        }
+
+        .calendar-task-inprogress {
+            background: #fef3c7 !important;
+            color: #92400e !important;
+        }
+
+        .calendar-task-onhold {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+        }
+
+        .calendar-task-yettostart {
+            background: #e2e8f0 !important;
+            color: #475569 !important;
+        }
+
         /* Toast Notification */
         .toast {
             position: fixed;
@@ -688,6 +709,25 @@
                             </select>
                             <input type="text" class="search-box" id="assignedToSearch" placeholder="Filter by assignee...">
                         </div>
+                    </div>
+                    <!-- Legend for calendar task colors -->
+                    <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;">
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-completed" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Completed
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-inprogress" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            In Progress
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-onhold" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            On Hold
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-yettostart" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Yet to Start
+                        </span>
                     </div>
                     <div id="calendarMonthHeader" style="font-size:1.3rem;font-weight:700;text-align:center;margin-bottom:1rem;"></div>
                     <div class="calendar-grid" id="calendarGrid"></div>
@@ -1292,6 +1332,18 @@
             `).join('');
         }
 
+        // Helper: get calendar color class for status
+        function getCalendarTaskClass(status) {
+            if (!status) return '';
+            switch (status.toLowerCase()) {
+                case 'completed': return 'calendar-task-completed';
+                case 'in progress': return 'calendar-task-inprogress';
+                case 'on hold': return 'calendar-task-onhold';
+                case 'yet to start': return 'calendar-task-yettostart';
+                default: return '';
+            }
+        }
+
         async function renderSchedule() {
             const monthNames = [
                 'January', 'February', 'March', 'April', 'May', 'June',
@@ -1357,9 +1409,9 @@
                         <div class="day-number">${day}</div>
                         ${dayTasks.length === 0 ? '<div style="color:#94a3b8;font-size:0.95rem;">No tasks</div>' : ''}
                         ${dayTasks.map(task => `
-                            <div class="task-item" title="${task.projectName}" onclick="editTask(${task.id})"
+                            <div class="task-item ${getCalendarTaskClass(task.status)}" title="${task.projectName}" onclick="editTask(${task.id})"
                                 style="margin-bottom:0.3rem;display:flex;align-items:center;gap:0.5rem;">
-                                <span style="font-weight:600;color:#3730a3;">${task.assignedTo || 'Unassigned'}</span>
+                                <span style="font-weight:600;">${task.assignedTo || 'Unassigned'}</span>
                                 <span style="color:#334155;">— ${task.projectName || ''}${task.subPhase ? ` (${task.subPhase})` : ''}</span>
                             </div>
                         `).join('')}
