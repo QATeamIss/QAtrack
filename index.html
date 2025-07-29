@@ -673,6 +673,7 @@
                             </thead>
                             <tbody id="tasksTableBody"></tbody>
                         </table>
+                        <div id="dashboardPagination"></div>
                     </div>
                 </div>
 
@@ -707,6 +708,7 @@
                             </thead>
                             <tbody id="trackerTableBody"></tbody>
                         </table>
+                        <div id="trackerPagination"></div>
                     </div>
                 </div>
 
@@ -776,6 +778,7 @@
                             </thead>
                             <tbody id="summaryTableBody"></tbody>
                         </table>
+                        <div id="summaryPagination"></div>
                     </div>
                 </div>
 
@@ -830,6 +833,7 @@
                                 </thead>
                                 <tbody id="attendanceTableBody"></tbody>
                             </table>
+                            <div id="attendancePagination"></div>
                         </div>
                     </div>
                 </div>
@@ -941,6 +945,9 @@
         let dashboardSearchTerm = '';
         let trackerSearchTerm = '';
         let summarySearchTerm = '';
+        // Pagination state
+        let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1;
+        const PAGE_SIZE = 10;
 
         /* Utility Functions */
         function formatDate(date) {
@@ -969,6 +976,16 @@
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function renderPagination(containerId, page, total, onPageChange) {
+            const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+            let html = `<div style="display:flex;justify-content:center;align-items:center;gap:1rem;margin:1rem 0;">`;
+            html += `<button ${page === 1 ? 'disabled' : ''} onclick="${onPageChange}(${page - 1})">Prev</button>`;
+            html += `<span>Page ${page} of ${totalPages}</span>`;
+            html += `<button ${page === totalPages ? 'disabled' : ''} onclick="${onPageChange}(${page + 1})">Next</button>`;
+            html += `</div>`;
+            document.getElementById(containerId).innerHTML = html;
         }
 
         /* Supabase Data Functions */
@@ -1296,12 +1313,20 @@
             document.getElementById('completedTasks').textContent = stats.completed;
             document.getElementById('overdueTasks').textContent = stats.overdue;
 
+            // Get total count for pagination
+            let { count } = await supabase
+                .from('tasks')
+                .select('*', { count: 'exact', head: true })
+                .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`);
+            count = count || 0;
+
+            // Fetch paginated data
             let { data: filteredTasks, error } = await supabase
                 .from('tasks')
                 .select('*')
                 .order('id', { ascending: false })
-                .limit(10)
-                .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`);
+                .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`)
+                .range((dashboardPage - 1) * PAGE_SIZE, dashboardPage * PAGE_SIZE - 1);
             if (error) {
                 console.error('Error searching tasks:', error);
                 showToast('Error searching tasks.');
@@ -1322,13 +1347,28 @@
                     </td>
                 </tr>
             `).join('');
+            renderPagination('dashboardPagination', dashboardPage, count, 'setDashboardPage');
+        }
+
+        function setDashboardPage(page) {
+            dashboardPage = page;
+            renderDashboard();
         }
 
         async function renderTracker() {
+            // Get total count for pagination
+            let { count } = await supabase
+                .from('tasks')
+                .select('*', { count: 'exact', head: true })
+                .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`);
+            count = count || 0;
+
             let { data: filteredTasks, error } = await supabase
                 .from('tasks')
                 .select('*')
-                .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`);
+                .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`)
+                .order('id', { ascending: false })
+                .range((trackerPage - 1) * PAGE_SIZE, trackerPage * PAGE_SIZE - 1);
             if (error) {
                 console.error('Error searching tasks:', error);
                 showToast('Error searching tasks.');
@@ -1357,105 +1397,30 @@
                     </td>
                 </tr>
             `).join('');
+            renderPagination('trackerPagination', trackerPage, count, 'setTrackerPage');
         }
 
-        // Helper: get calendar color class for status
-        function getCalendarTaskClass(status) {
-            if (!status) return '';
-            switch (status.toLowerCase()) {
-                case 'completed': return 'calendar-task-completed';
-                case 'in progress': return 'calendar-task-inprogress';
-                case 'on hold': return 'calendar-task-onhold';
-                case 'yet to start': return 'calendar-task-yettostart';
-                case 'forecast': return 'calendar-task-forecast';
-                case 'rejected': return 'calendar-task-rejected';
-                default: return '';
-            }
-        }
-
-        async function renderSchedule() {
-            const monthNames = [
-                'January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'
-            ];
-            document.getElementById('calendarMonthHeader').textContent =
-                `${monthNames[calendarMonth]} ${calendarYear}`;
-
-            const monthSelect = document.getElementById('monthSelect');
-            if (monthSelect && monthSelect.childElementCount === 0) {
-                for (let y = calendarYear - 2; y <= calendarYear + 2; y++) {
-                    for (let m = 0; m < 12; m++) {
-                        const opt = document.createElement('option');
-                        opt.value = `${y}-${m}`;
-                        opt.textContent = `${monthNames[m]} ${y}`;
-                        if (y === calendarYear && m === calendarMonth) opt.selected = true;
-                        monthSelect.appendChild(opt);
-                    }
-                }
-            }
-
-            assignedToFilter = document.getElementById('assignedToSearch')?.value?.toLowerCase() || '';
-
-            const calendarGrid = document.getElementById('calendarGrid');
-            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-            const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
-
-            let calendarHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-                .map(day => `<div class="calendar-day calendar-day-header">${day}</div>`).join('');
-
-            for (let i = 0; i < firstDay; i++) calendarHTML += '<div></div>';
-
-            // Helper to parse YYYY-MM-DD as local date
-            function parseLocalDate(str) {
-                if (!str) return null;
-                const [y, m, d] = str.split('-').map(Number);
-                return new Date(y, m - 1, d);
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                let dayTasks = tasks.filter(task => {
-                    if (!task.startDate || !task.endDate) return false;
-                    const start = parseLocalDate(task.startDate);
-                    const end = parseLocalDate(task.endDate);
-                    let last;
-                    if (task.status === 'Completed' && task.completedAt) {
-                        const completedDate = parseLocalDate(task.completedAt.slice(0, 10));
-                        last = completedDate;
-                    } else {
-                        last = end;
-                    }
-                    const thisDate = parseLocalDate(dateStr);
-                    return thisDate >= start && thisDate <= last;
-                });
-                if (assignedToFilter) {
-                    dayTasks = dayTasks.filter(task =>
-                        (task.assignedTo || '').toLowerCase().includes(assignedToFilter)
-                    );
-                }
-                calendarHTML += `
-                    <div class="calendar-day calendar-day-body">
-                        <div class="day-number">${day}</div>
-                        ${dayTasks.length === 0 ? '<div style="color:#94a3b8;font-size:0.95rem;">No tasks</div>' : ''}
-                        ${dayTasks.map(task => `
-                            <div class="task-item ${getCalendarTaskClass(task.status)}" title="${task.projectName}" onclick="editTask(${task.id})"
-                                style="margin-bottom:0.3rem;display:flex;align-items:center;gap:0.5rem;">
-                                <span style="font-weight:600;">${task.assignedTo || 'Unassigned'}</span>
-                                <span style="color:#334155;">— ${task.projectName || ''}${task.subPhase ? ` (${task.subPhase})` : ''}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            calendarGrid.innerHTML = calendarHTML;
+        function setTrackerPage(page) {
+            trackerPage = page;
+            renderTracker();
         }
 
         async function renderSummary() {
+            // Get total count for pagination
+            let { count } = await supabase
+                .from('tasks')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'Completed')
+                .or(`project_name.ilike.%${summarySearchTerm}%,assigned_to.ilike.%${summarySearchTerm}%,sub_phase.ilike.%${summarySearchTerm}%`);
+            count = count || 0;
+
             let { data: filteredTasks, error } = await supabase
                 .from('tasks')
                 .select('*')
                 .eq('status', 'Completed')
-                .or(`project_name.ilike.%${summarySearchTerm}%,assigned_to.ilike.%${summarySearchTerm}%,sub_phase.ilike.%${summarySearchTerm}%`);
+                .or(`project_name.ilike.%${summarySearchTerm}%,assigned_to.ilike.%${summarySearchTerm}%,sub_phase.ilike.%${summarySearchTerm}%`)
+                .order('id', { ascending: false })
+                .range((summaryPage - 1) * PAGE_SIZE, summaryPage * PAGE_SIZE - 1);
             if (error) {
                 console.error('Error searching tasks:', error);
                 showToast('Error searching tasks.');
@@ -1475,79 +1440,23 @@
                     <td data-label="Bug Count">${task.bug_count || '0'}</td>
                 </tr>
             `).join('');
+            renderPagination('summaryPagination', summaryPage, count, 'setSummaryPage');
         }
 
-        async function renderAnalytics() {
-            analyticsStatusFilter = document.getElementById('analyticsStatusFilter')?.value || '';
-            analyticsAssigneeFilter = document.getElementById('analyticsAssigneeFilter')?.value?.toLowerCase() || '';
-
-            let filteredTasks = tasks;
-            if (analyticsStatusFilter) {
-                filteredTasks = filteredTasks.filter(t => t.status === analyticsStatusFilter);
-            }
-            if (analyticsAssigneeFilter) {
-                filteredTasks = filteredTasks.filter(t =>
-                    (t.assignedTo || '').toLowerCase().includes(analyticsAssigneeFilter)
-                );
-            }
-
-            const statusCounts = ['Yet to Start', 'In Progress', 'On Hold', 'Completed', 'Forecast', 'Rejected'].map(status =>
-                filteredTasks.filter(t => t.status === status).length
-            );
-            const statusColors = ['#e2e8f0', '#fef3c7', '#fee2e2', '#d1fae5', '#bae6fd', '#fca5a5'];
-            const ctx1 = document.getElementById('taskChart').getContext('2d');
-            if (window.taskChartInstance) window.taskChartInstance.destroy();
-            window.taskChartInstance = new Chart(ctx1, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Yet to Start', 'In Progress', 'On Hold', 'Completed', 'Forecast', 'Rejected'],
-                    datasets: [{
-                        data: statusCounts,
-                        backgroundColor: statusColors,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    plugins: {
-                        title: { display: true, text: 'Task Status Distribution', font: { size: 18 } },
-                        legend: { position: 'bottom' }
-                    }
-                }
-            });
-
-            const assigneeMap = {};
-            filteredTasks.forEach(t => {
-                const name = t.assignedTo || 'Unassigned';
-                assigneeMap[name] = (assigneeMap[name] || 0) + (parseInt(t.bugCount) || 0);
-            });
-            const assignees = Object.keys(assigneeMap);
-            const bugCounts = assignees.map(a => assigneeMap[a]);
-            const ctx2 = document.getElementById('performanceChart').getContext('2d');
-            if (window.performanceChartInstance) window.performanceChartInstance.destroy();
-            window.performanceChartInstance = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: assignees,
-                    datasets: [{
-                        label: 'Bug Count',
-                        data: bugCounts,
-                        backgroundColor: '#6366f1'
-                    }]
-                },
-                options: {
-                    plugins: {
-                        title: { display: true, text: 'Bug Count per Assignee', font: { size: 18 } },
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: { title: { display: true, text: 'Assignee' } },
-                        y: { title: { display: true, text: 'Bug Count' }, beginAtZero: true }
-                    }
-                }
-            });
+        function setSummaryPage(page) {
+            summaryPage = page;
+            renderSummary();
         }
 
         async function renderAttendance() {
+            // Get total count for pagination
+            const count = attendanceRecords.length;
+            const start = (attendancePage - 1) * PAGE_SIZE;
+            const end = attendancePage * PAGE_SIZE;
+            const pageRecords = attendanceRecords
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .slice(start, end);
+
             const employeeSet = new Set(tasks.map(t => t.assignedTo).filter(Boolean));
             const select = document.getElementById('attendanceEmployee');
             select.innerHTML = '<option value="">Select Employee</option>';
@@ -1559,8 +1468,7 @@
             });
 
             const tbody = document.getElementById('attendanceTableBody');
-            tbody.innerHTML = attendanceRecords
-                .sort((a, b) => b.date.localeCompare(a.date))
+            tbody.innerHTML = pageRecords
                 .map(rec => `
                     <tr>
                         <td>${rec.date}</td>
@@ -1572,29 +1480,12 @@
                         </td>
                     </tr>
                 `).join('');
+            renderPagination('attendancePagination', attendancePage, count, 'setAttendancePage');
         }
 
-        async function markAttendance(status) {
-            const emp = document.getElementById('attendanceEmployee').value;
-            if (!emp) {
-                showToast('Please select an employee.');
-                return;
-            }
-            // Use ISO date format for Postgres DATE type
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const isoDate = `${yyyy}-${mm}-${dd}`;
-            const success = await saveAttendance({
-                employee: emp,
-                date: isoDate,
-                status: status
-            });
-            if (success) {
-                showToast(`${emp} marked as ${status} for ${isoDate}`);
-                await renderAttendance();
-            }
+        function setAttendancePage(page) {
+            attendancePage = page;
+            renderAttendance();
         }
 
         /* Initialize App */
