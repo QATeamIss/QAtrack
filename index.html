@@ -1077,6 +1077,11 @@
         }
 
         async function clearAllData() {
+            const pwd = prompt('Enter password to clear all data:');
+            if (pwd !== '121416') {
+                showToast('Incorrect password.');
+                return;
+            }
             if (confirm('Are you sure? This will delete ALL tasks and attendance records.')) {
                 try {
                     const { error: tasksError } = await supabase
