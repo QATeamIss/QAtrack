@@ -483,6 +483,16 @@
             color: #475569 !important;
         }
 
+        .calendar-task-forecast {
+            background: #bae6fd !important;
+            color: #0369a1 !important;
+        }
+
+        .calendar-task-rejected {
+            background: #fca5a5 !important;
+            color: #991b1b !important;
+        }
+
         /* Toast Notification */
         .toast {
             position: fixed;
@@ -711,7 +721,7 @@
                         </div>
                     </div>
                     <!-- Legend for calendar task colors -->
-                    <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;">
+                    <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
                         <span style="display:flex;align-items:center;gap:0.5rem;">
                             <span class="task-item calendar-task-completed" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
                             Completed
@@ -727,6 +737,14 @@
                         <span style="display:flex;align-items:center;gap:0.5rem;">
                             <span class="task-item calendar-task-yettostart" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
                             Yet to Start
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-forecast" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Forecast
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-rejected" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Rejected
                         </span>
                     </div>
                     <div id="calendarMonthHeader" style="font-size:1.3rem;font-weight:700;text-align:center;margin-bottom:1rem;"></div>
@@ -771,6 +789,8 @@
                                 <option value="In Progress">In Progress</option>
                                 <option value="On Hold">On Hold</option>
                                 <option value="Completed">Completed</option>
+                                <option value="Forecast">Forecast</option>
+                                <option value="Rejected">Rejected</option>
                             </select>
                             <input type="text" class="search-box" id="analyticsAssigneeFilter" placeholder="Filter by assignee...">
                         </div>
@@ -847,6 +867,8 @@
                             <option value="In Progress">In Progress</option>
                             <option value="On Hold">On Hold</option>
                             <option value="Completed">Completed</option>
+                            <option value="Forecast">Forecast</option>
+                            <option value="Rejected">Rejected</option>
                         </select>
                     </div>
                 </div>
@@ -1345,6 +1367,8 @@
                 case 'in progress': return 'calendar-task-inprogress';
                 case 'on hold': return 'calendar-task-onhold';
                 case 'yet to start': return 'calendar-task-yettostart';
+                case 'forecast': return 'calendar-task-forecast';
+                case 'rejected': return 'calendar-task-rejected';
                 default: return '';
             }
         }
@@ -1467,16 +1491,16 @@
                 );
             }
 
-            const statusCounts = ['Yet to Start', 'In Progress', 'On Hold', 'Completed'].map(status =>
+            const statusCounts = ['Yet to Start', 'In Progress', 'On Hold', 'Completed', 'Forecast', 'Rejected'].map(status =>
                 filteredTasks.filter(t => t.status === status).length
             );
-            const statusColors = ['#e2e8f0', '#fef3c7', '#fee2e2', '#d1fae5'];
+            const statusColors = ['#e2e8f0', '#fef3c7', '#fee2e2', '#d1fae5', '#bae6fd', '#fca5a5'];
             const ctx1 = document.getElementById('taskChart').getContext('2d');
             if (window.taskChartInstance) window.taskChartInstance.destroy();
             window.taskChartInstance = new Chart(ctx1, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Yet to Start', 'In Progress', 'On Hold', 'Completed'],
+                    labels: ['Yet to Start', 'In Progress', 'On Hold', 'Completed', 'Forecast', 'Rejected'],
                     datasets: [{
                         data: statusCounts,
                         backgroundColor: statusColors,
