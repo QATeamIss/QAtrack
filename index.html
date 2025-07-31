@@ -1583,11 +1583,11 @@
         }
 
         /* Rendering Functions */
-        function calculateStats() {
-            const total = tasks.length;
-            const completed = tasks.filter(task => task.status === 'Completed').length;
-            const active = tasks.filter(task => ['In Progress', 'Yet to Start', 'On Hold'].includes(task.status)).length;
-            const overdue = tasks.filter(task => {
+        function calculateStats(tasksList) {
+            const total = tasksList.length;
+            const completed = tasksList.filter(task => task.status === 'Completed').length;
+            const active = tasksList.filter(task => ['In Progress', 'Yet to Start', 'On Hold'].includes(task.status)).length;
+            const overdue = tasksList.filter(task => {
                 if (!task.endDate || task.status === 'Completed') return false;
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -1597,12 +1597,6 @@
         }
 
         async function renderDashboard() {
-            const stats = calculateStats();
-            document.getElementById('totalTasks').textContent = stats.total;
-            document.getElementById('activeTasks').textContent = stats.active;
-            document.getElementById('completedTasks').textContent = stats.completed;
-            document.getElementById('overdueTasks').textContent = stats.overdue;
-
             // Fetch all filtered tasks (no range)
             let taskQuery = supabase
                 .from('tasks')
@@ -1617,6 +1611,22 @@
                 showToast('Error searching tasks.');
                 allFilteredTasks = [];
             }
+
+            // Stats: filter by date if set, else all
+            let statsTasks;
+            if (dashboardDateFilter) {
+                statsTasks = allFilteredTasks.filter(t => t.end_date === dashboardDateFilter);
+            } else {
+                statsTasks = allFilteredTasks;
+            }
+            const stats = calculateStats(statsTasks.map(task => ({
+                ...task,
+                endDate: task.end_date
+            })));
+            document.getElementById('totalTasks').textContent = stats.total;
+            document.getElementById('activeTasks').textContent = stats.active;
+            document.getElementById('completedTasks').textContent = stats.completed;
+            document.getElementById('overdueTasks').textContent = stats.overdue;
 
             // Sort all filtered tasks
             allFilteredTasks.sort((a, b) => {
