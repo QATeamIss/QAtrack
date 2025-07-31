@@ -418,10 +418,11 @@
         /* Calendar View - Light Mode */
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, minmax(120px, 1fr));
+            grid-template-columns: repeat(7, 1fr);
             gap: 0.75rem;
             margin-top: 2rem;
             width: 100%;
+            overflow-x: auto;
         }
 
         .calendar-day {
@@ -430,6 +431,7 @@
             border-radius: 12px;
             padding: 0.75rem 0.5rem 0.5rem 0.5rem;
             min-height: 140px;
+            min-width: 220px;
             transition: all 0.3s ease;
             color: #334155;
             display: flex;
@@ -588,7 +590,7 @@
             .stats-card { padding: 2rem 1.5rem; }
             .page-title { font-size: 2rem; }
             .form-row { flex-direction: column; gap: 0; }
-            .calendar-grid { grid-template-columns: repeat(5, minmax(120px, 1fr)); }
+            .calendar-grid { grid-template-columns: repeat(5, 1fr); overflow-x: auto; }
             .filter-group { flex-direction: column; }
         }
 
@@ -643,7 +645,7 @@
             }
             .status-badge, .action-btn { display: inline-block; margin: 0.25rem; }
             .modal-content { padding: 1.5rem; }
-            .calendar-grid { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+            .calendar-grid { grid-template-columns: repeat(3, 1fr); overflow-x: auto; }
         }
 
         @media (max-width: 480px) {
@@ -653,7 +655,7 @@
             .nav-icon { margin-right: 0; font-size: 1.5rem; }
             .btn { padding: 0.8rem 1.2rem; width: 100%; }
             .form-actions { flex-direction: column-reverse; }
-            .calendar-grid { grid-template-columns: repeat(2, minmax(100px, 1fr)); }
+            .calendar-grid { grid-template-columns: repeat(2, 1fr); overflow-x: auto; }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
