@@ -687,7 +687,11 @@
             </div>
             <div class="nav-item" data-tab="attendance">
                 <span class="nav-icon">🗓️</span>
-                <span>Employee Attendance</span>
+                <span>Attendance</span>
+            </div>
+            <div class="nav-item" data-tab="allprojects">
+                <span class="nav-icon">✅</span>
+                <span>Completed</span>
             </div>
         </nav>
 
@@ -750,7 +754,7 @@
                     </div>
                     <div class="table-container">
                         <div class="table-header">
-                            <h3>All Projects</h3>
+                            <h3>All Projects (Active/Not Completed)</h3>
                             <input type="text" class="search-box" placeholder="Filter projects..." id="trackerSearch">
                         </div>
                         <table>
@@ -902,6 +906,40 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="allprojects" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">All Completed Projects</h1>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>Completed Projects</h3>
+                            <input type="text" class="search-box" placeholder="Filter completed projects..." id="allProjectsSearch">
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Phase</th>
+                                    <th>PC</th>
+                                    <th>Assigned To (1)</th>
+                                    <th>Assigned To (2)</th>
+                                    <th>Status</th>
+                                    <th>Start Date</th>
+                                    <th>Expected End Date</th>
+                                    <th>Actual Completion Date</th>
+                                    <th>Comments</th>
+                                    <th>Bug Count</th>
+                                    <th>Deviation</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allProjectsTableBody"></tbody>
+                        </table>
+                        <div id="allProjectsPagination"></div>
+                    </div>
+                </div>
+
                 <button class="btn btn-secondary" onclick="clearAllData()" style="margin-top: 2rem;">Clear All Data (Reset)</button>
             </div>
             <footer class="app-footer">
@@ -1011,8 +1049,9 @@
         let trackerSearchTerm = '';
         let summarySearchTerm = '';
         let dashboardDateFilter = '';
+        let allProjectsSearchTerm = '';
         // Pagination state
-        let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1;
+        let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1, allProjectsPage = 1;
         const PAGE_SIZE = 10;
 
         /* Utility Functions */
@@ -1280,6 +1319,12 @@
             renderSummary();
         });
 
+        document.getElementById('allProjectsSearch')?.addEventListener('input', (e) => {
+            allProjectsSearchTerm = e.target.value;
+            allProjectsPage = 1;
+            renderAllProjects();
+        });
+
         /* Navigation */
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
@@ -1305,6 +1350,7 @@
             switch (currentTab) {
                 case 'dashboard': await renderDashboard(); break;
                 case 'tracker': await renderTracker(); break;
+                case 'allprojects': await renderAllProjects(); break;
                 case 'schedule': await renderSchedule(); break;
                 case 'summary': await renderSummary(); break;
                 case 'analytics': await renderAnalytics(); break;
@@ -1670,6 +1716,9 @@
                 allFilteredTasks = [];
             }
 
+            // Only show NOT completed
+            allFilteredTasks = allFilteredTasks.filter(t => t.status !== 'Completed');
+
             // Sort all filtered tasks
             allFilteredTasks.sort((a, b) => {
                 const orderA = statusSortOrder(a.status);
@@ -1707,6 +1756,46 @@
             renderPagination('trackerPagination', trackerPage, count, 'setTrackerPage');
         }
 
+        async function renderAllProjects() {
+            let taskQuery = supabase
+                .from('tasks')
+                .select('*')
+                .eq('status', 'Completed')
+                .or(`project_name.ilike.%${allProjectsSearchTerm}%,assigned_to.ilike.%${allProjectsSearchTerm}%,sub_phase.ilike.%${allProjectsSearchTerm}%`);
+            let { data: allCompletedTasks, error } = await taskQuery;
+            if (error) {
+                console.error('Error searching completed tasks:', error);
+                showToast('Error searching completed tasks.');
+                allCompletedTasks = [];
+            }
+
+            // Sort by id desc
+            allCompletedTasks.sort((a, b) => b.id - a.id);
+
+            const count = allCompletedTasks.length;
+            const pagedTasks = allCompletedTasks.slice((allProjectsPage - 1) * PAGE_SIZE, allProjectsPage * PAGE_SIZE);
+
+            const tbody = document.getElementById('allProjectsTableBody');
+            tbody.innerHTML = pagedTasks.map(task => `
+                <tr>
+                    <td data-label="Project">${task.project_name || '-'}</td>
+                    <td data-label="Phase">${task.sub_phase || '-'}</td>
+                    <td data-label="PC">${task.pc || '-'}</td>
+                    <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
+                    <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
+                    <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
+                    <td data-label="Start Date">${formatDate(task.start_date)}</td>
+                    <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
+                    <td data-label="Actual Completion Date">${formatDate(task.completed_at)}</td>
+                    <td data-label="Comments">${task.comments || '-'}</td>
+                    <td data-label="Bug Count">${task.bug_count || '0'}</td>
+                    <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
+                    <td data-label="Reason">${task.deviation_reason || '-'}</td>
+                </tr>
+            `).join('');
+            renderPagination('allProjectsPagination', allProjectsPage, count, 'setAllProjectsPage');
+        }
+
         function setDashboardPage(page) {
             dashboardPage = page;
             renderDashboard();
@@ -1715,6 +1804,11 @@
         function setTrackerPage(page) {
             trackerPage = page;
             renderTracker();
+        }
+
+        function setAllProjectsPage(page) {
+            allProjectsPage = page;
+            renderAllProjects();
         }
 
         async function renderSummary() {
