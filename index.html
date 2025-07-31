@@ -291,6 +291,8 @@
         .status-inprogress { background: #fef3c7; color: #92400e; }
         .status-completed { background: #d1fae5; color: #065f46; }
         .status-onhold { background: #fee2e2; color: #991b1b; }
+        .status-forecast { background: #bae6fd; color: #0369a1; }
+        .status-rejected { background: #fca5a5; color: #991b1b; }
 
         /* Action Buttons - Light Mode */
         .action-btn {
@@ -410,19 +412,24 @@
         /* Calendar View - Light Mode */
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1rem;
+            grid-template-columns: repeat(7, minmax(120px, 1fr));
+            gap: 0.75rem;
             margin-top: 2rem;
+            width: 100%;
         }
 
         .calendar-day {
             background: rgba(255, 255, 255, 0.6);
             border: 1px solid rgba(0, 0, 0, 0.07);
             border-radius: 12px;
-            padding: 1rem;
-            min-height: 120px;
+            padding: 0.75rem;
+            min-height: 140px;
             transition: all 0.3s ease;
             color: #334155;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 200px;
         }
 
         .calendar-day-header {
@@ -431,6 +438,7 @@
             text-align: center;
             padding: 0.5rem;
             font-size: 0.9rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.07);
         }
 
         .calendar-day:hover {
@@ -439,30 +447,38 @@
 
         .day-number {
             font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            margin: 0.5rem 0;
             color: #1e293b;
+            padding-left: 0.5rem;
         }
 
         .task-item {
             background: #e0e7ff;
             color: #3730a3;
             border-radius: 6px;
-            padding: 0.4rem 0.6rem;
-            margin: 0.2rem 0;
-            font-size: 0.85rem;
+            padding: 0.3rem 0.5rem;
+            margin: 0.2rem 0.5rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s ease;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            line-height: 1.2;
         }
 
         .task-item:hover {
             background: #c7d2fe;
         }
 
-        /* Calendar task status colors */
+        .task-assignee {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            display: block;
+            margin-top: 0.2rem;
+        }
+
         .calendar-task-completed {
             background: #d1fae5 !important;
             color: #065f46 !important;
@@ -562,6 +578,7 @@
             .stats-card { padding: 2rem 1.5rem; }
             .page-title { font-size: 2rem; }
             .form-row { flex-direction: column; gap: 0; }
+            .calendar-grid { grid-template-columns: repeat(5, minmax(120px, 1fr)); }
         }
 
         @media (max-width: 768px) {
@@ -615,6 +632,7 @@
             }
             .status-badge, .action-btn { display: inline-block; margin: 0.25rem; }
             .modal-content { padding: 1.5rem; }
+            .calendar-grid { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
         }
 
         @media (max-width: 480px) {
@@ -624,7 +642,7 @@
             .nav-icon { margin-right: 0; font-size: 1.5rem; }
             .btn { padding: 0.8rem 1.2rem; width: 100%; }
             .form-actions { flex-direction: column-reverse; }
-            .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+            .calendar-grid { grid-template-columns: repeat(2, minmax(100px, 1fr)); }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -754,7 +772,6 @@
                             <input type="text" class="search-box" id="assignedToSearch" placeholder="Filter by assignee...">
                         </div>
                     </div>
-                    <!-- Legend for calendar task colors -->
                     <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
                         <span style="display:flex;align-items:center;gap:0.5rem;">
                             <span class="task-item calendar-task-completed" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
@@ -1133,7 +1150,6 @@
 
         async function saveAttendance(record) {
             try {
-                // Use upsert for unique (employee, date)
                 const { error } = await supabase
                     .from('attendance')
                     .upsert([record], { onConflict: ['employee', 'date'] });
@@ -1324,6 +1340,218 @@
             }
         };
 
+        /* Calendar Functions */
+        function populateMonthSelect() {
+            const monthSelect = document.getElementById('monthSelect');
+            const currentYear = new Date().getFullYear();
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            monthSelect.innerHTML = '';
+            for (let y = currentYear - 1; y <= currentYear + 1; y++) {
+                for (let m = 0; m < 12; m++) {
+                    const option = document.createElement('option');
+                    option.value = `${y}-${m}`;
+                    option.textContent = `${months[m]} ${y}`;
+                    if (y === calendarYear && m === calendarMonth) {
+                        option.selected = true;
+                    }
+                    monthSelect.appendChild(option);
+                }
+            }
+        }
+
+        async function renderSchedule() {
+            populateMonthSelect();
+            const monthHeader = document.getElementById('calendarMonthHeader');
+            const calendarGrid = document.getElementById('calendarGrid');
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            monthHeader.textContent = `${months[calendarMonth]} ${calendarYear}`;
+
+            // Get first day of the month
+            const firstDay = new Date(calendarYear, calendarMonth, 1);
+            const lastDay = new Date(calendarYear, calendarMonth + 1, 0);
+            const firstDayOfWeek = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+
+            // Generate day headers
+            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let html = daysOfWeek.map(day => `
+                <div class="calendar-day-header">${day}</div>
+            `).join('');
+
+            // Add blank days for offset
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                html += `<div class="calendar-day"></div>`;
+            }
+
+            // Filter tasks by month and assignee
+            const filteredTasks = tasks.filter(task => {
+                if (!task.startDate) return false;
+                const taskStart = new Date(task.startDate);
+                const taskEnd = task.endDate ? new Date(task.endDate) : new Date(task.startDate);
+                const taskYear = taskStart.getFullYear();
+                const taskMonth = taskStart.getMonth();
+                const taskEndYear = taskEnd.getFullYear();
+                const taskEndMonth = taskEnd.getMonth();
+                const inMonth =
+                    (taskYear === calendarYear && taskMonth === calendarMonth) ||
+                    (taskEndYear === calendarYear && taskEndMonth === calendarMonth) ||
+                    (taskStart <= new Date(calendarYear, calendarMonth + 1, 0) &&
+                     taskEnd >= new Date(calendarYear, calendarMonth, 1));
+                if (!inMonth) return false;
+                if (!assignedToFilter) return true;
+                return (
+                    task.assignedTo?.toLowerCase().includes(assignedToFilter) ||
+                    task.assignedTo2?.toLowerCase().includes(assignedToFilter)
+                );
+            });
+
+            // Generate calendar days
+            for (let day = 1; day <= totalDays; day++) {
+                const date = new Date(calendarYear, calendarMonth, day);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayTasks = filteredTasks.filter(task => {
+                    const taskStart = task.startDate ? new Date(task.startDate) : null;
+                    if (!taskStart) return false;
+                    // For completed tasks, use completedAt if earlier than endDate
+                    let taskEnd;
+                    if (task.status === 'Completed' && task.completedAt) {
+                        taskEnd = new Date(task.completedAt);
+                    } else {
+                        taskEnd = task.endDate ? new Date(task.endDate) : taskStart;
+                    }
+                    // Normalize dates to start of day for comparison
+                    taskStart.setHours(0, 0, 0, 0);
+                    taskEnd.setHours(0, 0, 0, 0);
+                    date.setHours(0, 0, 0, 0);
+                    // Include task if date is within startDate and endDate (or completedAt)
+                    return taskStart <= date && taskEnd >= date;
+                });
+                html += `
+                    <div class="calendar-day">
+                        <div class="day-number">${day}</div>
+                        ${dayTasks.map(task => {
+                            const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
+                            return `
+                                <div class="task-item calendar-task-${task.status.toLowerCase().replace(/ /g, '')}" 
+                                     title="${task.projectName} (${task.status}) - ${assignees}"
+                                     onclick="editTask(${task.id})">
+                                    ${task.projectName}
+                                    <span class="task-assignee">${assignees}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            calendarGrid.innerHTML = html;
+        }
+
+        /* Analytics Functions */
+        async function renderAnalytics() {
+            const statusFilter = document.getElementById('analyticsStatusFilter').value;
+            const assigneeFilter = document.getElementById('analyticsAssigneeFilter').value.toLowerCase();
+            
+            const filteredTasks = tasks.filter(task => {
+                const matchesStatus = !statusFilter || task.status === statusFilter;
+                const matchesAssignee = !assigneeFilter || 
+                    task.assignedTo?.toLowerCase().includes(assigneeFilter) ||
+                    task.assignedTo2?.toLowerCase().includes(assigneeFilter);
+                return matchesStatus && matchesAssignee;
+            });
+
+            const taskStatusCounts = {
+                'Yet to Start': 0,
+                'In Progress': 0,
+                'On Hold': 0,
+                'Completed': 0,
+                'Forecast': 0,
+                'Rejected': 0
+            };
+
+            filteredTasks.forEach(task => {
+                taskStatusCounts[task.status]++;
+            });
+
+            const ctxTask = document.getElementById('taskChart').getContext('2d');
+            if (window.taskChartInstance) window.taskChartInstance.destroy();
+            window.taskChartInstance = new Chart(ctxTask, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(taskStatusCounts),
+                    datasets: [{
+                        label: 'Task Status Distribution',
+                        data: Object.values(taskStatusCounts),
+                        backgroundColor: [
+                            '#e2e8f0', '#fef3c7', '#fee2e2',
+                            '#d1fae5', '#bae6fd', '#fca5a5'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Tasks' } } }
+                }
+            });
+
+            const performanceData = {};
+            filteredTasks.forEach(task => {
+                if (task.assignedTo) {
+                    performanceData[task.assignedTo] = (performanceData[task.assignedTo] || 0) + 1;
+                }
+                if (task.assignedTo2) {
+                    performanceData[task.assignedTo2] = (performanceData[task.assignedTo2] || 0) + 1;
+                }
+            });
+
+            const ctxPerformance = document.getElementById('performanceChart').getContext('2d');
+            if (window.performanceChartInstance) window.performanceChartInstance.destroy();
+            window.performanceChartInstance = new Chart(ctxPerformance, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(performanceData),
+                    datasets: [{
+                        label: 'Tasks per Assignee',
+                        data: Object.values(performanceData),
+                        backgroundColor: [
+                            '#6366f1', '#8b5cf6', '#06b6d4', '#10b981',
+                            '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+                        ]
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        /* Attendance Functions */
+        async function markAttendance(status) {
+            const employee = document.getElementById('attendanceEmployee').value;
+            if (!employee) {
+                showToast('Please select an employee.');
+                return;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            const record = {
+                employee,
+                date: today,
+                status
+            };
+            const success = await saveAttendance(record);
+            if (success) {
+                showToast(`Marked ${employee} as ${status} for ${today}`);
+                await renderAttendance();
+            }
+        }
+
         /* Rendering Functions */
         function calculateStats() {
             const total = tasks.length;
@@ -1345,14 +1573,12 @@
             document.getElementById('completedTasks').textContent = stats.completed;
             document.getElementById('overdueTasks').textContent = stats.overdue;
 
-            // Get total count for pagination
             let { count } = await supabase
                 .from('tasks')
                 .select('*', { count: 'exact', head: true })
                 .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`);
             count = count || 0;
 
-            // Fetch paginated data
             let { data: filteredTasks, error } = await supabase
                 .from('tasks')
                 .select('*')
@@ -1388,7 +1614,6 @@
         }
 
         async function renderTracker() {
-            // Get total count for pagination
             let { count } = await supabase
                 .from('tasks')
                 .select('*', { count: 'exact', head: true })
@@ -1438,7 +1663,6 @@
         }
 
         async function renderSummary() {
-            // Get total count for pagination
             let { count } = await supabase
                 .from('tasks')
                 .select('*', { count: 'exact', head: true })
@@ -1481,7 +1705,6 @@
         }
 
         async function renderAttendance() {
-            // Get total count for pagination
             const count = attendanceRecords.length;
             const start = (attendancePage - 1) * PAGE_SIZE;
             const end = attendancePage * PAGE_SIZE;
@@ -1537,8 +1760,8 @@
                     status: 'In Progress',
                     sprint: 'Sprint 23.4',
                     bugCount: '3',
-                    startDate: formatDate(today),
-                    endDate: formatDate(new Date(today.setDate(today.getDate() + 7))),
+                    startDate: '2025-07-29',
+                    endDate: '2025-07-31',
                     comments: 'Focus on payment gateway.',
                     deviationReason: '',
                     createdAt: new Date().toISOString(),
@@ -1558,7 +1781,7 @@
                     comments: 'Identified one critical vulnerability.',
                     deviationReason: 'Completed ahead of schedule.',
                     createdAt: '2025-07-20T10:00:00Z',
-                    completedAt: '2025-07-24T17:00:00Z'
+                    completedAt: '2025-07-22T17:00:00Z'
                 }, {
                     id: Date.now() + 2,
                     projectName: 'Website Redesign',
