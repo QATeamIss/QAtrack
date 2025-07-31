@@ -234,7 +234,7 @@
             align-items: center;
         }
 
-        .search-box {
+        .search-box, .date-filter {
             background: rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 10px;
@@ -245,14 +245,20 @@
             transition: all 0.3s ease;
         }
 
-        .search-box:focus {
+        .search-box:focus, .date-filter:focus {
             outline: none;
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
 
-        .search-box::placeholder {
+        .search-box::placeholder, .date-filter::placeholder {
             color: rgba(100, 116, 139, 0.6);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
 
         table {
@@ -579,6 +585,7 @@
             .page-title { font-size: 2rem; }
             .form-row { flex-direction: column; gap: 0; }
             .calendar-grid { grid-template-columns: repeat(5, minmax(120px, 1fr)); }
+            .filter-group { flex-direction: column; }
         }
 
         @media (max-width: 768px) {
@@ -594,7 +601,7 @@
             .main-content { padding: 1.5rem 1rem; }
             .header { flex-direction: column; gap: 1rem; }
             .table-header { flex-direction: column; gap: 1rem; }
-            .search-box { max-width: 100%; }
+            .search-box, .date-filter { max-width: 100%; }
             .cards-grid { grid-template-columns: 1fr; }
             table, thead, tbody, th, td, tr {
                 display: block;
@@ -708,7 +715,10 @@
                     <div class="table-container">
                         <div class="table-header">
                             <h3>Recent Tasks</h3>
-                            <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
+                            <div class="filter-group">
+                                <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
+                                <input type="date" class="date-filter" id="dateFilter" placeholder="Filter by due date">
+                            </div>
                         </div>
                         <table id="tasksTable">
                             <thead>
@@ -994,6 +1004,7 @@
         let dashboardSearchTerm = '';
         let trackerSearchTerm = '';
         let summarySearchTerm = '';
+        let dashboardDateFilter = '';
         // Pagination state
         let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1;
         const PAGE_SIZE = 10;
@@ -1035,6 +1046,12 @@
             html += `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="${onPageChange}(${page + 1})">Next</button>`;
             html += `</div>`;
             document.getElementById(containerId).innerHTML = html;
+        }
+
+        function statusSortOrder(status) {
+            if (status === 'In Progress') return 1;
+            if (status === 'Yet to Start') return 2;
+            return 3;
         }
 
         /* Supabase Data Functions */
@@ -1237,6 +1254,13 @@
         /* Search Event Listeners */
         document.getElementById('searchInput')?.addEventListener('input', (e) => {
             dashboardSearchTerm = e.target.value;
+            dashboardPage = 1; // Reset to first page on search
+            renderDashboard();
+        });
+
+        document.getElementById('dateFilter')?.addEventListener('input', (e) => {
+            dashboardDateFilter = e.target.value;
+            dashboardPage = 1; // Reset to first page on filter
             renderDashboard();
         });
 
@@ -1573,26 +1597,35 @@
             document.getElementById('completedTasks').textContent = stats.completed;
             document.getElementById('overdueTasks').textContent = stats.overdue;
 
-            let { count } = await supabase
-                .from('tasks')
-                .select('*', { count: 'exact', head: true })
-                .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`);
-            count = count || 0;
-
-            let { data: filteredTasks, error } = await supabase
+            // Fetch all filtered tasks (no range)
+            let taskQuery = supabase
                 .from('tasks')
                 .select('*')
-                .order('id', { ascending: false })
-                .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`)
-                .range((dashboardPage - 1) * PAGE_SIZE, dashboardPage * PAGE_SIZE - 1);
+                .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`);
+            if (dashboardDateFilter) {
+                taskQuery = taskQuery.eq('end_date', dashboardDateFilter);
+            }
+            let { data: allFilteredTasks, error } = await taskQuery;
             if (error) {
                 console.error('Error searching tasks:', error);
                 showToast('Error searching tasks.');
-                filteredTasks = [];
+                allFilteredTasks = [];
             }
 
+            // Sort all filtered tasks
+            allFilteredTasks.sort((a, b) => {
+                const orderA = statusSortOrder(a.status);
+                const orderB = statusSortOrder(b.status);
+                if (orderA !== orderB) return orderA - orderB;
+                return b.id - a.id;
+            });
+
+            // Pagination in JS
+            const count = allFilteredTasks.length;
+            const pagedTasks = allFilteredTasks.slice((dashboardPage - 1) * PAGE_SIZE, dashboardPage * PAGE_SIZE);
+
             const tbody = document.getElementById('tasksTableBody');
-            tbody.innerHTML = filteredTasks.map(task => `
+            tbody.innerHTML = pagedTasks.map(task => `
                 <tr>
                     <td data-label="Project">${task.project_name || '-'}</td>
                     <td data-label="Phase">${task.sub_phase || '-'}</td>
@@ -1608,32 +1641,33 @@
             renderPagination('dashboardPagination', dashboardPage, count, 'setDashboardPage');
         }
 
-        function setDashboardPage(page) {
-            dashboardPage = page;
-            renderDashboard();
-        }
-
         async function renderTracker() {
-            let { count } = await supabase
-                .from('tasks')
-                .select('*', { count: 'exact', head: true })
-                .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`);
-            count = count || 0;
-
-            let { data: filteredTasks, error } = await supabase
+            // Fetch all filtered tasks (no range)
+            let taskQuery = supabase
                 .from('tasks')
                 .select('*')
-                .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`)
-                .order('id', { ascending: false })
-                .range((trackerPage - 1) * PAGE_SIZE, trackerPage * PAGE_SIZE - 1);
+                .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`);
+            let { data: allFilteredTasks, error } = await taskQuery;
             if (error) {
                 console.error('Error searching tasks:', error);
                 showToast('Error searching tasks.');
-                filteredTasks = [];
+                allFilteredTasks = [];
             }
 
+            // Sort all filtered tasks
+            allFilteredTasks.sort((a, b) => {
+                const orderA = statusSortOrder(a.status);
+                const orderB = statusSortOrder(b.status);
+                if (orderA !== orderB) return orderA - orderB;
+                return b.id - a.id;
+            });
+
+            // Pagination in JS
+            const count = allFilteredTasks.length;
+            const pagedTasks = allFilteredTasks.slice((trackerPage - 1) * PAGE_SIZE, trackerPage * PAGE_SIZE);
+
             const tbody = document.getElementById('trackerTableBody');
-            tbody.innerHTML = filteredTasks.map(task => `
+            tbody.innerHTML = pagedTasks.map(task => `
                 <tr>
                     <td data-label="Project">${task.project_name || '-'}</td>
                     <td data-label="Phase">${task.sub_phase || '-'}</td>
@@ -1655,6 +1689,11 @@
                 </tr>
             `).join('');
             renderPagination('trackerPagination', trackerPage, count, 'setTrackerPage');
+        }
+
+        function setDashboardPage(page) {
+            dashboardPage = page;
+            renderDashboard();
         }
 
         function setTrackerPage(page) {
@@ -1810,16 +1849,21 @@
                 calendarMonth = parseInt(m, 10);
                 await renderSchedule();
             });
-            document.getElementById('assignedToSearch')?.addEventListener('input', async function(e) {
-                assignedToFilter = e.target.value.toLowerCase();
-                await renderSchedule();
+
+            document.getElementById('analyticsStatusFilter')?.addEventListener('change', async function(e) {
+                analyticsStatusFilter = e.target.value;
+                await renderAnalytics();
             });
-            document.getElementById('analyticsStatusFilter')?.addEventListener('change', renderAnalytics);
-            document.getElementById('analyticsAssigneeFilter')?.addEventListener('input', renderAnalytics);
+
+            document.getElementById('analyticsAssigneeFilter')?.addEventListener('input', async function(e) {
+                analyticsAssigneeFilter = e.target.value.toLowerCase();
+                await renderAnalytics();
+            });
+
             document.getElementById('markPresentBtn')?.addEventListener('click', () => markAttendance('Present'));
             document.getElementById('markAbsentBtn')?.addEventListener('click', () => markAttendance('Absent'));
 
-            await switchTab('dashboard');
+            await renderCurrentTab();
         });
     </script>
 </body>
