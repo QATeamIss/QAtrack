@@ -524,6 +524,38 @@
             animation: slideIn 0.5s ease forwards;
         }
 
+        /* Pagination - Light Mode */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0 0.5rem 0;
+        }
+        .pagination-btn {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+        }
+        .pagination-btn:disabled {
+            background: #e5e7eb;
+            color: #a1a1aa;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .pagination-info {
+            font-size: 1.05rem;
+            color: #475569;
+            font-weight: 500;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .sidebar { width: 200px; }
@@ -980,10 +1012,10 @@
 
         function renderPagination(containerId, page, total, onPageChange) {
             const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-            let html = `<div style="display:flex;justify-content:center;align-items:center;gap:1rem;margin:1rem 0;">`;
-            html += `<button ${page === 1 ? 'disabled' : ''} onclick="${onPageChange}(${page - 1})">Prev</button>`;
-            html += `<span>Page ${page} of ${totalPages}</span>`;
-            html += `<button ${page === totalPages ? 'disabled' : ''} onclick="${onPageChange}(${page + 1})">Next</button>`;
+            let html = `<div class="pagination">`;
+            html += `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="${onPageChange}(${page - 1})">Prev</button>`;
+            html += `<span class="pagination-info">Page ${page} of ${totalPages}</span>`;
+            html += `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="${onPageChange}(${page + 1})">Next</button>`;
             html += `</div>`;
             document.getElementById(containerId).innerHTML = html;
         }
