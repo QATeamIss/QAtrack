@@ -739,7 +739,7 @@
 
                     <div class="table-container">
                         <div class="table-header">
-                            <h3>Recent Tasks</h3>
+                            <h3 id="dashboardTableTitle">Recent Tasks</h3>
                             <div class="filter-group">
                                 <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
                                 <input type="date" class="date-filter" id="dateFilter" placeholder="Filter by due date">
@@ -1758,6 +1758,16 @@
             document.getElementById('activeTasks').textContent = stats.active;
             document.getElementById('completedTasks').textContent = stats.completed;
             document.getElementById('overdueTasks').textContent = stats.overdue;
+
+            // Set table title based on date filter
+            const tableTitle = document.getElementById('dashboardTableTitle');
+            if (dashboardDateFilter) {
+                const dateObj = new Date(dashboardDateFilter);
+                const formatted = dateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                tableTitle.textContent = `${formatted} Tracker`;
+            } else {
+                tableTitle.textContent = "Recent Tasks";
+            }
 
             // Sort all filtered tasks
             allFilteredTasks.sort((a, b) => {
