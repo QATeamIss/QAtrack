@@ -221,12 +221,12 @@
 
         /* Task Table - Light Mode */
         .table-container {
-            background: #f3f4f6;
-            border: none;
-            border-radius: 0;
+            background: #f3f4f6; /* slightly darker for contrast */
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 20px;
             overflow-x: auto;
             margin-top: 2rem;
-            box-shadow: none;
         }
 
         .table-header {
@@ -268,24 +268,21 @@
             width: 100%;
             border-collapse: collapse;
             white-space: nowrap;
-            background: #fff;
         }
 
         th, td {
             padding: 1.2rem 1.5rem;
             text-align: left;
-            border: 1px solid #e0e0e0; /* Google Sheets-like border */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.07);
             color: #334155;
-            background: #fff;
         }
 
         th {
             font-weight: 600;
-            background: #f8fafc;
+            background: rgba(0, 0, 0, 0.03);
             position: sticky;
             top: 0;
-            z-index: 2;
-            border-bottom: 2px solid #e0e0e0;
+            z-index: 1;
         }
 
         /* Status Badges - Light Mode */
@@ -625,20 +622,18 @@
             }
             tbody tr { 
                 margin-bottom: 1rem; 
-                border: 1px solid #e0e0e0;
-                border-radius: 0;
+                border: 1px solid rgba(0,0,0,0.1);
+                border-radius: 8px;
                 padding: 1rem;
-                background: #fff;
             }
             td { 
                 padding: 0.8rem; border: none; 
-                border-bottom: 1px solid #e0e0e0;
+                border-bottom: 1px solid rgba(0,0,0,0.05);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 text-align: right;
                 white-space: normal;
-                background: #fff;
             }
             td:before { 
                 content: attr(data-label); 
@@ -1720,9 +1715,6 @@
                 .from('tasks')
                 .select('*')
                 .or(`project_name.ilike.%${dashboardSearchTerm}%,assigned_to.ilike.%${dashboardSearchTerm}%,sub_phase.ilike.%${dashboardSearchTerm}%`);
-            if (dashboardDateFilter) {
-                taskQuery = taskQuery.eq('end_date', dashboardDateFilter);
-            }
             let { data: allFilteredTasks, error } = await taskQuery;
             if (error) {
                 console.error('Error searching tasks:', error);
@@ -1730,13 +1722,22 @@
                 allFilteredTasks = [];
             }
 
-            // Stats: filter by date if set, else all
-            let statsTasks;
+            // Filter by date in JS if set (show all tasks active on that date)
             if (dashboardDateFilter) {
-                statsTasks = allFilteredTasks.filter(t => t.end_date === dashboardDateFilter);
-            } else {
-                statsTasks = allFilteredTasks;
+                const selectedDate = new Date(dashboardDateFilter);
+                selectedDate.setHours(0, 0, 0, 0);
+                allFilteredTasks = allFilteredTasks.filter(t => {
+                    const start = t.start_date ? new Date(t.start_date) : null;
+                    const end = t.end_date ? new Date(t.end_date) : null;
+                    if (!start) return false;
+                    start.setHours(0, 0, 0, 0);
+                    if (end) end.setHours(0, 0, 0, 0);
+                    return start <= selectedDate && (!end || end >= selectedDate);
+                });
             }
+
+            // Stats: filter by date if set, else all
+            let statsTasks = allFilteredTasks;
             const stats = calculateStats(statsTasks.map(task => ({
                 ...task,
                 endDate: task.end_date
@@ -1778,7 +1779,6 @@
                         </td>
                     </tr>
                 `).join('');
-                // Per-assignee pagination controls
                 html += `<tr><td colspan="6">` +
                     `<div class="pagination">` +
                     `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(dashboardAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderDashboard)">Prev</button>` +
@@ -1787,7 +1787,6 @@
                     `</div></td></tr>`;
             });
             tbody.innerHTML = html;
-            // Remove global pagination for dashboard table
             document.getElementById('dashboardPagination').innerHTML = '';
         }
 
@@ -1797,14 +1796,25 @@
                 .from('tasks')
                 .select('*')
                 .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`);
-            if (trackerDateFilter) {
-                taskQuery = taskQuery.eq('end_date', trackerDateFilter);
-            }
             let { data: allFilteredTasks, error } = await taskQuery;
             if (error) {
                 console.error('Error searching tasks:', error);
                 showToast('Error searching tasks.');
                 allFilteredTasks = [];
+            }
+
+            // Filter by date in JS if set (show all tasks active on that date)
+            if (trackerDateFilter) {
+                const selectedDate = new Date(trackerDateFilter);
+                selectedDate.setHours(0, 0, 0, 0);
+                allFilteredTasks = allFilteredTasks.filter(t => {
+                    const start = t.start_date ? new Date(t.start_date) : null;
+                    const end = t.end_date ? new Date(t.end_date) : null;
+                    if (!start) return false;
+                    start.setHours(0, 0, 0, 0);
+                    if (end) end.setHours(0, 0, 0, 0);
+                    return start <= selectedDate && (!end || end >= selectedDate);
+                });
             }
 
             // Only show NOT completed
