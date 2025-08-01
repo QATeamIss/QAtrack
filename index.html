@@ -755,7 +755,10 @@
                     <div class="table-container">
                         <div class="table-header">
                             <h3>All Projects (Active/Not Completed)</h3>
-                            <input type="text" class="search-box" placeholder="Filter projects..." id="trackerSearch">
+                            <div class="filter-group">
+                                <input type="text" class="search-box" placeholder="Filter projects..." id="trackerSearch">
+                                <input type="date" class="date-filter" id="trackerDateFilter" placeholder="Filter by expected end date">
+                            </div>
                         </div>
                         <table>
                             <thead>
@@ -1050,9 +1053,26 @@
         let summarySearchTerm = '';
         let dashboardDateFilter = '';
         let allProjectsSearchTerm = '';
+        let trackerDateFilter = '';
         // Pagination state
         let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1, allProjectsPage = 1;
         const PAGE_SIZE = 10;
+
+        // Per-assignee pagination state
+        let dashboardAssigneePages = {};
+        let trackerAssigneePages = {};
+        let allProjectsAssigneePages = {};
+        let summaryAssigneePages = {};
+
+        // Helper: Get page for assignee
+        function getAssigneePage(stateObj, assignee) {
+            return stateObj[assignee] || 1;
+        }
+        // Helper: Set page for assignee and re-render
+        function setAssigneePage(stateObj, assignee, page, renderFn) {
+            stateObj[assignee] = page;
+            renderFn();
+        }
 
         /* Utility Functions */
         function formatDate(date) {
@@ -1097,6 +1117,42 @@
             if (status === 'In Progress') return 1;
             if (status === 'Yet to Start') return 2;
             return 3;
+        }
+
+        // Utility: Get unique assignees from a list of tasks (including assigned_to2)
+        function getUniqueAssignees(tasksList) {
+            const set = new Set();
+            tasksList.forEach(t => {
+                if (t.assigned_to) set.add(t.assigned_to);
+                if (t.assigned_to2) set.add(t.assigned_to2);
+            });
+            return Array.from(set).sort();
+        }
+
+        // Utility: Group tasks by assignee (including assigned_to2)
+        function groupTasksByAssignee(tasksList) {
+            const groups = {};
+            tasksList.forEach(task => {
+                let added = false;
+                if (task.assigned_to) {
+                    if (!groups[task.assigned_to]) groups[task.assigned_to] = [];
+                    groups[task.assigned_to].push(task);
+                    added = true;
+                }
+                if (task.assigned_to2) {
+                    if (!groups[task.assigned_to2]) groups[task.assigned_to2] = [];
+                    // Avoid duplicate if assigned_to == assigned_to2
+                    if (task.assigned_to2 !== task.assigned_to) {
+                        groups[task.assigned_to2].push(task);
+                        added = true;
+                    }
+                }
+                if (!added) {
+                    if (!groups['Unassigned']) groups['Unassigned'] = [];
+                    groups['Unassigned'].push(task);
+                }
+            });
+            return groups;
         }
 
         /* Supabase Data Functions */
@@ -1311,6 +1367,13 @@
 
         document.getElementById('trackerSearch')?.addEventListener('input', (e) => {
             trackerSearchTerm = e.target.value;
+            trackerPage = 1;
+            renderTracker();
+        });
+
+        document.getElementById('trackerDateFilter')?.addEventListener('input', (e) => {
+            trackerDateFilter = e.target.value;
+            trackerPage = 1;
             renderTracker();
         });
 
@@ -1682,25 +1745,41 @@
                 return b.id - a.id;
             });
 
-            // Pagination in JS
-            const count = allFilteredTasks.length;
-            const pagedTasks = allFilteredTasks.slice((dashboardPage - 1) * PAGE_SIZE, dashboardPage * PAGE_SIZE);
+            // Group by assignee
+            const groups = groupTasksByAssignee(allFilteredTasks);
 
             const tbody = document.getElementById('tasksTableBody');
-            tbody.innerHTML = pagedTasks.map(task => `
-                <tr>
-                    <td data-label="Project">${task.project_name || '-'}</td>
-                    <td data-label="Phase">${task.sub_phase || '-'}</td>
-                    <td data-label="Assigned To">${task.assigned_to || '-'}</td>
-                    <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
-                    <td data-label="Due Date">${formatDate(task.end_date)}</td>
-                    <td data-label="Actions">
-                        <button class="action-btn" onclick="editTask(${task.id})">Edit</button>
-                        <button class="action-btn" onclick="deleteTask(${task.id})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-            renderPagination('dashboardPagination', dashboardPage, count, 'setDashboardPage');
+            let html = '';
+            Object.entries(groups).forEach(([assignee, tasks]) => {
+                const page = getAssigneePage(dashboardAssigneePages, assignee);
+                const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
+                const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+                html += `<tr><td colspan="6" style="font-weight:bold;background:#f1f5f9">${assignee}</td></tr>`;
+                html += pagedTasks.map(task => `
+                    <tr>
+                        <td data-label="Project">${task.project_name || '-'}</td>
+                        <td data-label="Phase">${task.sub_phase || '-'}</td>
+                        <td data-label="Assigned To">${task.assigned_to || '-'}</td>
+                        <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
+                        <td data-label="Due Date">${formatDate(task.end_date)}</td>
+                        <td data-label="Actions">
+                            <button class="action-btn" onclick="editTask(${task.id})">Edit</button>
+                            <button class="action-btn" onclick="deleteTask(${task.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+                // Per-assignee pagination controls
+                html += `<tr><td colspan="6">` +
+                    `<div class="pagination">` +
+                    `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(dashboardAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderDashboard)">Prev</button>` +
+                    `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
+                    `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="setAssigneePage(dashboardAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page + 1}, renderDashboard)">Next</button>` +
+                    `</div></td></tr>`;
+            });
+            tbody.innerHTML = html;
+            // Remove global pagination for dashboard table
+            document.getElementById('dashboardPagination').innerHTML = '';
         }
 
         async function renderTracker() {
@@ -1709,6 +1788,9 @@
                 .from('tasks')
                 .select('*')
                 .or(`project_name.ilike.%${trackerSearchTerm}%,assigned_to.ilike.%${trackerSearchTerm}%,sub_phase.ilike.%${trackerSearchTerm}%`);
+            if (trackerDateFilter) {
+                taskQuery = taskQuery.eq('end_date', trackerDateFilter);
+            }
             let { data: allFilteredTasks, error } = await taskQuery;
             if (error) {
                 console.error('Error searching tasks:', error);
@@ -1727,36 +1809,51 @@
                 return b.id - a.id;
             });
 
-            // Pagination in JS
-            const count = allFilteredTasks.length;
-            const pagedTasks = allFilteredTasks.slice((trackerPage - 1) * PAGE_SIZE, trackerPage * PAGE_SIZE);
+            // Group by assignee
+            const groups = groupTasksByAssignee(allFilteredTasks);
 
             const tbody = document.getElementById('trackerTableBody');
-            tbody.innerHTML = pagedTasks.map(task => `
-                <tr>
-                    <td data-label="Project">${task.project_name || '-'}</td>
-                    <td data-label="Phase">${task.sub_phase || '-'}</td>
-                    <td data-label="PC">${task.pc || '-'}</td>
-                    <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
-                    <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
-                    <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
-                    <td data-label="Start Date">${formatDate(task.start_date)}</td>
-                    <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
-                    <td data-label="Actual Completion Date">${formatDate(task.completed_at)}</td>
-                    <td data-label="Comments">${task.comments || '-'}</td>
-                    <td data-label="Bug Count">${task.bug_count || '0'}</td>
-                    <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
-                    <td data-label="Reason">${task.deviation_reason || '-'}</td>
-                    <td data-label="Actions">
-                        <button class="action-btn" onclick="editTask(${task.id})">Edit</button>
-                        <button class="action-btn" onclick="deleteTask(${task.id})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-            renderPagination('trackerPagination', trackerPage, count, 'setTrackerPage');
+            let html = '';
+            Object.entries(groups).forEach(([assignee, tasks]) => {
+                const page = getAssigneePage(trackerAssigneePages, assignee);
+                const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
+                const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+                html += `<tr><td colspan="14" style="font-weight:bold;background:#f1f5f9">${assignee}</td></tr>`;
+                html += pagedTasks.map(task => `
+                    <tr>
+                        <td data-label="Project">${task.project_name || '-'}</td>
+                        <td data-label="Phase">${task.sub_phase || '-'}</td>
+                        <td data-label="PC">${task.pc || '-'}</td>
+                        <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
+                        <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
+                        <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
+                        <td data-label="Start Date">${formatDate(task.start_date)}</td>
+                        <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
+                        <td data-label="Actual Completion Date">${formatDate(task.completed_at)}</td>
+                        <td data-label="Comments">${task.comments || '-'}</td>
+                        <td data-label="Bug Count">${task.bug_count || '0'}</td>
+                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
+                        <td data-label="Reason">${task.deviation_reason || '-'}</td>
+                        <td data-label="Actions">
+                            <button class="action-btn" onclick="editTask(${task.id})">Edit</button>
+                            <button class="action-btn" onclick="deleteTask(${task.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+                html += `<tr><td colspan="14">` +
+                    `<div class="pagination">` +
+                    `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(trackerAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderTracker)">Prev</button>` +
+                    `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
+                    `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="setAssigneePage(trackerAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page + 1}, renderTracker)">Next</button>` +
+                    `</div></td></tr>`;
+            });
+            tbody.innerHTML = html;
+            document.getElementById('trackerPagination').innerHTML = '';
         }
 
         async function renderAllProjects() {
+            // Fetch all filtered tasks (no range)
             let taskQuery = supabase
                 .from('tasks')
                 .select('*')
@@ -1772,43 +1869,43 @@
             // Sort by id desc
             allCompletedTasks.sort((a, b) => b.id - a.id);
 
-            const count = allCompletedTasks.length;
-            const pagedTasks = allCompletedTasks.slice((allProjectsPage - 1) * PAGE_SIZE, allProjectsPage * PAGE_SIZE);
+            // Group by assignee
+            const groups = groupTasksByAssignee(allCompletedTasks);
 
             const tbody = document.getElementById('allProjectsTableBody');
-            tbody.innerHTML = pagedTasks.map(task => `
-                <tr>
-                    <td data-label="Project">${task.project_name || '-'}</td>
-                    <td data-label="Phase">${task.sub_phase || '-'}</td>
-                    <td data-label="PC">${task.pc || '-'}</td>
-                    <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
-                    <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
-                    <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
-                    <td data-label="Start Date">${formatDate(task.start_date)}</td>
-                    <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
-                    <td data-label="Actual Completion Date">${formatDate(task.completed_at)}</td>
-                    <td data-label="Comments">${task.comments || '-'}</td>
-                    <td data-label="Bug Count">${task.bug_count || '0'}</td>
-                    <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
-                    <td data-label="Reason">${task.deviation_reason || '-'}</td>
-                </tr>
-            `).join('');
-            renderPagination('allProjectsPagination', allProjectsPage, count, 'setAllProjectsPage');
-        }
+            let html = '';
+            Object.entries(groups).forEach(([assignee, tasks]) => {
+                const page = getAssigneePage(allProjectsAssigneePages, assignee);
+                const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
+                const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-        function setDashboardPage(page) {
-            dashboardPage = page;
-            renderDashboard();
-        }
-
-        function setTrackerPage(page) {
-            trackerPage = page;
-            renderTracker();
-        }
-
-        function setAllProjectsPage(page) {
-            allProjectsPage = page;
-            renderAllProjects();
+                html += `<tr><td colspan="13" style="font-weight:bold;background:#f1f5f9">${assignee}</td></tr>`;
+                html += pagedTasks.map(task => `
+                    <tr>
+                        <td data-label="Project">${task.project_name || '-'}</td>
+                        <td data-label="Phase">${task.sub_phase || '-'}</td>
+                        <td data-label="PC">${task.pc || '-'}</td>
+                        <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
+                        <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
+                        <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
+                        <td data-label="Start Date">${formatDate(task.start_date)}</td>
+                        <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
+                        <td data-label="Actual Completion Date">${formatDate(task.completed_at)}</td>
+                        <td data-label="Comments">${task.comments || '-'}</td>
+                        <td data-label="Bug Count">${task.bug_count || '0'}</td>
+                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
+                        <td data-label="Reason">${task.deviation_reason || '-'}</td>
+                    </tr>
+                `).join('');
+                html += `<tr><td colspan="13">` +
+                    `<div class="pagination">` +
+                    `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(allProjectsAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderAllProjects)">Prev</button>` +
+                    `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
+                    `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="setAssigneePage(allProjectsAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page + 1}, renderAllProjects)">Next</button>` +
+                    `</div></td></tr>`;
+            });
+            tbody.innerHTML = html;
+            document.getElementById('allProjectsPagination').innerHTML = '';
         }
 
         async function renderSummary() {
@@ -1832,20 +1929,53 @@
                 filteredTasks = [];
             }
 
+            // Group by assignee
+            const groups = groupTasksByAssignee(filteredTasks);
+
             const tbody = document.getElementById('summaryTableBody');
-            tbody.innerHTML = filteredTasks.map(task => `
-                <tr>
-                    <td data-label="Projects">${task.project_name || '-'}</td>
-                    <td data-label="Resource">${task.assigned_to || '-'}</td>
-                    <td data-label="Phase">${task.sub_phase || '-'}</td>
-                    <td data-label="Start Date">${formatDate(task.start_date)}</td>
-                    <td data-label="Time Taken">${calculateTimeTaken(task.start_date, task.completed_at)}</td>
-                    <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
-                    <td data-label="Sprint">${task.sprint || '-'}</td>
-                    <td data-label="Bug Count">${task.bug_count || '0'}</td>
-                </tr>
-            `).join('');
-            renderPagination('summaryPagination', summaryPage, count, 'setSummaryPage');
+            let html = '';
+            Object.entries(groups).forEach(([assignee, tasks]) => {
+                const page = getAssigneePage(summaryAssigneePages, assignee);
+                const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
+                const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+                html += `<tr><td colspan="8" style="font-weight:bold;background:#f1f5f9">${assignee}</td></tr>`;
+                html += pagedTasks.map(task => `
+                    <tr>
+                        <td data-label="Projects">${task.project_name || '-'}</td>
+                        <td data-label="Resource">${task.assigned_to || '-'}</td>
+                        <td data-label="Phase">${task.sub_phase || '-'}</td>
+                        <td data-label="Start Date">${formatDate(task.start_date)}</td>
+                        <td data-label="Time Taken">${calculateTimeTaken(task.start_date, task.completed_at)}</td>
+                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
+                        <td data-label="Sprint">${task.sprint || '-'}</td>
+                        <td data-label="Bug Count">${task.bug_count || '0'}</td>
+                    </tr>
+                `).join('');
+                html += `<tr><td colspan="8">` +
+                    `<div class="pagination">` +
+                    `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(summaryAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderSummary)">Prev</button>` +
+                    `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
+                    `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="setAssigneePage(summaryAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page + 1}, renderSummary)">Next</button>` +
+                    `</div></td></tr>`;
+            });
+            tbody.innerHTML = html;
+            document.getElementById('summaryPagination').innerHTML = '';
+        }
+
+        function setDashboardPage(page) {
+            dashboardPage = page;
+            renderDashboard();
+        }
+
+        function setTrackerPage(page) {
+            trackerPage = page;
+            renderTracker();
+        }
+
+        function setAllProjectsPage(page) {
+            allProjectsPage = page;
+            renderAllProjects();
         }
 
         function setSummaryPage(page) {
