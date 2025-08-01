@@ -660,6 +660,18 @@
             .form-actions { flex-direction: column-reverse; }
             .calendar-grid { grid-template-columns: repeat(2, 1fr); overflow-x: auto; }
         }
+
+        /* Add color classes for assignee headers */
+        .assignee-header-0 { background: #e0e7ff !important; color: #3730a3 !important; }
+        .assignee-header-1 { background: #fef9c3 !important; color: #92400e !important; }
+        .assignee-header-2 { background: #bbf7d0 !important; color: #065f46 !important; }
+        .assignee-header-3 { background: #bae6fd !important; color: #0369a1 !important; }
+        .assignee-header-4 { background: #fca5a5 !important; color: #991b1b !important; }
+        .assignee-header-5 { background: #ddd6fe !important; color: #7c3aed !important; }
+        .assignee-header-6 { background: #fdba74 !important; color: #b45309 !important; }
+        .assignee-header-7 { background: #fcd34d !important; color: #92400e !important; }
+        .assignee-header-8 { background: #fbcfe8 !important; color: #be185d !important; }
+        .assignee-header-9 { background: #a7f3d0 !important; color: #065f46 !important; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
@@ -1757,6 +1769,7 @@
 
             // Group by assignee
             const groups = groupTasksByAssignee(allFilteredTasks);
+            const assigneesList = Object.keys(groups);
 
             const tbody = document.getElementById('tasksTableBody');
             let html = '';
@@ -1765,7 +1778,8 @@
                 const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
                 const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-                html += `<tr><td colspan="6" style="font-weight:bold;background:#f1f5f9">${assignee}</td></tr>`;
+                const colorClass = getAssigneeColorClass(assignee, assigneesList);
+                html += `<tr><td colspan="6" class="${colorClass}" style="font-weight:bold;">${assignee}</td></tr>`;
                 html += pagedTasks.map(task => `
                     <tr>
                         <td data-label="Project">${task.project_name || '-'}</td>
@@ -1830,6 +1844,7 @@
 
             // Group by assignee
             const groups = groupTasksByAssignee(allFilteredTasks);
+            const assigneesList = Object.keys(groups);
 
             const tbody = document.getElementById('trackerTableBody');
             let html = '';
@@ -1838,7 +1853,8 @@
                 const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
                 const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-                html += `<tr><td colspan="14" style="font-weight:bold;background:#f1f5f9">${assignee}</td></tr>`;
+                const colorClass = getAssigneeColorClass(assignee, assigneesList);
+                html += `<tr><td colspan="14" class="${colorClass}" style="font-weight:bold;">${assignee}</td></tr>`;
                 html += pagedTasks.map(task => `
                     <tr>
                         <td data-label="Project">${task.project_name || '-'}</td>
@@ -2039,6 +2055,12 @@
         function setAttendancePage(page) {
             attendancePage = page;
             renderAttendance();
+        }
+
+        // Helper: Get color class for assignee
+        function getAssigneeColorClass(assignee, assigneesList) {
+            const idx = assigneesList.indexOf(assignee);
+            return `assignee-header-${idx % 10}`;
         }
 
         /* Initialize App */
