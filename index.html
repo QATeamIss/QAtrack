@@ -275,6 +275,11 @@
             text-align: left;
             border-bottom: 1px solid rgba(0, 0, 0, 0.07);
             color: #334155;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        th:last-child, td:last-child {
+            border-right: none;
         }
 
         th {
@@ -1040,6 +1045,11 @@
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Task</button>
+                    <button type="button" class="btn btn-secondary" id="generateTaskBtn" style="display:none;">Generate Task</button>
+                </div>
+                <div id="taskSummaryContainer" style="display:none;margin-top:1rem;">
+                    <label class="form-label">Task Summary (copy below):</label>
+                    <textarea id="taskSummaryText" class="form-input form-textarea" rows="6" readonly style="font-family:monospace;"></textarea>
                 </div>
             </form>
         </div>
@@ -1445,6 +1455,8 @@
             document.getElementById('modalTitle').textContent = taskId ? 'Edit Task' : 'Add New Task';
             form.elements.taskId.value = taskId || '';
             document.getElementById('taskModal').classList.add('active');
+            document.getElementById('generateTaskBtn').style.display = taskId ? '' : 'none';
+            document.getElementById('taskSummaryContainer').style.display = 'none';
 
             if (taskId) {
                 const task = tasks.find(t => t.id == taskId);
@@ -2072,6 +2084,32 @@
             const idx = assigneesList.indexOf(assignee);
             return `assignee-header-${idx % 10}`;
         }
+
+        // Generate formatted summary for the task using current form values
+        function generateTaskSummary() {
+            const form = document.getElementById('taskForm');
+            const get = name => form.elements[name]?.value || '-';
+
+            const summary = 
+`Project: ${get('projectName')}
+Phase: ${get('subPhase')}
+PC: ${get('pc')}
+Assigned To: ${get('assignedTo')}${get('assignedTo2') && get('assignedTo2') !== '-' ? ', ' + get('assignedTo2') : ''}
+Status: ${get('status')}
+Start Date: ${get('startDate') && get('startDate') !== '-' ? formatDate(get('startDate')) : '-'}
+Expected End Date: ${get('endDate') && get('endDate') !== '-' ? formatDate(get('endDate')) : '-'}
+Actual Completion Date: ${get('completedAt') && get('completedAt') !== '-' ? formatDate(get('completedAt')) : '-'}
+Sprint: ${get('sprint')}
+Bug Count: ${get('bugCount')}
+Comments: ${get('comments')}
+Deviation: ${get('deviation')}
+Reason: ${get('deviationReason')}`;
+
+            document.getElementById('taskSummaryText').value = summary;
+            document.getElementById('taskSummaryContainer').style.display = '';
+        }
+
+        document.getElementById('generateTaskBtn').addEventListener('click', generateTaskSummary);
 
         /* Initialize App */
         document.addEventListener('DOMContentLoaded', async () => {
