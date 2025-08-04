@@ -680,6 +680,7 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -721,6 +722,7 @@
                     <div class="header">
                         <h1 class="page-title">Dashboard</h1>
                         <button class="btn btn-primary" onclick="openModal()" style="margin-left:auto;">+ New Task</button>
+                        <button class="btn btn-secondary" onclick="openReportModal()" style="margin-left:1rem;">Daily Reports</button>
                     </div>
 
                     <div class="cards-grid">
@@ -972,6 +974,16 @@
         </main>
     </div>
 
+    <!-- Hidden containers for screenshot reports -->
+    <div id="todayStatusScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;padding:2rem;">
+        <h2 style="margin-bottom:1rem;">Today's Work Status</h2>
+        <table id="todayStatusScreenshotTable" style="border-collapse:collapse;width:100%;"></table>
+    </div>
+    <div id="tomorrowScheduleScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;padding:2rem;">
+        <h2 style="margin-bottom:1rem;">Next Day's Work Schedule</h2>
+        <table id="tomorrowScheduleScreenshotTable" style="border-collapse:collapse;width:100%;"></table>
+    </div>
+
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <h2 id="modalTitle">Add New Task</h2>
@@ -1052,6 +1064,18 @@
                     <textarea id="taskSummaryText" class="form-input form-textarea" rows="6" readonly style="font-family:monospace;"></textarea>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <h2>Generate Daily Report</h2>
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <button class="btn btn-primary" onclick="generateTrackerScreenshot()">1. Tracker Table Screenshot</button>
+                <button class="btn btn-primary" onclick="generateTodayStatusReport()">2. Today's Work Status Report</button>
+                <button class="btn btn-primary" onclick="generateTomorrowScheduleReport()">3. Next Day's Work Schedule</button>
+                <button class="btn btn-secondary" onclick="closeReportModal()">Close</button>
+            </div>
         </div>
     </div>
 
@@ -2110,6 +2134,151 @@ Reason: ${get('deviationReason')}`;
         }
 
         document.getElementById('generateTaskBtn').addEventListener('click', generateTaskSummary);
+
+        // --- Report Modal Functions ---
+        function openReportModal() {
+            document.getElementById('reportModal').classList.add('active');
+        }
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        // 1. Tracker Table Screenshot
+        async function generateTrackerScreenshot() {
+            closeReportModal();
+            if (currentTab !== 'tracker') {
+                switchTab('tracker');
+                setTimeout(() => _captureTrackerTable(), 600);
+            } else {
+                _captureTrackerTable();
+            }
+        }
+        function _captureTrackerTable() {
+            const trackerTable = document.querySelector('#tracker .table-container');
+            if (!trackerTable) {
+                showToast('Tracker table not found.');
+                return;
+            }
+            const body = document.body;
+            const prevZoom = body.style.zoom;
+            body.style.zoom = '1';
+            trackerTable.scrollIntoView({ behavior: 'instant', block: 'center' });
+            setTimeout(() => {
+                html2canvas(trackerTable).then(canvas => {
+                    body.style.zoom = prevZoom || '0.75';
+                    const link = document.createElement('a');
+                    link.download = `Tracker_Table_${(new Date()).toISOString().slice(0,10)}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    showToast('Tracker table screenshot downloaded!');
+                }).catch(() => {
+                    body.style.zoom = prevZoom || '0.75';
+                    showToast('Screenshot failed.');
+                });
+            }, 200);
+        }
+
+        // 2. Today's Work Status Screenshot
+        async function generateTodayStatusReport() {
+            closeReportModal();
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            // Tasks active today (start <= today <= end)
+            const todayTasks = tasks.filter(t => {
+                const start = t.startDate ? new Date(t.startDate) : null;
+                const end = t.endDate ? new Date(t.endDate) : null;
+                if (!start) return false;
+                start.setHours(0,0,0,0);
+                if (end) end.setHours(0,0,0,0);
+                return start <= today && (!end || end >= today);
+            });
+            renderScreenshotTable(
+                'todayStatusScreenshotTable',
+                todayTasks,
+                ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
+                t => [
+                    t.projectName||'',
+                    t.subPhase||'',
+                    [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
+                    t.status||'',
+                    t.startDate ? formatDate(t.startDate) : '',
+                    t.endDate ? formatDate(t.endDate) : '',
+                    t.comments||''
+                ]
+            );
+            await _captureScreenshotContainer('todayStatusScreenshotContainer', `Today_Work_Status_${today.toISOString().split('T')[0]}.png`);
+        }
+
+        // 3. Next Day's Work Schedule Screenshot
+        async function generateTomorrowScheduleReport() {
+            closeReportModal();
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0,0,0,0);
+            const tomorrowTasks = tasks.filter(t => {
+                const start = t.startDate ? new Date(t.startDate) : null;
+                const end = t.endDate ? new Date(t.endDate) : null;
+                if (!start) return false;
+                start.setHours(0,0,0,0);
+                if (end) end.setHours(0,0,0,0);
+                return start <= tomorrow && (!end || end >= tomorrow);
+            });
+            renderScreenshotTable(
+                'tomorrowScheduleScreenshotTable',
+                tomorrowTasks,
+                ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
+                t => [
+                    t.projectName||'',
+                    t.subPhase||'',
+                    [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
+                    t.status||'',
+                    t.startDate ? formatDate(t.startDate) : '',
+                    t.endDate ? formatDate(t.endDate) : '',
+                    t.comments||''
+                ]
+            );
+            await _captureScreenshotContainer('tomorrowScheduleScreenshotContainer', `Tomorrow_Schedule_${tomorrow.toISOString().split('T')[0]}.png`);
+        }
+
+        // Helper: Render a table for screenshot
+        function renderScreenshotTable(tableId, data, headers, rowFn) {
+            const table = document.getElementById(tableId);
+            let html = '<thead><tr>' + headers.map(h => `<th style="border:1px solid #ccc;padding:8px;background:#f3f4f6;">${h}</th>`).join('') + '</tr></thead>';
+            html += '<tbody>';
+            if (data.length === 0) {
+                html += `<tr><td colspan="${headers.length}" style="text-align:center;padding:2rem;">No data</td></tr>`;
+            } else {
+                html += data.map(t =>
+                    '<tr>' + rowFn(t).map(val => `<td style="border:1px solid #ccc;padding:8px;">${val}</td>`).join('') + '</tr>'
+                ).join('');
+            }
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        // Helper: Screenshot a container and download
+        async function _captureScreenshotContainer(containerId, filename) {
+            const body = document.body;
+            const prevZoom = body.style.zoom;
+            body.style.zoom = '1';
+            const container = document.getElementById(containerId);
+            container.style.display = 'block';
+            setTimeout(() => {
+                html2canvas(container).then(canvas => {
+                    body.style.zoom = prevZoom || '0.75';
+                    container.style.display = '';
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    showToast('Screenshot downloaded!');
+                }).catch(() => {
+                    body.style.zoom = prevZoom || '0.75';
+                    container.style.display = '';
+                    showToast('Screenshot failed.');
+                });
+            }, 200);
+        }
 
         /* Initialize App */
         document.addEventListener('DOMContentLoaded', async () => {
