@@ -1535,7 +1535,27 @@
         </div>
     </div>
 
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast">    </div>
+
+    <!-- Password Confirmation Modal for Clear All Data -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="margin: 0; color: #dc2626; font-size: 1.75rem; font-weight: 700;">🔒 Security Required</h2>
+                <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 1rem;">Enter password to clear all data</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="clearDataPassword" class="form-input" placeholder="Enter password" autocomplete="off" onkeypress="if(event.key==='Enter') confirmClearAllData()">
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-primary" onclick="confirmClearAllData()" style="background: #dc2626; border-color: #dc2626;">Clear All Data</button>
+                    <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // --- Supabase credentials and client ---
@@ -1946,9 +1966,18 @@
             }
         }
 
-        async function clearAllData() {
-            const pwd = prompt('Enter password to clear all data:');
-            if (pwd !== '121416') {
+        function clearAllData() {
+            document.getElementById('passwordModal').classList.add('active');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+            document.getElementById('clearDataPassword').value = '';
+        }
+
+        async function confirmClearAllData() {
+            const pwd = document.getElementById('clearDataPassword').value;
+            if (pwd !== 'Abhihere12@') {
                 showToast('Incorrect password.');
                 return;
             }
@@ -1967,6 +1996,7 @@
                     attendanceRecords = [];
                     showToast('All data cleared!');
                     await renderCurrentTab();
+                    closePasswordModal();
                 } catch (error) {
                     console.error('Error clearing data:', error);
                     showToast('Error clearing data.');
