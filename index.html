@@ -108,9 +108,17 @@
             z-index: 1000;
             margin-top: 0.5rem;
             padding: 0.5rem 0;
+            display: none;
         }
 
         .dropdown-container:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Show dropdown when JavaScript sets display: block */
+        .dropdown-menu[style*="display: block"] {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
@@ -359,11 +367,15 @@
         }
         
         .status-yettostart, .status-todo { background: #e2e8f0; color: #475569; }
+        .status-beingdeveloped { background: #fef3c7; color: #92400e; }
+        .status-readyforqa { background: #dbeafe; color: #1e40af; }
+        .status-assignedtoqa { background: #e0e7ff; color: #3730a3; }
         .status-inprogress { background: #fef3c7; color: #92400e; }
         .status-completed { background: #d1fae5; color: #065f46; }
         .status-onhold { background: #fee2e2; color: #991b1b; }
         .status-forecast { background: #bae6fd; color: #0369a1; }
         .status-rejected { background: #fca5a5; color: #991b1b; }
+        .status-holiday { background: #fecaca; color: #991b1b; }
 
         /* Action Buttons - Light Mode */
         .action-btn {
@@ -404,21 +416,197 @@
         }
 
         .modal-content {
-            background: #f8fafc;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
             padding: 2rem 2.5rem;
             width: 90%;
             max-width: 700px;
+            max-height: 90vh;
             color: #334155;
             animation: modalSlideIn 0.3s ease;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             margin: 2rem 0;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar for modal content */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Task Summary Styling */
+        #taskSummaryContainer {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        #taskSummaryText {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #334155;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        #taskSummaryText:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 16px 16px 0 0;
         }
 
         @keyframes modalSlideIn {
             from { opacity: 0; transform: translateY(-50px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Report Options Styling */
+        .report-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .report-option {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .report-option:hover {
+            background: white;
+            border-color: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-option:hover::before {
+            transform: scaleX(1);
+        }
+
+        .report-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .report-content {
+            flex: 1;
+        }
+
+        .report-content h3 {
+            margin: 0 0 0.5rem 0;
+            color: #1e293b;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .report-content p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .report-arrow {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .report-option:hover .report-arrow {
+            color: #667eea;
+            transform: translateX(4px);
+        }
+
+        /* Responsive Report Modal */
+        @media (max-width: 768px) {
+            .report-option {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .report-icon {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            
+            .report-arrow {
+                display: none;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+                max-height: 95vh;
+                overflow-y: auto;
+            }
         }
         
         .form-row {
@@ -561,6 +749,21 @@
             color: #fff !important;
         }
 
+        .calendar-task-beingdeveloped {
+            background: #f59e0b !important;   /* Amber */
+            color: #fff !important;
+        }
+
+        .calendar-task-readyforqa {
+            background: #3b82f6 !important;   /* Blue */
+            color: #fff !important;
+        }
+
+        .calendar-task-assignedtoqa {
+            background: #6366f1 !important;   /* Indigo */
+            color: #fff !important;
+        }
+
         .calendar-task-inprogress {
             background: #f59e42 !important;   /* Orange */
             color: #fff !important;
@@ -577,7 +780,7 @@
         }
 
         .calendar-task-forecast {
-            background: #0ea5e9 !important;   /* Blue */
+            background: #0ea5e9 !important;   /* Sky Blue */
             color: #fff !important;
         }
 
@@ -721,7 +924,11 @@
                 border-bottom: none;
             }
             .status-badge, .action-btn { display: inline-block; margin: 0.25rem; }
-            .modal-content { padding: 1.5rem; }
+            .modal-content { 
+                padding: 1.5rem; 
+                max-height: 95vh;
+                overflow-y: auto;
+            }
             .calendar-grid { grid-template-columns: repeat(3, 1fr); overflow-x: auto; }
         }
 
@@ -906,6 +1113,18 @@
                             Completed
                         </span>
                         <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-beingdeveloped" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Being Developed
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-readyforqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Ready for QA
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-assignedtoqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Assigned to QA
+                        </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
                             <span class="task-item calendar-task-inprogress" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
                             In Progress
                         </span>
@@ -966,6 +1185,9 @@
                             <select class="form-select" id="analyticsStatusFilter" style="width:auto;">
                                 <option value="">All Status</option>
                                 <option value="Yet to Start">Yet to Start</option>
+                                <option value="Being Developed">Being Developed</option>
+                                <option value="Ready for QA">Ready for QA</option>
+                                <option value="Assigned to QA">Assigned to QA</option>
                                 <option value="In Progress">In Progress</option>
                                 <option value="On Hold">On Hold</option>
                                 <option value="Completed">Completed</option>
@@ -1121,13 +1343,24 @@
     </div>
 
     <!-- Hidden containers for screenshot reports -->
-    <div id="todayStatusScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;padding:2rem;">
-        <h2 style="margin-bottom:1rem;">Today's Work Status</h2>
+    <div id="todayStatusScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);padding:3rem;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.1);">
+        <div style="text-align:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:3px solid #667eea;">
+            <h2 style="margin:0;color:#1e293b;font-size:2rem;font-weight:700;">📅 Today's Work Status</h2>
+            <p id="todayStatusDate" style="margin:0.5rem 0 0 0;color:#64748b;font-size:1rem;">Generated on </p>
+            <p id="todayStatusDayName" style="margin:0.5rem 0 0 0;color:#667eea;font-size:1.1rem;font-weight:600;"></p>
+        </div>
+        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.05);">
         <table id="todayStatusScreenshotTable" style="border-collapse:collapse;width:100%;"></table>
     </div>
-    <div id="tomorrowScheduleScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:#fff;padding:2rem;">
-        <h2 style="margin-bottom:1rem;">Next Day's Work Schedule</h2>
+    </div>
+    <div id="tomorrowScheduleScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);padding:3rem;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.1);">
+        <div style="text-align:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:3px solid #764ba2;">
+            <h2 style="margin:0;color:#1e293b;font-size:2rem;font-weight:700;">🔮 Next Day's Work Schedule</h2>
+            <p id="tomorrowScheduleDate" style="margin:0.5rem 0 0 0;color:#64748b;font-size:1rem;">Generated on </p>
+        </div>
+        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.05);">
         <table id="tomorrowScheduleScreenshotTable" style="border-collapse:collapse;width:100%;"></table>
+        </div>
     </div>
 
     <div class="modal" id="taskModal">
@@ -1153,6 +1386,9 @@
                         <label class="form-label">Status</label>
                         <select class="form-select" name="status">
                             <option value="Yet to Start">Yet to Start</option>
+                            <option value="Being Developed">Being Developed</option>
+                            <option value="Ready for QA">Ready for QA</option>
+                            <option value="Assigned to QA">Assigned to QA</option>
                             <option value="In Progress">In Progress</option>
                             <option value="On Hold">On Hold</option>
                             <option value="Completed">Completed</option>
@@ -1175,10 +1411,38 @@
                     <div class="form-group">
                         <label class="form-label">Start Date</label>
                         <input type="date" class="form-input" name="startDate">
+                        <small style="color: #64748b; font-size: 0.8rem;">First working day of the task (optional)</small>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Expected End Date</label>
+                        <label class="form-label">End Date</label>
                         <input type="date" class="form-input" name="endDate">
+                        <small style="color: #64748b; font-size: 0.8rem;">Last working day of the task (optional)</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Working Days</label>
+                        <input type="number" class="form-input" name="workingDays" readonly style="background-color: #f8fafc;">
+                        <small style="color: #64748b; font-size: 0.8rem;">Automatically calculated from start and end dates</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Include Saturday</label>
+                        <select class="form-input" name="includeSaturday">
+                            <option value="false">No (Monday-Friday only)</option>
+                            <option value="true">Yes (Monday-Saturday)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Actual End Date</label>
+                        <input type="date" class="form-input" name="actualEndDate">
+                        <small style="color: #64748b; font-size: 0.8rem;">Actual completion date (if different from expected)</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Actual Working Days</label>
+                        <input type="number" class="form-input" name="actualWorkingDays" readonly style="background-color: #f8fafc;">
+                        <small style="color: #64748b; font-size: 0.8rem;">Calculated from start to actual end date</small>
                     </div>
                 </div>
                 <div class="form-row">
@@ -1215,12 +1479,58 @@
 
     <div class="modal" id="reportModal">
         <div class="modal-content">
-            <h2>Generate Daily Report</h2>
-            <div style="display:flex;flex-direction:column;gap:1rem;">
-                <button class="btn btn-primary" onclick="generateTrackerScreenshot()">1. Tracker Table Screenshot</button>
-                <button class="btn btn-primary" onclick="generateTodayStatusReport()">2. Today's Work Status Report</button>
-                <button class="btn btn-primary" onclick="generateTomorrowScheduleReport()">3. Next Day's Work Schedule</button>
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="margin: 0; color: #1e293b; font-size: 1.75rem; font-weight: 700;">📊 Generate Daily Report</h2>
+                <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 1rem;">Choose a report type to generate and download</p>
+            </div>
+            <div class="report-options">
+                <div class="report-option" onclick="generateTrackerScreenshot()">
+                    <div class="report-icon">📋</div>
+                    <div class="report-content">
+                        <h3>Tracker Table Screenshot</h3>
+                        <p>Generate a screenshot of the current tracker table with all active projects</p>
+                    </div>
+                    <div class="report-arrow">→</div>
+                </div>
+                <div class="report-option" onclick="generateTodayStatusReport()">
+                    <div class="report-icon">📅</div>
+                    <div class="report-content">
+                        <h3>Today's Work Status</h3>
+                        <p>Create a report showing all tasks scheduled for today</p>
+                    </div>
+                    <div class="report-arrow">→</div>
+                </div>
+                <div class="report-option" onclick="openScheduleDatePicker()">
+                    <div class="report-icon">🔮</div>
+                    <div class="report-content">
+                        <h3>Work Schedule</h3>
+                        <p>Generate a preview of work schedule for a specific date</p>
+                    </div>
+                    <div class="report-arrow">→</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
                 <button class="btn btn-secondary" onclick="closeReportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Picker Modal for Work Schedule -->
+    <div class="modal" id="scheduleDateModal">
+        <div class="modal-content">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="margin: 0; color: #1e293b; font-size: 1.75rem; font-weight: 700;">📅 Select Work Schedule Date</h2>
+                <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 1rem;">Choose a date to generate the work schedule report</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 300px;">
+                    <label style="color: #374151; font-weight: 600; font-size: 0.95rem;">Select Date:</label>
+                    <input type="date" id="scheduleDatePicker" class="form-input" style="width: 100%; padding: 0.875rem; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem;">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn btn-primary" onclick="generateScheduleReport()">Generate Report</button>
+                    <button class="btn btn-secondary" onclick="closeScheduleDateModal()">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1278,6 +1588,100 @@
         function formatDate(date) {
             if (!date) return '-';
             return new Date(date).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+        }
+
+        // Helper function to get appropriate status considering weekends and holidays
+        function getDisplayStatus(task, currentDate = null) {
+            if (!currentDate) {
+                currentDate = new Date();
+            }
+            currentDate.setHours(0,0,0,0);
+            
+            const dayOfWeek = currentDate.getDay();
+            const isHoliday = dayOfWeek === 0; // Sunday is holiday, Saturday can be working day
+            
+            // If it's a holiday, show "Holiday" instead of "In Progress"
+            if (isHoliday && task.status === 'In Progress') {
+                return 'Holiday';
+            }
+            
+            // For other cases, return the original status
+            return task.status || '-';
+        }
+
+        // Calculate working days between two dates
+        function calculateWorkingDays(startDate, endDate, includeSaturday = false) {
+            // Validate input dates
+            if (!startDate || !endDate || startDate.trim() === '' || endDate.trim() === '') {
+                return 0;
+            }
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            // Check if dates are valid
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                return 0;
+            }
+            
+            // Ensure start date is before or equal to end date
+            if (start > end) {
+                return 0;
+            }
+            
+            let count = 0;
+            const currentDate = new Date(start); // Don't modify the original start date
+            
+            while (currentDate <= end) {
+                const dayOfWeek = currentDate.getDay();
+                // Monday = 1, Tuesday = 2, ..., Friday = 5, Saturday = 6, Sunday = 0
+                if (dayOfWeek >= 1 && dayOfWeek <= 5) { // Monday to Friday
+                    count++;
+                } else if (includeSaturday && dayOfWeek === 6) { // Saturday
+                    count++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            return count;
+        }
+
+        // Calculate end date based on working days
+        function calculateEndDate(startDate, workingDays, includeSaturday = false) {
+            // Validate input
+            if (!startDate || startDate.trim() === '' || !workingDays || workingDays <= 0) {
+                return '';
+            }
+            
+            const start = new Date(startDate);
+            
+            // Check if date is valid
+            if (isNaN(start.getTime())) {
+                return '';
+            }
+            
+            let daysAdded = 0;
+            let currentDate = new Date(start);
+            
+            while (daysAdded < workingDays) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                const dayOfWeek = currentDate.getDay();
+                
+                // Check if it's a working day
+                if (dayOfWeek >= 1 && dayOfWeek <= 5) { // Monday to Friday
+                    daysAdded++;
+                } else if (includeSaturday && dayOfWeek === 6) { // Saturday
+                    daysAdded++;
+                }
+            }
+            
+            return currentDate.toISOString().split('T')[0];
+        }
+
+        // Check if a date is a working day
+        function isWorkingDay(date, includeSaturday = false) {
+            const dayOfWeek = date.getDay();
+            return (dayOfWeek >= 1 && dayOfWeek <= 5) || (includeSaturday && dayOfWeek === 6);
         }
 
         function calculateTimeTaken(start, end) {
@@ -1373,6 +1777,11 @@
                     status: task.status,
                     startDate: task.start_date,
                     endDate: task.end_date,
+                    workingDays: task.working_days || 1,
+                    includeSaturday: task.include_saturday || false,
+                    actualStartDate: task.actual_start_date,
+                    actualEndDate: task.actual_end_date,
+                    actualWorkingDays: task.actual_working_days || task.working_days || 1,
                     completedAt: task.completed_at,
                     comments: task.comments,
                     bugCount: task.bug_count,
@@ -1380,6 +1789,8 @@
                     sprint: task.sprint,
                     createdAt: task.created_at
                 }));
+                
+                console.log('Loaded tasks with statuses:', tasks.map(t => ({ id: t.id, status: t.status })));
             } catch (error) {
                 console.error('Error loading tasks:', error);
                 tasks = [];
@@ -1389,15 +1800,38 @@
 
         async function saveTask(taskData, taskId) {
             try {
+                // Calculate working days from start and end dates
+                const startDate = taskData.startDate && taskData.startDate.trim() !== '' ? taskData.startDate : null;
+                const endDate = taskData.endDate && taskData.endDate.trim() !== '' ? taskData.endDate : null;
+                const actualEndDate = taskData.actualEndDate && taskData.actualEndDate.trim() !== '' ? taskData.actualEndDate : null;
+                const includeSaturday = taskData.includeSaturday === 'true';
+                
+                // Calculate expected working days
+                const expectedWorkingDays = startDate && endDate ? 
+                    calculateWorkingDays(startDate, endDate, includeSaturday) : 0;
+                
+                // Calculate actual working days if actual end date is provided
+                const actualWorkingDays = startDate && actualEndDate ? 
+                    calculateWorkingDays(startDate, actualEndDate, includeSaturday) : 
+                    (expectedWorkingDays || 0);
+                
+                // Use the status directly since database constraint has been updated
+                const validStatus = taskData.status || 'Yet to Start';
+                
                 const task = {
                     project_name: taskData.projectName || null,
                     sub_phase: taskData.subPhase || null,
                     pc: taskData.pc || null,
                     assigned_to: taskData.assignedTo || null,
                     assigned_to2: taskData.assignedTo2 || null,
-                    status: taskData.status || 'Yet to Start',
-                    start_date: taskData.startDate || null,
-                    end_date: taskData.endDate || null,
+                    status: validStatus,
+                    start_date: startDate || null,
+                    end_date: endDate || null,
+                    working_days: expectedWorkingDays,
+                    include_saturday: includeSaturday,
+                    actual_start_date: startDate || null,
+                    actual_end_date: actualEndDate || endDate || null,
+                    actual_working_days: actualWorkingDays,
                     comments: taskData.comments || null,
                     bug_count: parseInt(taskData.bugCount) || 0,
                     deviation_reason: taskData.deviationReason || null,
@@ -1411,17 +1845,48 @@
                         .from('tasks')
                         .update(task)
                         .eq('id', taskId);
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Update error:', error);
+                        throw error;
+                    }
                 } else {
                     task.id = Date.now();
                     task.created_at = new Date().toISOString();
                     task.completed_at = taskData.status === 'Completed' ? new Date().toISOString() : null;
+                    
+                    // Create a minimal task object with only essential fields
+                    const safeTask = {
+                        project_name: task.project_name,
+                        assigned_to: task.assigned_to,
+                        status: validStatus, // Use the mapped status
+                        start_date: task.start_date,
+                        end_date: task.end_date,
+                        comments: task.comments,
+                        bug_count: task.bug_count,
+                        id: task.id,
+                        created_at: task.created_at,
+                        completed_at: task.completed_at
+                    };
+                    
+                    // Add optional fields only if they have values
+                    if (task.sub_phase) safeTask.sub_phase = task.sub_phase;
+                    if (task.pc) safeTask.pc = task.pc;
+                    if (task.assigned_to2) safeTask.assigned_to2 = task.assigned_to2;
+                    if (task.deviation_reason) safeTask.deviation_reason = task.deviation_reason;
+                    if (task.sprint) safeTask.sprint = task.sprint;
+                    
+                    console.log('Saving task:', safeTask);
                     const { error } = await supabase
                         .from('tasks')
-                        .insert([task]);
-                    if (error) throw error;
+                        .insert([safeTask]);
+                    if (error) {
+                        console.error('Insert error:', error);
+                        throw error;
+                    }
                 }
                 await loadTasks();
+                console.log('Task saved successfully, reloaded tasks:', tasks.length);
+                console.log('Latest task status:', tasks[tasks.length - 1]?.status);
                 return true;
             } catch (error) {
                 console.error('Error saving task:', error);
@@ -1604,22 +2069,60 @@
                 e.preventDefault();
                 const tab = item.dataset.tab;
                 if (tab) {
-                    switchTab(tab);
+                switchTab(tab);
                 }
             });
         });
 
-        // Handle dropdown menu items
-        document.querySelectorAll('.dropdown-item').forEach(item => {
-            item.addEventListener('click', (e) => {
+        // Handle dropdown container clicks (toggle dropdown visibility)
+        document.querySelectorAll('.dropdown-container').forEach(container => {
+            container.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const tab = item.dataset.tab;
-                if (tab) {
-                    switchTab(tab);
+                
+                // Toggle dropdown visibility
+                const dropdown = container.querySelector('.dropdown-menu');
+                if (dropdown) {
+                    const isVisible = dropdown.style.display === 'block';
+                    // Hide all other dropdowns first
+                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                        menu.style.display = 'none';
+                    });
+                    // Toggle current dropdown
+                    dropdown.style.display = isVisible ? 'none' : 'block';
                 }
             });
         });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown-container')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
+        });
+
+        // Handle dropdown menu items
+        function attachDropdownListeners() {
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const tab = item.dataset.tab;
+                    if (tab) {
+                        switchTab(tab);
+                        // Close all dropdowns after selection
+                        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                            menu.style.display = 'none';
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Attach dropdown listeners immediately
+        attachDropdownListeners();
 
         function switchTab(tab) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -1785,6 +2288,13 @@
                 const dayTasks = filteredTasks.filter(task => {
                     const taskStart = task.startDate ? new Date(task.startDate) : null;
                     if (!taskStart) return false;
+                    
+                    // Check if this date is a working day for this task
+                    const includeSaturday = task.include_saturday || false;
+                    if (!isWorkingDay(date, includeSaturday)) {
+                        return false;
+                    }
+                    
                     // For completed tasks, use completedAt if earlier than endDate
                     let taskEnd;
                     if (task.status === 'Completed' && task.completedAt) {
@@ -1835,6 +2345,9 @@
 
             const taskStatusCounts = {
                 'Yet to Start': 0,
+                'Being Developed': 0,
+                'Ready for QA': 0,
+                'Assigned to QA': 0,
                 'In Progress': 0,
                 'On Hold': 0,
                 'Completed': 0,
@@ -1923,7 +2436,7 @@
         function calculateStats(tasksList) {
             const total = tasksList.length;
             const completed = tasksList.filter(task => task.status === 'Completed').length;
-            const active = tasksList.filter(task => ['In Progress', 'Yet to Start', 'On Hold'].includes(task.status)).length;
+            const active = tasksList.filter(task => ['In Progress', 'Yet to Start', 'On Hold', 'Being Developed', 'Ready for QA', 'Assigned to QA'].includes(task.status)).length;
             const overdue = tasksList.filter(task => {
                 if (!task.endDate || task.status === 'Completed') return false;
                 const today = new Date();
@@ -2007,7 +2520,7 @@
                         <td data-label="Project">${task.project_name || '-'}</td>
                         <td data-label="Phase">${task.sub_phase || '-'}</td>
                         <td data-label="Assigned To">${task.assigned_to || '-'}</td>
-                        <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
+                        <td data-label="Status"><span class="status-badge status-${getDisplayStatus(task).toLowerCase().replace(/ /g, '')}">${getDisplayStatus(task)}</span></td>
                         <td data-label="Due Date">${formatDate(task.end_date)}</td>
                         <td data-label="Actions">
                             <button class="action-btn" onclick="editTask(${task.id})">Edit</button>
@@ -2403,20 +2916,55 @@
             const form = document.getElementById('taskForm');
             const get = name => form.elements[name]?.value || '-';
 
+            // Get working days info
+            const workingDays = get('workingDays') && get('workingDays') !== '-' ? get('workingDays') : 'Not calculated';
+            const includeSaturday = get('includeSaturday') === 'true' ? 'Yes (Mon-Sat)' : 'No (Mon-Fri)';
+            const actualEndDate = get('actualEndDate') && get('actualEndDate') !== '-' ? formatDate(get('actualEndDate')) : 'Not set';
+            const actualWorkingDays = get('actualWorkingDays') && get('actualWorkingDays') !== '-' ? get('actualWorkingDays') : 'Not calculated';
+
             const summary = 
-`Project: ${get('projectName')}
-Phase: ${get('subPhase')}
-PC: ${get('pc')}
-Assigned To: ${get('assignedTo')}${get('assignedTo2') && get('assignedTo2') !== '-' ? ', ' + get('assignedTo2') : ''}
+`📋 TASK SUMMARY
+═══════════════════════════════════════════════════════════════
+
+📁 PROJECT DETAILS
+───────────────────────────────────────────────────────────────
+Project Name: ${get('projectName')}
+Sub Phase: ${get('subPhase')}
+Project Coordinator: ${get('pc')}
+
+👥 ASSIGNMENT
+───────────────────────────────────────────────────────────────
+Primary Assignee: ${get('assignedTo')}
+Secondary Assignee: ${get('assignedTo2') && get('assignedTo2') !== '-' ? get('assignedTo2') : 'Not assigned'}
+
+📊 STATUS & SCHEDULING
+───────────────────────────────────────────────────────────────
 Status: ${get('status')}
-Start Date: ${get('startDate') && get('startDate') !== '-' ? formatDate(get('startDate')) : '-'}
-Expected End Date: ${get('endDate') && get('endDate') !== '-' ? formatDate(get('endDate')) : '-'}
-Actual Completion Date: ${get('completedAt') && get('completedAt') !== '-' ? formatDate(get('completedAt')) : '-'}
 Sprint: ${get('sprint')}
+
+📅 DATES & TIMELINE
+───────────────────────────────────────────────────────────────
+Start Date: ${get('startDate') && get('startDate') !== '-' ? formatDate(get('startDate')) : 'Not set'}
+Expected End Date: ${get('endDate') && get('endDate') !== '-' ? formatDate(get('endDate')) : 'Not set'}
+Actual End Date: ${actualEndDate}
+
+⏱️ WORKING DAYS
+───────────────────────────────────────────────────────────────
+Expected Working Days: ${workingDays}
+Actual Working Days: ${actualWorkingDays}
+Include Saturday: ${includeSaturday}
+
+🐛 QUALITY METRICS
+───────────────────────────────────────────────────────────────
 Bug Count: ${get('bugCount')}
+
+📝 NOTES & COMMENTS
+───────────────────────────────────────────────────────────────
 Comments: ${get('comments')}
-Deviation: ${get('deviation')}
-Reason: ${get('deviationReason')}`;
+Deviation Reason: ${get('deviationReason')}
+
+═══════════════════════════════════════════════════════════════
+Generated on: ${new Date().toLocaleString()}`;
 
             document.getElementById('taskSummaryText').value = summary;
             document.getElementById('taskSummaryContainer').style.display = '';
@@ -2430,6 +2978,73 @@ Reason: ${get('deviationReason')}`;
         }
         function closeReportModal() {
             document.getElementById('reportModal').classList.remove('active');
+        }
+
+        // Schedule Date Picker Functions
+        function openScheduleDatePicker() {
+            closeReportModal();
+            const datePicker = document.getElementById('scheduleDatePicker');
+            // Set default to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            datePicker.value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('scheduleDateModal').classList.add('active');
+        }
+
+        function closeScheduleDateModal() {
+            document.getElementById('scheduleDateModal').classList.remove('active');
+        }
+
+        async function generateScheduleReport() {
+            const selectedDate = document.getElementById('scheduleDatePicker').value;
+            if (!selectedDate) {
+                showToast('Please select a date');
+                return;
+            }
+            
+            closeScheduleDateModal();
+            const scheduleDate = new Date(selectedDate);
+            scheduleDate.setHours(0,0,0,0);
+            
+            // Update the date display
+            const tomorrowDateElement = document.getElementById('tomorrowScheduleDate');
+            if (tomorrowDateElement) {
+                tomorrowDateElement.textContent = `Generated on ${scheduleDate.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}`;
+            }
+            
+            // Check if it's a weekend (Saturday or Sunday)
+            const dayOfWeek = scheduleDate.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Sunday = 0, Saturday = 6
+            
+            // For now, we'll allow Saturday as a working day (you can modify this logic)
+            const isHoliday = dayOfWeek === 0; // Only Sunday is considered holiday by default
+            
+            const scheduleTasks = tasks.filter(t => {
+                const start = t.startDate ? new Date(t.startDate) : null;
+                const end = t.endDate ? new Date(t.endDate) : null;
+                if (!start) return false;
+                start.setHours(0,0,0,0);
+                if (end) end.setHours(0,0,0,0);
+                return start <= scheduleDate && (!end || end >= scheduleDate);
+            });
+            
+            renderScreenshotTable(
+                'tomorrowScheduleScreenshotTable',
+                scheduleTasks,
+                ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
+                t => [
+                    t.projectName||'',
+                    t.subPhase||'',
+                    [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
+                    isHoliday ? 'Holiday' : (t.status||''),
+                    t.startDate ? formatDate(t.startDate) : '',
+                    t.endDate ? formatDate(t.endDate) : '',
+                    t.comments||''
+                ]
+            );
+            
+            const dateStr = scheduleDate.toISOString().split('T')[0];
+            await _captureScreenshotContainer('tomorrowScheduleScreenshotContainer', `Work_Schedule_${dateStr}.png`);
         }
 
         // 1. Tracker Table Screenshot
@@ -2472,6 +3087,21 @@ Reason: ${get('deviationReason')}`;
             closeReportModal();
             const today = new Date();
             today.setHours(0,0,0,0);
+            
+            // Update the date display
+            const todayDateElement = document.getElementById('todayStatusDate');
+            const todayDayNameElement = document.getElementById('todayStatusDayName');
+            if (todayDateElement) {
+                todayDateElement.textContent = `Generated on ${today.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}`;
+            }
+            if (todayDayNameElement) {
+                const dayName = today.toLocaleDateString('en-IN', { 
+                    timeZone: 'Asia/Kolkata', 
+                    weekday: 'long' 
+                });
+                todayDayNameElement.textContent = dayName;
+            }
+            
             // Tasks active today (start <= today <= end)
             const todayTasks = tasks.filter(t => {
                 const start = t.startDate ? new Date(t.startDate) : null;
@@ -2504,6 +3134,13 @@ Reason: ${get('deviationReason')}`;
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(0,0,0,0);
+            
+            // Update the date display
+            const tomorrowDateElement = document.getElementById('tomorrowScheduleDate');
+            if (tomorrowDateElement) {
+                tomorrowDateElement.textContent = `Generated on ${tomorrow.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}`;
+            }
+            
             const tomorrowTasks = tasks.filter(t => {
                 const start = t.startDate ? new Date(t.startDate) : null;
                 const end = t.endDate ? new Date(t.endDate) : null;
@@ -2532,14 +3169,15 @@ Reason: ${get('deviationReason')}`;
         // Helper: Render a table for screenshot
         function renderScreenshotTable(tableId, data, headers, rowFn) {
             const table = document.getElementById(tableId);
-            let html = '<thead><tr>' + headers.map(h => `<th style="border:1px solid #ccc;padding:8px;background:#f3f4f6;">${h}</th>`).join('') + '</tr></thead>';
+            let html = '<thead><tr>' + headers.map(h => `<th style="border:1px solid #e5e7eb;padding:16px 12px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;font-weight:600;text-align:left;font-size:0.9rem;">${h}</th>`).join('') + '</tr></thead>';
             html += '<tbody>';
             if (data.length === 0) {
-                html += `<tr><td colspan="${headers.length}" style="text-align:center;padding:2rem;">No data</td></tr>`;
+                html += `<tr><td colspan="${headers.length}" style="text-align:center;padding:3rem;color:#64748b;font-style:italic;background:#f8fafc;">No data available</td></tr>`;
             } else {
-                html += data.map(t =>
-                    '<tr>' + rowFn(t).map(val => `<td style="border:1px solid #ccc;padding:8px;">${val}</td>`).join('') + '</tr>'
-                ).join('');
+                html += data.map((t, index) => {
+                    const bgColor = index % 2 === 0 ? '#ffffff' : '#f8fafc';
+                    return '<tr>' + rowFn(t).map(val => `<td style="border:1px solid #e5e7eb;padding:12px;color:#374151;background:${bgColor};font-size:0.85rem;">${val}</td>`).join('') + '</tr>';
+                }).join('');
             }
             html += '</tbody>';
             table.innerHTML = html;
@@ -2650,8 +3288,70 @@ Reason: ${get('deviationReason')}`;
             document.getElementById('markPresentBtn')?.addEventListener('click', () => markAttendance('Present'));
             document.getElementById('markAbsentBtn')?.addEventListener('click', () => markAttendance('Absent'));
 
+            // Re-attach dropdown listeners after DOM is loaded
+            attachDropdownListeners();
+
+            // Add working days calculation listeners
+            setupWorkingDaysCalculation();
+
             await renderCurrentTab();
         });
+
+        // Setup working days calculation
+        function setupWorkingDaysCalculation() {
+            const startDateInput = document.querySelector('input[name="startDate"]');
+            const endDateInput = document.querySelector('input[name="endDate"]');
+            const workingDaysInput = document.querySelector('input[name="workingDays"]');
+            const includeSaturdaySelect = document.querySelector('select[name="includeSaturday"]');
+            const actualEndDateInput = document.querySelector('input[name="actualEndDate"]');
+            const actualWorkingDaysInput = document.querySelector('input[name="actualWorkingDays"]');
+
+            function calculateExpectedWorkingDays() {
+                const startDate = startDateInput?.value;
+                const endDate = endDateInput?.value;
+                const includeSaturday = includeSaturdaySelect?.value === 'true';
+
+                if (startDate && endDate) {
+                    const workingDays = calculateWorkingDays(startDate, endDate, includeSaturday);
+                    if (workingDaysInput) {
+                        workingDaysInput.value = workingDays;
+                    }
+                } else if (workingDaysInput) {
+                    workingDaysInput.value = '0';
+                }
+            }
+
+            function calculateActualWorkingDays() {
+                const startDate = startDateInput?.value;
+                const actualEndDate = actualEndDateInput?.value;
+                const includeSaturday = includeSaturdaySelect?.value === 'true';
+
+                if (startDate && actualEndDate) {
+                    const actualWorkingDays = calculateWorkingDays(startDate, actualEndDate, includeSaturday);
+                    if (actualWorkingDaysInput) {
+                        actualWorkingDaysInput.value = actualWorkingDays;
+                    }
+                } else if (actualWorkingDaysInput) {
+                    actualWorkingDaysInput.value = '0';
+                }
+            }
+
+            // Event listeners for expected working days calculation
+            if (startDateInput) {
+                startDateInput.addEventListener('change', calculateExpectedWorkingDays);
+            }
+            if (endDateInput) {
+                endDateInput.addEventListener('change', calculateExpectedWorkingDays);
+            }
+            if (includeSaturdaySelect) {
+                includeSaturdaySelect.addEventListener('change', calculateExpectedWorkingDays);
+            }
+
+            // Event listeners for actual working days calculation
+            if (actualEndDateInput) {
+                actualEndDateInput.addEventListener('change', calculateActualWorkingDays);
+            }
+        }
     </script>
 </body>
 </html>
