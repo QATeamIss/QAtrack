@@ -953,6 +953,127 @@
         .assignee-header-7 { background: #fcd34d !important; color: #92400e !important; }
         .assignee-header-8 { background: #fbcfe8 !important; color: #be185d !important; }
         .assignee-header-9 { background: #a7f3d0 !important; color: #065f46 !important; }
+
+        /* Project Details in Labels Table */
+        .label-row:hover {
+            background-color: #f8fafc !important;
+            transition: background-color 0.2s ease;
+        }
+
+        .project-details-row {
+            background-color: #f8fafc;
+        }
+
+        .project-details-cell {
+            padding: 0 !important;
+            border-top: none !important;
+        }
+
+        .project-details-container {
+            padding: 1.5rem;
+            background: white;
+            margin: 0.5rem;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-details-container h4 {
+            margin: 0 0 1rem 0;
+            color: #1f2937;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+
+        .project-details-table {
+            overflow-x: auto;
+        }
+
+        .projects-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            min-width: 1200px;
+        }
+
+        .projects-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.6rem 0.4rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .projects-table td {
+            padding: 0.6rem 0.4rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            white-space: nowrap;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .projects-table tr:nth-child(even) td {
+            background: #f9fafb;
+        }
+
+        .projects-table tr:hover td {
+            background: #f3f4f6;
+        }
+
+        .usage-count {
+            background: #3b82f6;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .label-type {
+            background: #e5e7eb;
+            color: #374151;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Special styling for project details columns */
+        .projects-table td[data-label="Project Name"] {
+            max-width: 200px;
+            font-weight: 600;
+        }
+
+        .projects-table td[data-label="Comments"] {
+            max-width: 250px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .projects-table td[data-label="Deviation Reason"] {
+            max-width: 200px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .projects-table td[data-label="Bug Count"] {
+            text-align: center;
+            font-weight: 600;
+            color: #dc2626;
+        }
+
+        .projects-table td[data-label="Working Days"] {
+            text-align: center;
+            font-weight: 600;
+            color: #059669;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
@@ -990,7 +1111,7 @@
                 <span class="nav-icon" aria-label="Completed" title="Completed">✅</span>
                 <span>Completed</span>
             </div>
-            <div class="nav-item dropdown-container">
+            <div class="nav-item dropdown-container" data-tab="labels">
                 <span class="nav-icon" aria-label="Labels" title="Labels">🏷️</span>
                 <span>Labels Table</span>
                 <div class="dropdown-menu">
@@ -1334,6 +1455,32 @@
                     </div>
                 </div>
 
+                <div id="labels" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">Labels Table</h1>
+                        <p class="page-subtitle">All labels and categories used in the system</p>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>System Labels</h3>
+                            <input type="text" class="search-box" placeholder="Filter labels..." id="labelsSearch">
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Label Type</th>
+                                    <th>Label Name</th>
+                                    <th>Description</th>
+                                    <th>Usage Count</th>
+                                    <th>Color</th>
+                                </tr>
+                            </thead>
+                            <tbody id="labelsTableBody"></tbody>
+                        </table>
+                        <div id="labelsPagination"></div>
+                    </div>
+                </div>
+
                 <button class="btn btn-secondary" onclick="clearAllData()" style="margin-top: 2rem;">Clear All Data (Reset)</button>
             </div>
             <footer class="app-footer">
@@ -1581,6 +1728,7 @@
         let allProjectsSearchTerm = '';
         let forecastSearchTerm = '';
         let yetToStartSearchTerm = '';
+        let labelsSearchTerm = '';
         let trackerDateFilter = '';
         // Pagination state
         let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1, allProjectsPage = 1;
@@ -2093,6 +2241,11 @@
             renderYetToStart();
         });
 
+        document.getElementById('labelsSearch')?.addEventListener('input', (e) => {
+            labelsSearchTerm = e.target.value;
+            renderLabels();
+        });
+
         /* Navigation */
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
@@ -2177,6 +2330,7 @@
                 case 'attendance': await renderAttendance(); break;
                 case 'forecast': await renderForecast(); break;
                 case 'yet-to-start': await renderYetToStart(); break;
+                case 'labels': await renderLabels(); break;
             }
         }
 
@@ -2819,6 +2973,227 @@
             });
             tbody.innerHTML = html;
             document.getElementById('yetToStartPagination').innerHTML = '';
+        }
+
+        async function renderLabels() {
+            // Collect all unique labels and categories from the tasks
+            const labels = new Map();
+            
+            // Status labels
+            const statusLabels = ['In Progress', 'Completed', 'On Hold', 'Cancelled', 'Forecast', 'Yet to Start'];
+            statusLabels.forEach(status => {
+                const count = tasks.filter(task => task.status === status).length;
+                labels.set(`status-${status}`, {
+                    type: 'Status',
+                    name: status,
+                    description: `Project status: ${status}`,
+                    count: count,
+                    color: getStatusColor(status)
+                });
+            });
+
+            // Phase labels
+            const phases = [...new Set(tasks.map(task => task.subPhase).filter(Boolean))];
+            phases.forEach(phase => {
+                const count = tasks.filter(task => task.subPhase === phase).length;
+                labels.set(`phase-${phase}`, {
+                    type: 'Phase',
+                    name: phase,
+                    description: `Project phase: ${phase}`,
+                    count: count,
+                    color: '#3b82f6'
+                });
+            });
+
+            // Priority labels (if any)
+            const priorities = [...new Set(tasks.map(task => task.priority).filter(Boolean))];
+            priorities.forEach(priority => {
+                const count = tasks.filter(task => task.priority === priority).length;
+                labels.set(`priority-${priority}`, {
+                    type: 'Priority',
+                    name: priority,
+                    description: `Project priority: ${priority}`,
+                    count: count,
+                    color: getPriorityColor(priority)
+                });
+            });
+
+            // Assignee labels
+            const assignees = [...new Set(tasks.flatMap(task => [task.assignedTo, task.assignedTo2]).filter(Boolean))];
+            assignees.forEach(assignee => {
+                const count = tasks.filter(task => task.assignedTo === assignee || task.assignedTo2 === assignee).length;
+                labels.set(`assignee-${assignee}`, {
+                    type: 'Assignee',
+                    name: assignee,
+                    description: `Assigned to: ${assignee}`,
+                    count: count,
+                    color: '#10b981'
+                });
+            });
+
+            // Convert to array and filter by search term
+            let labelsArray = Array.from(labels.values());
+            
+            // Apply search filter
+            if (labelsSearchTerm) {
+                const searchTerm = labelsSearchTerm.toLowerCase();
+                labelsArray = labelsArray.filter(label => 
+                    label.type.toLowerCase().includes(searchTerm) ||
+                    label.name.toLowerCase().includes(searchTerm) ||
+                    label.description.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Sort by type, then by count
+            labelsArray.sort((a, b) => {
+                if (a.type !== b.type) return a.type.localeCompare(b.type);
+                return b.count - a.count;
+            });
+
+            // Render the table
+            const tbody = document.getElementById('labelsTableBody');
+            if (labelsArray.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:#64748b;">No labels found</td></tr>';
+                return;
+            }
+
+            const html = labelsArray.map((label, index) => `
+                <tr class="label-row" data-label-type="${label.type}" data-label-name="${label.name}" style="cursor: pointer;" onclick="showLabelProjects('${label.type}', '${label.name}')">
+                    <td data-label="Label Type"><span class="label-type">${label.type}</span></td>
+                    <td data-label="Label Name"><strong>${label.name}</strong></td>
+                    <td data-label="Description">${label.description}</td>
+                    <td data-label="Usage Count"><span class="usage-count">${label.count}</span></td>
+                    <td data-label="Color">
+                        <span class="color-indicator" style="background-color: ${label.color}; width: 20px; height: 20px; border-radius: 50%; display: inline-block; border: 2px solid #e5e7eb;"></span>
+                    </td>
+                </tr>
+                <tr id="projects-${label.type}-${label.name.replace(/\s+/g, '-')}" class="project-details-row" style="display: none;">
+                    <td colspan="5" class="project-details-cell">
+                        <div class="project-details-container">
+                            <h4>Projects with ${label.type}: ${label.name}</h4>
+                            <div class="project-details-table">
+                                <table class="projects-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Project Name</th>
+                                            <th>Phase</th>
+                                            <th>PC</th>
+                                            <th>Assigned To (1)</th>
+                                            <th>Assigned To (2)</th>
+                                            <th>Status</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Actual Start</th>
+                                            <th>Actual End</th>
+                                            <th>Working Days</th>
+                                            <th>Sprint</th>
+                                            <th>Bug Count</th>
+                                            <th>Completed At</th>
+                                            <th>Deviation Reason</th>
+                                            <th>Comments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="projects-${label.type}-${label.name.replace(/\s+/g, '-')}-body">
+                                        <!-- Projects will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = html;
+            document.getElementById('labelsPagination').innerHTML = '';
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'In Progress': '#3b82f6',
+                'Completed': '#10b981',
+                'On Hold': '#f59e0b',
+                'Cancelled': '#ef4444',
+                'Forecast': '#8b5cf6',
+                'Yet to Start': '#6b7280'
+            };
+            return colors[status] || '#6b7280';
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                'High': '#ef4444',
+                'Medium': '#f59e0b',
+                'Low': '#10b981'
+            };
+            return colors[priority] || '#6b7280';
+        }
+
+        function showLabelProjects(labelType, labelName) {
+            // Toggle the project details row
+            const projectRowId = `projects-${labelType}-${labelName.replace(/\s+/g, '-')}`;
+            const projectRow = document.getElementById(projectRowId);
+            const projectBodyId = `projects-${labelType}-${labelName.replace(/\s+/g, '-')}-body`;
+            const projectBody = document.getElementById(projectBodyId);
+            
+            if (projectRow.style.display === 'none') {
+                // Show the row and load projects
+                projectRow.style.display = 'table-row';
+                
+                // Filter tasks based on label type and name
+                let filteredTasks = [];
+                
+                switch (labelType) {
+                    case 'Status':
+                        filteredTasks = tasks.filter(task => task.status === labelName);
+                        break;
+                    case 'Phase':
+                        filteredTasks = tasks.filter(task => task.subPhase === labelName);
+                        break;
+                    case 'Priority':
+                        filteredTasks = tasks.filter(task => task.priority === labelName);
+                        break;
+                    case 'Assignee':
+                        filteredTasks = tasks.filter(task => 
+                            task.assignedTo === labelName || task.assignedTo2 === labelName
+                        );
+                        break;
+                }
+                
+                // Render the projects table
+                if (filteredTasks.length === 0) {
+                    projectBody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:2rem;color:#64748b;">No projects found for this label</td></tr>';
+                } else {
+                    const projectsHtml = filteredTasks.map(task => `
+                        <tr>
+                            <td data-label="Project Name"><strong>${task.projectName || '-'}</strong></td>
+                            <td data-label="Phase">${task.subPhase || '-'}</td>
+                            <td data-label="PC">${task.pc || '-'}</td>
+                            <td data-label="Assigned To (1)">${task.assignedTo || '-'}</td>
+                            <td data-label="Assigned To (2)">${task.assignedTo2 || '-'}</td>
+                            <td data-label="Status">
+                                <span class="status-badge status-${getDisplayStatus(task).toLowerCase().replace(/ /g, '')}">
+                                    ${getDisplayStatus(task)}
+                                </span>
+                            </td>
+                            <td data-label="Start Date">${formatDate(task.startDate)}</td>
+                            <td data-label="End Date">${formatDate(task.endDate)}</td>
+                            <td data-label="Actual Start">${formatDate(task.actualStartDate)}</td>
+                            <td data-label="Actual End">${formatDate(task.actualEndDate)}</td>
+                            <td data-label="Working Days">${task.workingDays || '-'}</td>
+                            <td data-label="Sprint">${task.sprint || '-'}</td>
+                            <td data-label="Bug Count">${task.bugCount || '0'}</td>
+                            <td data-label="Completed At">${formatDate(task.completedAt)}</td>
+                            <td data-label="Deviation Reason">${task.deviationReason || '-'}</td>
+                            <td data-label="Comments">${task.comments || '-'}</td>
+                        </tr>
+                    `).join('');
+                    
+                    projectBody.innerHTML = projectsHtml;
+                }
+            } else {
+                // Hide the row
+                projectRow.style.display = 'none';
+            }
         }
 
         async function renderSummary() {
