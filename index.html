@@ -13,17 +13,21 @@
         }
 
         /* Base Typography & Light Mode Theme */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            height: 100vh;
+            background-attachment: fixed;
             color: #334155;
             line-height: 1.5;
             overflow-x: hidden;
             zoom: 0.75;
-            margin: 0;
-            padding: 0;
+            min-height: 100vh;
         }
 
         h1, h2, h3, h4 {
@@ -38,6 +42,8 @@
             display: flex;
             min-height: 100vh;
             width: 100%;
+            position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
         /* Glassmorphism Sidebar - Light Mode */
@@ -51,13 +57,60 @@
             top: 0;
             left: 0;
             height: 100vh;
+            min-height: 100vh;
             overflow-y: auto;
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            z-index: -1;
+        }
+
+        .sidebar::after {
+            content: '';
+            position: fixed;
+            top: 100vh;
+            left: 0;
+            width: 280px;
+            height: 50vh;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            z-index: -1;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .nav-items {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.collapsed {
             width: 80px;
             padding: 2rem 1rem;
+        }
+
+        .sidebar.collapsed::before {
+            width: 80px;
+        }
+
+        .sidebar.collapsed::after {
+            width: 80px;
         }
 
         .sidebar.collapsed .logo {
@@ -224,10 +277,12 @@
             min-height: 100vh;
             transition: margin-left 0.3s ease;
             box-sizing: border-box;
+            width: calc(100% - 280px);
         }
 
         .main-content.sidebar-collapsed {
             margin-left: 80px;
+            width: calc(100% - 80px);
         }
         
         .main-content-wrapper {
@@ -361,9 +416,36 @@
             background: white;
             border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 16px;
-            overflow-x: auto;
             margin-top: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-scroll-container {
+            overflow-x: auto;
+            overflow-y: visible;
+            max-width: 100%;
+            border-radius: 16px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+
+        .table-scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-scroll-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .table-scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .table-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         .table-header {
@@ -404,6 +486,7 @@
 
         table {
             width: 100%;
+            min-width: 800px;
             border-collapse: collapse;
             white-space: nowrap;
         }
@@ -414,6 +497,7 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             color: #334155;
             border-right: 1px solid #e5e7eb;
+            min-width: 120px;
         }
 
         th:last-child, td:last-child {
@@ -930,9 +1014,11 @@
             .sidebar { width: 200px; }
             .main-content {
                 margin-left: 200px;
+                width: calc(100% - 200px);
             }
             .main-content.sidebar-collapsed {
                 margin-left: 80px;
+                width: calc(100% - 80px);
             }
             .stats-card { padding: 2rem 1.5rem; }
             .page-title { font-size: 2rem; }
@@ -942,14 +1028,19 @@
         }
 
         @media (max-width: 768px) {
-            .app-container { flex-direction: column; }
             .sidebar {
                 width: 100%;
+                height: 100vh;
+                min-height: 100vh;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                z-index: 1001;
+                transition: left 0.3s ease;
                 padding: 1.5rem 1rem;
-                border-right: none;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                position: relative;
-                height: auto;
+            }
+            .sidebar.open {
+                left: 0;
             }
             .sidebar.collapsed {
                 width: 100%;
@@ -972,16 +1063,21 @@
             .logo { margin-bottom: 1.5rem; font-size: 1.5rem; }
             .nav-item { padding: 0.8rem 1rem; margin: 0.25rem 0; }
             .main-content { 
-                padding: 1.5rem 1rem; 
+                padding: 1rem; 
                 margin-left: 0; 
-                position: relative;
+                width: 100%;
             }
             .main-content.sidebar-collapsed {
                 margin-left: 0;
+                width: 100%;
             }
             .header { flex-direction: column; gap: 1rem; }
             .sidebar-toggle {
-                display: none;
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1002;
             }
             .table-header { flex-direction: column; gap: 1rem; }
             .search-box, .date-filter { max-width: 100%; }
@@ -1413,45 +1509,49 @@
         </button>
         <nav class="sidebar" id="sidebar">
             <div class="logo">QA Tracker Pro</div>
-            <div class="nav-item active" data-tab="dashboard">
-                <span class="nav-icon" aria-label="Dashboard" title="Dashboard">📊</span>
-                <span>Dashboard</span>
-            </div>
-            <div class="nav-item" data-tab="tracker">
-                <span class="nav-icon" aria-label="Tracker" title="Tracker">📋</span>
-                <span>Tracker</span>
-            </div>
-            <div class="nav-item" data-tab="schedule">
-                <span class="nav-icon" aria-label="Schedule" title="Schedule">📅</span>
-                <span>Schedule</span>
-            </div>
-            <div class="nav-item" data-tab="summary">
-                <span class="nav-icon" aria-label="Summary" title="Summary">📈</span>
-                <span>Summary</span>
-            </div>
-            <div class="nav-item" data-tab="analytics">
-                <span class="nav-icon" aria-label="Analytics" title="Analytics">🔍</span>
-                <span>Analytics</span>
-            </div>
-            <div class="nav-item" data-tab="attendance">
-                <span class="nav-icon" aria-label="Attendance" title="Attendance">🗓️</span>
-                <span>Attendance</span>
-            </div>
-            <div class="nav-item" data-tab="allprojects">
-                <span class="nav-icon" aria-label="Completed" title="Completed">✅</span>
-                <span>Completed</span>
-            </div>
-            <div class="nav-item dropdown-container" data-tab="labels">
-                <span class="nav-icon" aria-label="Labels" title="Labels">🏷️</span>
-                <span>Labels Table</span>
-                <div class="dropdown-menu">
-                    <div class="dropdown-item" data-tab="forecast">
-                        <span class="nav-icon">📊</span>
-                        <span>Forecast</span>
+            <div class="sidebar-nav">
+                <div class="nav-items">
+                    <div class="nav-item active" data-tab="dashboard">
+                        <span class="nav-icon" aria-label="Dashboard" title="Dashboard">📊</span>
+                        <span>Dashboard</span>
                     </div>
-                    <div class="dropdown-item" data-tab="yet-to-start">
-                        <span class="nav-icon">⏳</span>
-                        <span>Yet to Start</span>
+                    <div class="nav-item" data-tab="tracker">
+                        <span class="nav-icon" aria-label="Tracker" title="Tracker">📋</span>
+                        <span>Tracker</span>
+                    </div>
+                    <div class="nav-item" data-tab="schedule">
+                        <span class="nav-icon" aria-label="Schedule" title="Schedule">📅</span>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="nav-item" data-tab="summary">
+                        <span class="nav-icon" aria-label="Summary" title="Summary">📈</span>
+                        <span>Summary</span>
+                    </div>
+                    <div class="nav-item" data-tab="analytics">
+                        <span class="nav-icon" aria-label="Analytics" title="Analytics">🔍</span>
+                        <span>Analytics</span>
+                    </div>
+                    <div class="nav-item" data-tab="attendance">
+                        <span class="nav-icon" aria-label="Attendance" title="Attendance">🗓️</span>
+                        <span>Attendance</span>
+                    </div>
+                    <div class="nav-item" data-tab="allprojects">
+                        <span class="nav-icon" aria-label="Completed" title="Completed">✅</span>
+                        <span>Completed</span>
+                    </div>
+                    <div class="nav-item dropdown-container" data-tab="labels">
+                        <span class="nav-icon" aria-label="Labels" title="Labels">🏷️</span>
+                        <span>Labels Table</span>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item" data-tab="forecast">
+                                <span class="nav-icon">📊</span>
+                                <span>Forecast</span>
+                            </div>
+                            <div class="dropdown-item" data-tab="yet-to-start">
+                                <span class="nav-icon">⏳</span>
+                                <span>Yet to Start</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1493,19 +1593,21 @@
                                 <input type="date" class="date-filter" id="dateFilter" placeholder="Filter by due date">
                             </div>
                         </div>
-                        <table id="tasksTable">
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Phase</th>
-                                    <th>Assigned To</th>
-                                    <th>Status</th>
-                                    <th>Due Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tasksTableBody"></tbody>
-                        </table>
+                        <div class="table-scroll-container">
+                            <table id="tasksTable">
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Phase</th>
+                                        <th>Assigned To</th>
+                                        <th>Status</th>
+                                        <th>Due Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tasksTableBody"></tbody>
+                            </table>
+                        </div>
                         <div id="dashboardPagination"></div>
                     </div>
                 </div>
@@ -1523,27 +1625,29 @@
                                 <input type="date" class="date-filter" id="trackerDateFilter" placeholder="Filter by expected end date">
                             </div>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Phase</th>
-                                    <th>PC</th>
-                                    <th>Assigned To (1)</th>
-                                    <th>Assigned To (2)</th>
-                                    <th>Status</th>
-                                    <th>Start Date</th>
-                                    <th>Expected End Date</th>
-                                    <th>Actual Completion Date</th>
-                                    <th>Comments</th>
-                                    <th>Bug Count</th>
-                                    <th>Deviation</th>
-                                    <th>Reason</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="trackerTableBody"></tbody>
-                        </table>
+                        <div class="table-scroll-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Phase</th>
+                                        <th>PC</th>
+                                        <th>Assigned To (1)</th>
+                                        <th>Assigned To (2)</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>Expected End Date</th>
+                                        <th>Actual Completion Date</th>
+                                        <th>Comments</th>
+                                        <th>Bug Count</th>
+                                        <th>Deviation</th>
+                                        <th>Reason</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trackerTableBody"></tbody>
+                            </table>
+                        </div>
                         <div id="trackerPagination"></div>
                     </div>
                 </div>
@@ -1610,21 +1714,23 @@
                             <h3>Completed Projects</h3>
                             <input type="text" class="search-box" placeholder="Search completed projects..." id="summarySearch">
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Projects</th>
-                                    <th>Resource</th>
-                                    <th>Phase</th>
-                                    <th>Start Date</th>
-                                    <th>Time Taken</th>
-                                    <th>Deviation</th>
-                                    <th>Sprint</th>
-                                    <th>Bug Count</th>
-                                </tr>
-                            </thead>
-                            <tbody id="summaryTableBody"></tbody>
-                        </table>
+                        <div class="table-scroll-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Projects</th>
+                                        <th>Resource</th>
+                                        <th>Phase</th>
+                                        <th>Start Date</th>
+                                        <th>Time Taken</th>
+                                        <th>Deviation</th>
+                                        <th>Sprint</th>
+                                        <th>Bug Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="summaryTableBody"></tbody>
+                            </table>
+                        </div>
                         <div id="summaryPagination"></div>
                     </div>
                 </div>
@@ -1674,16 +1780,18 @@
                             <div class="table-header">
                                 <h3>Attendance History</h3>
                             </div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Employee</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="attendanceTableBody"></tbody>
-                            </table>
+                            <div class="table-scroll-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Employee</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendanceTableBody"></tbody>
+                                </table>
+                            </div>
                             <div id="attendancePagination"></div>
                         </div>
                     </div>
@@ -1698,26 +1806,28 @@
                             <h3>Completed Projects</h3>
                             <input type="text" class="search-box" placeholder="Filter completed projects..." id="allProjectsSearch">
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Phase</th>
-                                    <th>PC</th>
-                                    <th>Assigned To (1)</th>
-                                    <th>Assigned To (2)</th>
-                                    <th>Status</th>
-                                    <th>Start Date</th>
-                                    <th>Expected End Date</th>
-                                    <th>Actual Completion Date</th>
-                                    <th>Comments</th>
-                                    <th>Bug Count</th>
-                                    <th>Deviation</th>
-                                    <th>Reason</th>
-                                </tr>
-                            </thead>
-                            <tbody id="allProjectsTableBody"></tbody>
-                        </table>
+                        <div class="table-scroll-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Phase</th>
+                                        <th>PC</th>
+                                        <th>Assigned To (1)</th>
+                                        <th>Assigned To (2)</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>Expected End Date</th>
+                                        <th>Actual Completion Date</th>
+                                        <th>Comments</th>
+                                        <th>Bug Count</th>
+                                        <th>Deviation</th>
+                                        <th>Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allProjectsTableBody"></tbody>
+                            </table>
+                        </div>
                         <div id="allProjectsPagination"></div>
                     </div>
                 </div>
@@ -1732,24 +1842,26 @@
                             <h3>Forecast Projects</h3>
                             <input type="text" class="search-box" placeholder="Filter forecast projects..." id="forecastSearch">
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Phase</th>
-                                    <th>PC</th>
-                                    <th>Assigned To (1)</th>
-                                    <th>Assigned To (2)</th>
-                                    <th>Status</th>
-                                    <th>Start Date</th>
-                                    <th>Expected End Date</th>
-                                    <th>Comments</th>
-                                    <th>Bug Count</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="forecastTableBody"></tbody>
-                        </table>
+                        <div class="table-scroll-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Phase</th>
+                                        <th>PC</th>
+                                        <th>Assigned To (1)</th>
+                                        <th>Assigned To (2)</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>Expected End Date</th>
+                                        <th>Comments</th>
+                                        <th>Bug Count</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="forecastTableBody"></tbody>
+                            </table>
+                        </div>
                         <div id="forecastPagination"></div>
                     </div>
                 </div>
@@ -1764,23 +1876,25 @@
                             <h3>Yet to Start Projects</h3>
                             <input type="text" class="search-box" placeholder="Filter yet to start projects..." id="yetToStartSearch">
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Project</th>
-                                    <th>Phase</th>
-                                    <th>PC</th>
-                                    <th>Assigned To (1)</th>
-                                    <th>Assigned To (2)</th>
-                                    <th>Status</th>
-                                    <th>Expected Start Date</th>
-                                    <th>Expected End Date</th>
-                                    <th>Comments</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="yetToStartTableBody"></tbody>
-                        </table>
+                        <div class="table-scroll-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Phase</th>
+                                        <th>PC</th>
+                                        <th>Assigned To (1)</th>
+                                        <th>Assigned To (2)</th>
+                                        <th>Status</th>
+                                        <th>Expected Start Date</th>
+                                        <th>Expected End Date</th>
+                                        <th>Comments</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="yetToStartTableBody"></tbody>
+                            </table>
+                        </div>
                         <div id="yetToStartPagination"></div>
                     </div>
                 </div>
@@ -1885,23 +1999,27 @@
     </div>
 
     <!-- Hidden containers for screenshot reports -->
-    <div id="todayStatusScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);padding:3rem;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.1);">
-        <div style="text-align:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:3px solid #667eea;">
-            <h2 style="margin:0;color:#1e293b;font-size:2rem;font-weight:700;">📅 Today's Work Status</h2>
-            <p id="todayStatusDate" style="margin:0.5rem 0 0 0;color:#64748b;font-size:1rem;">Generated on </p>
-            <p id="todayStatusDayName" style="margin:0.5rem 0 0 0;color:#667eea;font-size:1.1rem;font-weight:600;"></p>
+    <div id="todayStatusScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:#ffffff;padding:2rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+        <div style="text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e5e7eb;">
+            <h2 style="margin:0;color:#374151;font-size:1.5rem;font-weight:600;">Today's Work Status</h2>
+            <p id="todayStatusDate" style="margin:0.5rem 0 0 0;color:#6b7280;font-size:0.9rem;">Generated on </p>
+            <p id="todayStatusDayName" style="margin:0.5rem 0 0 0;color:#6b7280;font-size:0.9rem;font-weight:500;"></p>
         </div>
-        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-        <table id="todayStatusScreenshotTable" style="border-collapse:collapse;width:100%;"></table>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;">
+        <div class="table-scroll-container">
+            <table id="todayStatusScreenshotTable" style="border-collapse:collapse;width:100%;min-width:800px;"></table>
+        </div>
     </div>
     </div>
-    <div id="tomorrowScheduleScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);padding:3rem;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.1);">
-        <div style="text-align:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:3px solid #764ba2;">
-            <h2 style="margin:0;color:#1e293b;font-size:2rem;font-weight:700;">🔮 Next Day's Work Schedule</h2>
-            <p id="tomorrowScheduleDate" style="margin:0.5rem 0 0 0;color:#64748b;font-size:1rem;">Generated on </p>
+    <div id="tomorrowScheduleScreenshotContainer" style="position:fixed;left:-9999px;top:0;z-index:-1;background:#ffffff;padding:2rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+        <div style="text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e5e7eb;">
+            <h2 style="margin:0;color:#374151;font-size:1.5rem;font-weight:600;">Next Day's Work Schedule</h2>
+            <p id="tomorrowScheduleDate" style="margin:0.5rem 0 0 0;color:#6b7280;font-size:0.9rem;">Generated on </p>
         </div>
-        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.05);">
-        <table id="tomorrowScheduleScreenshotTable" style="border-collapse:collapse;width:100%;"></table>
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:4px;overflow:hidden;">
+        <div class="table-scroll-container">
+            <table id="tomorrowScheduleScreenshotTable" style="border-collapse:collapse;width:100%;min-width:800px;"></table>
+        </div>
         </div>
     </div>
 
@@ -2121,18 +2239,61 @@
             const mainContent = document.querySelector('.main-content');
             const toggleIcon = document.getElementById('toggleIcon');
             
-            sidebarCollapsed = !sidebarCollapsed;
+            // Check if we're on mobile
+            const isMobile = window.innerWidth <= 768;
             
-            if (sidebarCollapsed) {
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('sidebar-collapsed');
-                toggleIcon.textContent = '☰';
+            if (isMobile) {
+                // Mobile behavior - toggle sidebar visibility
+                sidebarCollapsed = !sidebarCollapsed;
+                if (sidebarCollapsed) {
+                    sidebar.classList.add('open');
+                    toggleIcon.textContent = '✕';
+                } else {
+                    sidebar.classList.remove('open');
+                    toggleIcon.textContent = '☰';
+                }
             } else {
-                sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('sidebar-collapsed');
-                toggleIcon.textContent = '✕';
+                // Desktop behavior - toggle sidebar width
+                sidebarCollapsed = !sidebarCollapsed;
+                if (sidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('sidebar-collapsed');
+                    toggleIcon.textContent = '☰';
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('sidebar-collapsed');
+                    toggleIcon.textContent = '✕';
+                }
             }
         }
+
+        // Handle window resize for responsive behavior
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Reset to mobile state
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                sidebar.classList.remove('open');
+                toggleIcon.textContent = '☰';
+                sidebarCollapsed = false;
+            } else {
+                // Reset to desktop state
+                sidebar.classList.remove('open');
+                if (sidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('sidebar-collapsed');
+                    toggleIcon.textContent = '☰';
+                } else {
+                    toggleIcon.textContent = '✕';
+                }
+            }
+        });
+
         let analyticsStatusFilter = '';
         let analyticsAssigneeFilter = '';
         let attendanceRecords = [];
@@ -3896,15 +4057,33 @@ Generated on: ${new Date().toLocaleString()}`;
                 'tomorrowScheduleScreenshotTable',
                 scheduleTasks,
                 ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
-                t => [
-                    t.projectName||'',
-                    t.subPhase||'',
-                    [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
-                    isHoliday ? 'Holiday' : (t.status||''),
-                    t.startDate ? formatDate(t.startDate) : '',
-                    t.endDate ? formatDate(t.endDate) : '',
-                    t.comments||''
-                ]
+                t => {
+                    if (isHoliday) {
+                        return [
+                            t.projectName||'',
+                            t.subPhase||'',
+                            [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
+                            'Holiday',
+                            t.startDate ? formatDate(t.startDate) : '',
+                            t.endDate ? formatDate(t.endDate) : '',
+                            t.comments||''
+                        ];
+                    }
+                    
+                    const isOverdue = isTaskOverdue(t);
+                    const overdueDays = calculateOverdueDays(t);
+                    const statusDisplay = isOverdue ? `Overdue (${overdueDays} days)` : (t.status || '');
+                    
+                    return [
+                        t.projectName||'',
+                        t.subPhase||'',
+                        [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
+                        statusDisplay,
+                        t.startDate ? formatDate(t.startDate) : '',
+                        t.endDate ? formatDate(t.endDate) : '',
+                        t.comments||''
+                    ];
+                }
             );
             
             const dateStr = scheduleDate.toISOString().split('T')[0];
@@ -3979,15 +4158,21 @@ Generated on: ${new Date().toLocaleString()}`;
                 'todayStatusScreenshotTable',
                 todayTasks,
                 ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
-                t => [
-                    t.projectName||'',
-                    t.subPhase||'',
-                    [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
-                    t.status||'',
-                    t.startDate ? formatDate(t.startDate) : '',
-                    t.endDate ? formatDate(t.endDate) : '',
-                    t.comments||''
-                ]
+                t => {
+                    const isOverdue = isTaskOverdue(t);
+                    const overdueDays = calculateOverdueDays(t);
+                    const statusDisplay = isOverdue ? `Overdue (${overdueDays} days)` : (t.status || '');
+                    
+                    return [
+                        t.projectName||'',
+                        t.subPhase||'',
+                        [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
+                        statusDisplay,
+                        t.startDate ? formatDate(t.startDate) : '',
+                        t.endDate ? formatDate(t.endDate) : '',
+                        t.comments||''
+                    ];
+                }
             );
             await _captureScreenshotContainer('todayStatusScreenshotContainer', `Today_Work_Status_${today.toISOString().split('T')[0]}.png`);
         }
@@ -4017,30 +4202,57 @@ Generated on: ${new Date().toLocaleString()}`;
                 'tomorrowScheduleScreenshotTable',
                 tomorrowTasks,
                 ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
-                t => [
-                    t.projectName||'',
-                    t.subPhase||'',
-                    [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
-                    t.status||'',
-                    t.startDate ? formatDate(t.startDate) : '',
-                    t.endDate ? formatDate(t.endDate) : '',
-                    t.comments||''
-                ]
+                t => {
+                    const isOverdue = isTaskOverdue(t);
+                    const overdueDays = calculateOverdueDays(t);
+                    const statusDisplay = isOverdue ? `Overdue (${overdueDays} days)` : (t.status || '');
+                    
+                    return [
+                        t.projectName||'',
+                        t.subPhase||'',
+                        [t.assignedTo, t.assignedTo2].filter(Boolean).join(', '),
+                        statusDisplay,
+                        t.startDate ? formatDate(t.startDate) : '',
+                        t.endDate ? formatDate(t.endDate) : '',
+                        t.comments||''
+                    ];
+                }
             );
             await _captureScreenshotContainer('tomorrowScheduleScreenshotContainer', `Tomorrow_Schedule_${tomorrow.toISOString().split('T')[0]}.png`);
+        }
+
+        // Helper: Calculate overdue days for a task
+        function calculateOverdueDays(task) {
+            if (!task.endDate) return 0;
+            const endDate = new Date(task.endDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            endDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = today - endDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays > 0 ? diffDays : 0;
+        }
+
+        // Helper: Check if task is overdue
+        function isTaskOverdue(task) {
+            if (!task.endDate || !task.status) return false;
+            const overdueDays = calculateOverdueDays(task);
+            const inProgressStatuses = ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'];
+            return overdueDays > 0 && inProgressStatuses.includes(task.status);
         }
 
         // Helper: Render a table for screenshot
         function renderScreenshotTable(tableId, data, headers, rowFn) {
             const table = document.getElementById(tableId);
-            let html = '<thead><tr>' + headers.map(h => `<th style="border:1px solid #e5e7eb;padding:16px 12px;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;font-weight:600;text-align:left;font-size:0.9rem;">${h}</th>`).join('') + '</tr></thead>';
+            let html = '<thead><tr>' + headers.map(h => `<th style="border:1px solid #d1d5db;padding:12px 8px;background:#f9fafb;color:#374151;font-weight:600;text-align:left;font-size:0.9rem;">${h}</th>`).join('') + '</tr></thead>';
             html += '<tbody>';
             if (data.length === 0) {
-                html += `<tr><td colspan="${headers.length}" style="text-align:center;padding:3rem;color:#64748b;font-style:italic;background:#f8fafc;">No data available</td></tr>`;
+                html += `<tr><td colspan="${headers.length}" style="text-align:center;padding:2rem;color:#6b7280;font-style:italic;background:#ffffff;">No data available</td></tr>`;
             } else {
                 html += data.map((t, index) => {
-                    const bgColor = index % 2 === 0 ? '#ffffff' : '#f8fafc';
-                    return '<tr>' + rowFn(t).map(val => `<td style="border:1px solid #e5e7eb;padding:12px;color:#374151;background:${bgColor};font-size:0.85rem;">${val}</td>`).join('') + '</tr>';
+                    const bgColor = index % 2 === 0 ? '#ffffff' : '#f9fafb';
+                    return '<tr>' + rowFn(t).map(val => `<td style="border:1px solid #e5e7eb;padding:10px 8px;color:#374151;background:${bgColor};font-size:0.85rem;">${val}</td>`).join('') + '</tr>';
                 }).join('');
             }
             html += '</tbody>';
