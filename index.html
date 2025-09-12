@@ -4050,7 +4050,15 @@ Generated on: ${new Date().toLocaleString()}`;
                 if (!start) return false;
                 start.setHours(0,0,0,0);
                 if (end) end.setHours(0,0,0,0);
-                return start <= scheduleDate && (!end || end >= scheduleDate);
+                
+                // Include tasks that are active on the schedule date
+                const isActiveOnDate = start <= scheduleDate && (!end || end >= scheduleDate);
+                
+                // Include overdue tasks (end date has passed but still in progress)
+                const inProgressStatuses = ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'];
+                const isOverdue = end && end < scheduleDate && inProgressStatuses.includes(t.status);
+                
+                return isActiveOnDate || isOverdue;
             });
             
             renderScreenshotTable(
@@ -4070,9 +4078,9 @@ Generated on: ${new Date().toLocaleString()}`;
                         ];
                     }
                     
-                    const isOverdue = isTaskOverdue(t);
-                    const overdueDays = calculateOverdueDays(t);
-                    const statusDisplay = isOverdue ? `Overdue (${overdueDays} days)` : (t.status || '');
+                    const isOverdue = isTaskOverdue(t, scheduleDate);
+                    const overdueDays = calculateOverdueDaysForDate(t, scheduleDate);
+                    const statusDisplay = isOverdue ? `Overdue By ${overdueDays} day${overdueDays > 1 ? 's' : ''}` : (t.status || '');
                     
                     return [
                         t.projectName||'',
@@ -4145,23 +4153,31 @@ Generated on: ${new Date().toLocaleString()}`;
                 todayDayNameElement.textContent = dayName;
             }
             
-            // Tasks active today (start <= today <= end)
+            // Tasks active today (start <= today <= end) OR overdue tasks (end < today but still in progress)
             const todayTasks = tasks.filter(t => {
                 const start = t.startDate ? new Date(t.startDate) : null;
                 const end = t.endDate ? new Date(t.endDate) : null;
                 if (!start) return false;
                 start.setHours(0,0,0,0);
                 if (end) end.setHours(0,0,0,0);
-                return start <= today && (!end || end >= today);
+                
+                // Include tasks that are active today
+                const isActiveToday = start <= today && (!end || end >= today);
+                
+                // Include overdue tasks (end date has passed but still in progress)
+                const inProgressStatuses = ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'];
+                const isOverdue = end && end < today && inProgressStatuses.includes(t.status);
+                
+                return isActiveToday || isOverdue;
             });
             renderScreenshotTable(
                 'todayStatusScreenshotTable',
                 todayTasks,
                 ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
                 t => {
-                    const isOverdue = isTaskOverdue(t);
-                    const overdueDays = calculateOverdueDays(t);
-                    const statusDisplay = isOverdue ? `Overdue (${overdueDays} days)` : (t.status || '');
+                    const isOverdue = isTaskOverdue(t, today);
+                    const overdueDays = calculateOverdueDaysForDate(t, today);
+                    const statusDisplay = isOverdue ? `Overdue By ${overdueDays} day${overdueDays > 1 ? 's' : ''}` : (t.status || '');
                     
                     return [
                         t.projectName||'',
@@ -4196,16 +4212,24 @@ Generated on: ${new Date().toLocaleString()}`;
                 if (!start) return false;
                 start.setHours(0,0,0,0);
                 if (end) end.setHours(0,0,0,0);
-                return start <= tomorrow && (!end || end >= tomorrow);
+                
+                // Include tasks that are active tomorrow
+                const isActiveTomorrow = start <= tomorrow && (!end || end >= tomorrow);
+                
+                // Include overdue tasks (end date has passed but still in progress)
+                const inProgressStatuses = ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'];
+                const isOverdue = end && end < tomorrow && inProgressStatuses.includes(t.status);
+                
+                return isActiveTomorrow || isOverdue;
             });
             renderScreenshotTable(
                 'tomorrowScheduleScreenshotTable',
                 tomorrowTasks,
                 ['Project', 'Phase', 'Assigned To', 'Status', 'Start Date', 'End Date', 'Comments'],
                 t => {
-                    const isOverdue = isTaskOverdue(t);
-                    const overdueDays = calculateOverdueDays(t);
-                    const statusDisplay = isOverdue ? `Overdue (${overdueDays} days)` : (t.status || '');
+                    const isOverdue = isTaskOverdue(t, tomorrow);
+                    const overdueDays = calculateOverdueDaysForDate(t, tomorrow);
+                    const statusDisplay = isOverdue ? `Overdue By ${overdueDays} day${overdueDays > 1 ? 's' : ''}` : (t.status || '');
                     
                     return [
                         t.projectName||'',
@@ -4234,10 +4258,23 @@ Generated on: ${new Date().toLocaleString()}`;
             return diffDays > 0 ? diffDays : 0;
         }
 
+        // Helper: Calculate overdue days for a specific date (for reports)
+        function calculateOverdueDaysForDate(task, reportDate) {
+            if (!task.endDate) return 0;
+            const endDate = new Date(task.endDate);
+            const checkDate = new Date(reportDate);
+            endDate.setHours(0, 0, 0, 0);
+            checkDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = checkDate - endDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays > 0 ? diffDays : 0;
+        }
+
         // Helper: Check if task is overdue
-        function isTaskOverdue(task) {
+        function isTaskOverdue(task, reportDate = null) {
             if (!task.endDate || !task.status) return false;
-            const overdueDays = calculateOverdueDays(task);
+            const overdueDays = reportDate ? calculateOverdueDaysForDate(task, reportDate) : calculateOverdueDays(task);
             const inProgressStatuses = ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'];
             return overdueDays > 0 && inProgressStatuses.includes(task.status);
         }
@@ -4252,7 +4289,14 @@ Generated on: ${new Date().toLocaleString()}`;
             } else {
                 html += data.map((t, index) => {
                     const bgColor = index % 2 === 0 ? '#ffffff' : '#f9fafb';
-                    return '<tr>' + rowFn(t).map(val => `<td style="border:1px solid #e5e7eb;padding:10px 8px;color:#374151;background:${bgColor};font-size:0.85rem;">${val}</td>`).join('') + '</tr>';
+                    const rowData = rowFn(t);
+                    return '<tr>' + rowData.map((val, colIndex) => {
+                        // Check if this is the status column and contains "Overdue"
+                        const isOverdueStatus = headers[colIndex] === 'Status' && val && val.toString().includes('Overdue');
+                        const cellBgColor = isOverdueStatus ? '#fef3c7' : bgColor; // Yellow background for overdue
+                        const cellTextColor = isOverdueStatus ? '#dc2626' : '#374151'; // Red text for overdue
+                        return `<td style="border:1px solid #e5e7eb;padding:10px 8px;color:${cellTextColor};background:${cellBgColor};font-size:0.85rem;font-weight:${isOverdueStatus ? '600' : 'normal'};">${val}</td>`;
+                    }).join('') + '</tr>';
                 }).join('');
             }
             html += '</tbody>';
