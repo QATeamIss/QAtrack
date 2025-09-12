@@ -17,10 +17,13 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
+            height: 100vh;
             color: #334155;
             line-height: 1.5;
             overflow-x: hidden;
             zoom: 0.75;
+            margin: 0;
+            padding: 0;
         }
 
         h1, h2, h3, h4 {
@@ -34,15 +37,80 @@
         .app-container {
             display: flex;
             min-height: 100vh;
+            width: 100%;
         }
 
         /* Glassmorphism Sidebar - Light Mode */
         .sidebar {
             width: 280px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             padding: 2rem 1.5rem;
             transition: all 0.3s ease;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+            padding: 2rem 1rem;
+        }
+
+        .sidebar.collapsed .logo {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item span:not(.nav-icon) {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 1rem 0.5rem;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar.collapsed .dropdown-container .dropdown-menu {
+            left: 80px;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            transform: translateY(-2px);
+        }
+
+        .sidebar.collapsed + .sidebar-toggle {
+            left: 1rem;
         }
 
         .logo {
@@ -64,21 +132,21 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
             font-weight: 500;
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             transform: translateX(4px);
         }
 
         .nav-item.active {
-            background: rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
             transform: translateX(4px);
         }
 
@@ -145,29 +213,34 @@
             font-size: 1rem;
         }
 
-        /* Main Content Area - Light Mode */
+        /* Main Content Area - Clean Design */
         .main-content {
             flex: 1;
             padding: 2rem;
-            overflow-y: auto;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin-left: 280px;
+            background: #ffffff;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 80px;
         }
         
         .main-content-wrapper {
             flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         
-        .app-footer {
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            background: rgba(255, 255, 255, 0.4);
-            border-top: 1px solid rgba(0, 0, 0, 0.07);
-            border-radius: 16px;
-            font-size: 0.9rem;
-            color: #64748b;
+        /* Labels Tab Content */
+        .tab-content.labels-tab {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .header {
@@ -855,6 +928,12 @@
         /* Responsive Design */
         @media (max-width: 1024px) {
             .sidebar { width: 200px; }
+            .main-content {
+                margin-left: 200px;
+            }
+            .main-content.sidebar-collapsed {
+                margin-left: 80px;
+            }
             .stats-card { padding: 2rem 1.5rem; }
             .page-title { font-size: 2rem; }
             .form-row { flex-direction: column; gap: 0; }
@@ -872,10 +951,38 @@
                 position: relative;
                 height: auto;
             }
+            .sidebar.collapsed {
+                width: 100%;
+                padding: 1.5rem 1rem;
+            }
+            .sidebar.collapsed .logo {
+                display: block;
+            }
+            .sidebar.collapsed .nav-item span:not(.nav-icon) {
+                display: inline;
+            }
+            .sidebar.collapsed .nav-item {
+                justify-content: flex-start;
+                padding: 0.8rem 1rem;
+            }
+            .sidebar.collapsed .nav-icon {
+                margin-right: 0.75rem;
+                font-size: 1rem;
+            }
             .logo { margin-bottom: 1.5rem; font-size: 1.5rem; }
             .nav-item { padding: 0.8rem 1rem; margin: 0.25rem 0; }
-            .main-content { padding: 1.5rem 1rem; margin-left: 0; }
+            .main-content { 
+                padding: 1.5rem 1rem; 
+                margin-left: 0; 
+                position: relative;
+            }
+            .main-content.sidebar-collapsed {
+                margin-left: 0;
+            }
             .header { flex-direction: column; gap: 1rem; }
+            .sidebar-toggle {
+                display: none;
+            }
             .table-header { flex-direction: column; gap: 1rem; }
             .search-box, .date-filter { max-width: 100%; }
             .cards-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -1074,6 +1181,226 @@
             font-weight: 600;
             color: #059669;
         }
+
+        /* New Labels Table Dropdown Interface */
+        .labels-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .labels-search-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-container .search-box {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-container .search-box:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .labels-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            flex: 1;
+        }
+
+        .label-category {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .category-header:hover {
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+        }
+
+        .category-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .category-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .category-content {
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .category-content.expanded {
+            display: block;
+        }
+
+        .category-search {
+            margin-bottom: 1rem;
+        }
+
+        .category-search input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .category-search input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .labels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .label-card {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .label-card:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .label-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .label-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .label-count {
+            background: #3b82f6;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .label-description {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .label-color-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+        }
+
+        .project-details-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+
+        .project-details-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-details-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .project-details-content {
+            padding: 1.5rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .labels-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .category-header {
+                padding: 0.75rem 1rem;
+            }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
@@ -1081,7 +1408,10 @@
 </head>
 <body>
     <div class="app-container">
-        <nav class="sidebar">
+        <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggle">
+            <span id="toggleIcon">✕</span>
+        </button>
+        <nav class="sidebar" id="sidebar">
             <div class="logo">QA Tracker Pro</div>
             <div class="nav-item active" data-tab="dashboard">
                 <span class="nav-icon" aria-label="Dashboard" title="Dashboard">📊</span>
@@ -1455,37 +1785,102 @@
                     </div>
                 </div>
 
-                <div id="labels" class="tab-content" style="display: none;">
+                <div id="labels" class="tab-content labels-tab" style="display: none;">
                     <div class="header">
                         <h1 class="page-title">Labels Table</h1>
-                        <p class="page-subtitle">All labels and categories used in the system</p>
+                        <p class="page-subtitle">Browse and explore all labels and categories used in the system</p>
                     </div>
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h3>System Labels</h3>
-                            <input type="text" class="search-box" placeholder="Filter labels..." id="labelsSearch">
+                    
+                    <div class="labels-container">
+                        <!-- Search and Filter Section -->
+                        <div class="labels-search-section">
+                            <div class="search-container">
+                                <input type="text" class="search-box" placeholder="Search all labels..." id="labelsSearch">
+                                <button class="btn btn-secondary" onclick="clearLabelsSearch()">Clear</button>
+                            </div>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Label Type</th>
-                                    <th>Label Name</th>
-                                    <th>Description</th>
-                                    <th>Usage Count</th>
-                                    <th>Color</th>
-                                </tr>
-                            </thead>
-                            <tbody id="labelsTableBody"></tbody>
-                        </table>
-                        <div id="labelsPagination"></div>
+
+                        <!-- Labels by Category -->
+                        <div class="labels-categories">
+                            <!-- Status Labels -->
+                            <div class="label-category">
+                                <div class="category-header" onclick="toggleCategory('status')">
+                                    <h3>📊 Status Labels</h3>
+                                    <span class="category-count" id="statusCount">0</span>
+                                    <span class="toggle-icon" id="statusToggle">▼</span>
+                                </div>
+                                <div class="category-content" id="statusContent">
+                                    <div class="category-search">
+                                        <input type="text" placeholder="Filter status labels..." id="statusSearch" onkeyup="filterCategoryLabels('status')">
+                                    </div>
+                                    <div class="labels-grid" id="statusLabels"></div>
+                                </div>
+                            </div>
+
+                            <!-- Phase Labels -->
+                            <div class="label-category">
+                                <div class="category-header" onclick="toggleCategory('phase')">
+                                    <h3>🔧 Phase Labels</h3>
+                                    <span class="category-count" id="phaseCount">0</span>
+                                    <span class="toggle-icon" id="phaseToggle">▼</span>
+                                </div>
+                                <div class="category-content" id="phaseContent">
+                                    <div class="category-search">
+                                        <input type="text" placeholder="Filter phase labels..." id="phaseSearch" onkeyup="filterCategoryLabels('phase')">
+                                    </div>
+                                    <div class="labels-grid" id="phaseLabels"></div>
+                                </div>
+                            </div>
+
+                            <!-- Priority Labels -->
+                            <div class="label-category">
+                                <div class="category-header" onclick="toggleCategory('priority')">
+                                    <h3>⚡ Priority Labels</h3>
+                                    <span class="category-count" id="priorityCount">0</span>
+                                    <span class="toggle-icon" id="priorityToggle">▼</span>
+                                </div>
+                                <div class="category-content" id="priorityContent">
+                                    <div class="category-search">
+                                        <input type="text" placeholder="Filter priority labels..." id="prioritySearch" onkeyup="filterCategoryLabels('priority')">
+                                    </div>
+                                    <div class="labels-grid" id="priorityLabels"></div>
+                                </div>
+                            </div>
+
+                            <!-- Assignee Labels -->
+                            <div class="label-category">
+                                <div class="category-header" onclick="toggleCategory('assignee')">
+                                    <h3>👥 Assignee Labels</h3>
+                                    <span class="category-count" id="assigneeCount">0</span>
+                                    <span class="toggle-icon" id="assigneeToggle">▼</span>
+                                </div>
+                                <div class="category-content" id="assigneeContent">
+                                    <div class="category-search">
+                                        <input type="text" placeholder="Filter assignee labels..." id="assigneeSearch" onkeyup="filterCategoryLabels('assignee')">
+                                    </div>
+                                    <div class="labels-grid" id="assigneeLabels"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Details Section -->
+                        <div class="project-details-section" id="projectDetailsSection" style="display: none;">
+                            <div class="project-details-header">
+                                <h3 id="projectDetailsTitle">Project Details</h3>
+                                <button class="btn btn-secondary" onclick="closeProjectDetails()">Close</button>
+                            </div>
+                            <div class="project-details-content" id="projectDetailsContent">
+                                <!-- Project details will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Clear All Data Button -->
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn btn-secondary" onclick="clearAllData()">Clear All Data (Reset)</button>
+                        </div>
                     </div>
                 </div>
-
-                <button class="btn btn-secondary" onclick="clearAllData()" style="margin-top: 2rem;">Clear All Data (Reset)</button>
             </div>
-            <footer class="app-footer">
-                © 2025 QA Tracker Pro.Designed By Abhiram .
-            </footer>
         </main>
     </div>
 
@@ -1718,6 +2113,26 @@
         let calendarMonth = (new Date()).getMonth();
         let calendarYear = (new Date()).getFullYear();
         let assignedToFilter = '';
+        let sidebarCollapsed = false;
+
+        /* Sidebar Toggle Function */
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            sidebarCollapsed = !sidebarCollapsed;
+            
+            if (sidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                toggleIcon.textContent = '☰';
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                toggleIcon.textContent = '✕';
+            }
+        }
         let analyticsStatusFilter = '';
         let analyticsAssigneeFilter = '';
         let attendanceRecords = [];
@@ -2242,8 +2657,22 @@
         });
 
         document.getElementById('labelsSearch')?.addEventListener('input', (e) => {
-            labelsSearchTerm = e.target.value;
-            renderLabels();
+            const searchTerm = e.target.value.toLowerCase();
+            
+            // Search across all categories
+            ['status', 'phase', 'priority', 'assignee'].forEach(category => {
+                const cards = document.querySelectorAll(`#${category}Labels .label-card`);
+                cards.forEach(card => {
+                    const labelName = card.querySelector('.label-name').textContent.toLowerCase();
+                    const labelDesc = card.querySelector('.label-description').textContent.toLowerCase();
+                    
+                    if (labelName.includes(searchTerm) || labelDesc.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
         });
 
         /* Navigation */
@@ -2976,28 +3405,31 @@
         }
 
         async function renderLabels() {
-            // Collect all unique labels and categories from the tasks
-            const labels = new Map();
-            
+            // Collect labels by category
+            const statusLabels = [];
+            const phaseLabels = [];
+            const priorityLabels = [];
+            const assigneeLabels = [];
+
             // Status labels
-            const statusLabels = ['In Progress', 'Completed', 'On Hold', 'Cancelled', 'Forecast', 'Yet to Start'];
-            statusLabels.forEach(status => {
+            const statusList = ['In Progress', 'Completed', 'On Hold', 'Cancelled', 'Forecast', 'Yet to Start'];
+            statusList.forEach(status => {
                 const count = tasks.filter(task => task.status === status).length;
-                labels.set(`status-${status}`, {
-                    type: 'Status',
-                    name: status,
-                    description: `Project status: ${status}`,
-                    count: count,
-                    color: getStatusColor(status)
-                });
+                if (count > 0) {
+                    statusLabels.push({
+                        name: status,
+                        description: `Project status: ${status}`,
+                        count: count,
+                        color: getStatusColor(status)
+                    });
+                }
             });
 
             // Phase labels
             const phases = [...new Set(tasks.map(task => task.subPhase).filter(Boolean))];
             phases.forEach(phase => {
                 const count = tasks.filter(task => task.subPhase === phase).length;
-                labels.set(`phase-${phase}`, {
-                    type: 'Phase',
+                phaseLabels.push({
                     name: phase,
                     description: `Project phase: ${phase}`,
                     count: count,
@@ -3005,12 +3437,11 @@
                 });
             });
 
-            // Priority labels (if any)
+            // Priority labels
             const priorities = [...new Set(tasks.map(task => task.priority).filter(Boolean))];
             priorities.forEach(priority => {
                 const count = tasks.filter(task => task.priority === priority).length;
-                labels.set(`priority-${priority}`, {
-                    type: 'Priority',
+                priorityLabels.push({
                     name: priority,
                     description: `Project priority: ${priority}`,
                     count: count,
@@ -3022,8 +3453,7 @@
             const assignees = [...new Set(tasks.flatMap(task => [task.assignedTo, task.assignedTo2]).filter(Boolean))];
             assignees.forEach(assignee => {
                 const count = tasks.filter(task => task.assignedTo === assignee || task.assignedTo2 === assignee).length;
-                labels.set(`assignee-${assignee}`, {
-                    type: 'Assignee',
+                assigneeLabels.push({
                     name: assignee,
                     description: `Assigned to: ${assignee}`,
                     count: count,
@@ -3031,80 +3461,38 @@
                 });
             });
 
-            // Convert to array and filter by search term
-            let labelsArray = Array.from(labels.values());
-            
-            // Apply search filter
-            if (labelsSearchTerm) {
-                const searchTerm = labelsSearchTerm.toLowerCase();
-                labelsArray = labelsArray.filter(label => 
-                    label.type.toLowerCase().includes(searchTerm) ||
-                    label.name.toLowerCase().includes(searchTerm) ||
-                    label.description.toLowerCase().includes(searchTerm)
-                );
-            }
+            // Render each category
+            renderLabelCategory('status', statusLabels);
+            renderLabelCategory('phase', phaseLabels);
+            renderLabelCategory('priority', priorityLabels);
+            renderLabelCategory('assignee', assigneeLabels);
 
-            // Sort by type, then by count
-            labelsArray.sort((a, b) => {
-                if (a.type !== b.type) return a.type.localeCompare(b.type);
-                return b.count - a.count;
-            });
+            // Update counts
+            document.getElementById('statusCount').textContent = statusLabels.length;
+            document.getElementById('phaseCount').textContent = phaseLabels.length;
+            document.getElementById('priorityCount').textContent = priorityLabels.length;
+            document.getElementById('assigneeCount').textContent = assigneeLabels.length;
+        }
 
-            // Render the table
-            const tbody = document.getElementById('labelsTableBody');
-            if (labelsArray.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:#64748b;">No labels found</td></tr>';
+        function renderLabelCategory(category, labels) {
+            const container = document.getElementById(category + 'Labels');
+            if (labels.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:2rem;color:#6b7280;font-style:italic;">No labels found</div>';
                 return;
             }
 
-            const html = labelsArray.map((label, index) => `
-                <tr class="label-row" data-label-type="${label.type}" data-label-name="${label.name}" style="cursor: pointer;" onclick="showLabelProjects('${label.type}', '${label.name}')">
-                    <td data-label="Label Type"><span class="label-type">${label.type}</span></td>
-                    <td data-label="Label Name"><strong>${label.name}</strong></td>
-                    <td data-label="Description">${label.description}</td>
-                    <td data-label="Usage Count"><span class="usage-count">${label.count}</span></td>
-                    <td data-label="Color">
-                        <span class="color-indicator" style="background-color: ${label.color}; width: 20px; height: 20px; border-radius: 50%; display: inline-block; border: 2px solid #e5e7eb;"></span>
-                    </td>
-                </tr>
-                <tr id="projects-${label.type}-${label.name.replace(/\s+/g, '-')}" class="project-details-row" style="display: none;">
-                    <td colspan="5" class="project-details-cell">
-                        <div class="project-details-container">
-                            <h4>Projects with ${label.type}: ${label.name}</h4>
-                            <div class="project-details-table">
-                                <table class="projects-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Project Name</th>
-                                            <th>Phase</th>
-                                            <th>PC</th>
-                                            <th>Assigned To (1)</th>
-                                            <th>Assigned To (2)</th>
-                                            <th>Status</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Actual Start</th>
-                                            <th>Actual End</th>
-                                            <th>Working Days</th>
-                                            <th>Sprint</th>
-                                            <th>Bug Count</th>
-                                            <th>Completed At</th>
-                                            <th>Deviation Reason</th>
-                                            <th>Comments</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="projects-${label.type}-${label.name.replace(/\s+/g, '-')}-body">
-                                        <!-- Projects will be loaded here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
+            const html = labels.map(label => `
+                <div class="label-card" onclick="showLabelProjects('${category}', '${label.name}')">
+                    <div class="label-card-header">
+                        <div class="label-name">${label.name}</div>
+                        <div class="label-count">${label.count}</div>
+                    </div>
+                    <div class="label-description">${label.description}</div>
+                    <div class="label-color-indicator" style="background-color: ${label.color};"></div>
+                </div>
             `).join('');
 
-            tbody.innerHTML = html;
-            document.getElementById('labelsPagination').innerHTML = '';
+            container.innerHTML = html;
         }
 
         function getStatusColor(status) {
@@ -3128,72 +3516,143 @@
             return colors[priority] || '#6b7280';
         }
 
-        function showLabelProjects(labelType, labelName) {
-            // Toggle the project details row
-            const projectRowId = `projects-${labelType}-${labelName.replace(/\s+/g, '-')}`;
-            const projectRow = document.getElementById(projectRowId);
-            const projectBodyId = `projects-${labelType}-${labelName.replace(/\s+/g, '-')}-body`;
-            const projectBody = document.getElementById(projectBodyId);
+        function toggleCategory(category) {
+            const content = document.getElementById(category + 'Content');
+            const toggle = document.getElementById(category + 'Toggle');
             
-            if (projectRow.style.display === 'none') {
-                // Show the row and load projects
-                projectRow.style.display = 'table-row';
-                
-                // Filter tasks based on label type and name
-                let filteredTasks = [];
-                
-                switch (labelType) {
-                    case 'Status':
-                        filteredTasks = tasks.filter(task => task.status === labelName);
-                        break;
-                    case 'Phase':
-                        filteredTasks = tasks.filter(task => task.subPhase === labelName);
-                        break;
-                    case 'Priority':
-                        filteredTasks = tasks.filter(task => task.priority === labelName);
-                        break;
-                    case 'Assignee':
-                        filteredTasks = tasks.filter(task => 
-                            task.assignedTo === labelName || task.assignedTo2 === labelName
-                        );
-                        break;
-                }
-                
-                // Render the projects table
-                if (filteredTasks.length === 0) {
-                    projectBody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:2rem;color:#64748b;">No projects found for this label</td></tr>';
-                } else {
-                    const projectsHtml = filteredTasks.map(task => `
-                        <tr>
-                            <td data-label="Project Name"><strong>${task.projectName || '-'}</strong></td>
-                            <td data-label="Phase">${task.subPhase || '-'}</td>
-                            <td data-label="PC">${task.pc || '-'}</td>
-                            <td data-label="Assigned To (1)">${task.assignedTo || '-'}</td>
-                            <td data-label="Assigned To (2)">${task.assignedTo2 || '-'}</td>
-                            <td data-label="Status">
-                                <span class="status-badge status-${getDisplayStatus(task).toLowerCase().replace(/ /g, '')}">
-                                    ${getDisplayStatus(task)}
-                                </span>
-                            </td>
-                            <td data-label="Start Date">${formatDate(task.startDate)}</td>
-                            <td data-label="End Date">${formatDate(task.endDate)}</td>
-                            <td data-label="Actual Start">${formatDate(task.actualStartDate)}</td>
-                            <td data-label="Actual End">${formatDate(task.actualEndDate)}</td>
-                            <td data-label="Working Days">${task.workingDays || '-'}</td>
-                            <td data-label="Sprint">${task.sprint || '-'}</td>
-                            <td data-label="Bug Count">${task.bugCount || '0'}</td>
-                            <td data-label="Completed At">${formatDate(task.completedAt)}</td>
-                            <td data-label="Deviation Reason">${task.deviationReason || '-'}</td>
-                            <td data-label="Comments">${task.comments || '-'}</td>
-                        </tr>
-                    `).join('');
-                    
-                    projectBody.innerHTML = projectsHtml;
-                }
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggle.textContent = '▼';
             } else {
-                // Hide the row
-                projectRow.style.display = 'none';
+                content.classList.add('expanded');
+                toggle.textContent = '▲';
             }
+        }
+
+        function filterCategoryLabels(category) {
+            const searchInput = document.getElementById(category + 'Search');
+            const searchTerm = searchInput.value.toLowerCase();
+            const cards = document.querySelectorAll(`#${category}Labels .label-card`);
+            
+            cards.forEach(card => {
+                const labelName = card.querySelector('.label-name').textContent.toLowerCase();
+                const labelDesc = card.querySelector('.label-description').textContent.toLowerCase();
+                
+                if (labelName.includes(searchTerm) || labelDesc.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function clearLabelsSearch() {
+            document.getElementById('labelsSearch').value = '';
+            // Reset all category searches
+            ['status', 'phase', 'priority', 'assignee'].forEach(category => {
+                document.getElementById(category + 'Search').value = '';
+                filterCategoryLabels(category);
+            });
+        }
+
+        function showLabelProjects(labelType, labelName) {
+            // Show the project details section
+            const projectDetailsSection = document.getElementById('projectDetailsSection');
+            const projectDetailsTitle = document.getElementById('projectDetailsTitle');
+            const projectDetailsContent = document.getElementById('projectDetailsContent');
+            
+            // Update title
+            projectDetailsTitle.textContent = `Projects with ${labelType}: ${labelName}`;
+            
+            // Filter tasks based on label type and name
+            let filteredTasks = [];
+            
+            switch (labelType) {
+                case 'status':
+                    filteredTasks = tasks.filter(task => task.status === labelName);
+                    break;
+                case 'phase':
+                    filteredTasks = tasks.filter(task => task.subPhase === labelName);
+                    break;
+                case 'priority':
+                    filteredTasks = tasks.filter(task => task.priority === labelName);
+                    break;
+                case 'assignee':
+                    filteredTasks = tasks.filter(task => 
+                        task.assignedTo === labelName || task.assignedTo2 === labelName
+                    );
+                    break;
+            }
+            
+            // Render the projects table
+            if (filteredTasks.length === 0) {
+                projectDetailsContent.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748b;">No projects found for this label</div>';
+            } else {
+                const projectsHtml = `
+                    <div class="project-details-table">
+                        <table class="projects-table">
+                            <thead>
+                                <tr>
+                                    <th>Project Name</th>
+                                    <th>Phase</th>
+                                    <th>PC</th>
+                                    <th>Assigned To (1)</th>
+                                    <th>Assigned To (2)</th>
+                                    <th>Status</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Actual Start</th>
+                                    <th>Actual End</th>
+                                    <th>Working Days</th>
+                                    <th>Sprint</th>
+                                    <th>Bug Count</th>
+                                    <th>Completed At</th>
+                                    <th>Deviation Reason</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filteredTasks.map(task => `
+                                    <tr>
+                                        <td data-label="Project Name"><strong>${task.projectName || '-'}</strong></td>
+                                        <td data-label="Phase">${task.subPhase || '-'}</td>
+                                        <td data-label="PC">${task.pc || '-'}</td>
+                                        <td data-label="Assigned To (1)">${task.assignedTo || '-'}</td>
+                                        <td data-label="Assigned To (2)">${task.assignedTo2 || '-'}</td>
+                                        <td data-label="Status">
+                                            <span class="status-badge status-${getDisplayStatus(task).toLowerCase().replace(/ /g, '')}">
+                                                ${getDisplayStatus(task)}
+                                            </span>
+                                        </td>
+                                        <td data-label="Start Date">${formatDate(task.startDate)}</td>
+                                        <td data-label="End Date">${formatDate(task.endDate)}</td>
+                                        <td data-label="Actual Start">${formatDate(task.actualStartDate)}</td>
+                                        <td data-label="Actual End">${formatDate(task.actualEndDate)}</td>
+                                        <td data-label="Working Days">${task.workingDays || '-'}</td>
+                                        <td data-label="Sprint">${task.sprint || '-'}</td>
+                                        <td data-label="Bug Count">${task.bugCount || '0'}</td>
+                                        <td data-label="Completed At">${formatDate(task.completedAt)}</td>
+                                        <td data-label="Deviation Reason">${task.deviationReason || '-'}</td>
+                                        <td data-label="Comments">${task.comments || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                projectDetailsContent.innerHTML = projectsHtml;
+            }
+            
+            // Show the section
+            projectDetailsSection.style.display = 'block';
+            
+            // Scroll to the section
+            projectDetailsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeProjectDetails() {
+            document.getElementById('projectDetailsSection').style.display = 'none';
         }
 
         async function renderSummary() {
