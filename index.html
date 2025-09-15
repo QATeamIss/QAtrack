@@ -357,6 +357,48 @@
             border-color: rgba(0, 0, 0, 0.15);
         }
 
+        .btn-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
         /* Cards Grid - Light Mode */
         .cards-grid {
             display: grid;
@@ -482,6 +524,12 @@
             display: flex;
             gap: 1rem;
             align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group .btn {
+            margin: 0;
+            white-space: nowrap;
         }
 
         table {
@@ -1278,6 +1326,545 @@
             color: #059669;
         }
 
+        /* Project Milestones Table Styles */
+        .milestones-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 2000px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .milestones-table th {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 1rem 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border: none;
+        }
+
+        .milestones-table td {
+            padding: 0.75rem 0.5rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            text-align: center;
+            vertical-align: middle;
+            max-width: 140px;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+        }
+
+        .milestones-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .milestones-table tr:hover td {
+            background: #f1f5f9;
+        }
+
+        .milestones-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .milestone-phase {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+            padding: 4px;
+            min-height: 60px;
+            justify-content: center;
+        }
+
+        .phase-checkbox {
+            margin-bottom: 4px;
+            transform: scale(1.1);
+        }
+
+        .phase-dates {
+            font-size: 0.7rem;
+            color: #6b7280;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 100%;
+        }
+
+        .phase-dates input {
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .phase-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .status-select {
+            font-size: 0.7rem;
+            padding: 4px 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            min-width: 90px;
+            color: #374151;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .rejection-icon {
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 4px;
+            padding: 2px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .rejection-icon:hover {
+            color: #b91c1c;
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .approval-icon {
+            color: #059669;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 4px;
+            padding: 2px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .approval-icon:hover {
+            color: #047857;
+            background: rgba(5, 150, 105, 0.1);
+        }
+
+        .add-phase-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .add-phase-btn:hover {
+            background: #3730a3;
+            transform: translateY(-1px);
+        }
+
+        /* QA Labels */
+        .qa-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            margin-top: 2px;
+            justify-content: center;
+        }
+
+        .qa-label {
+            background: #4f46e5;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 500;
+            min-width: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .qa-label:hover {
+            background: #3730a3;
+            transform: scale(1.1);
+        }
+
+        .qa-label.multiple {
+            background: #059669;
+        }
+
+        .qa-label.multiple:hover {
+            background: #047857;
+        }
+
+        /* Done Button */
+        .done-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            margin-top: 2px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .done-btn:hover {
+            background: #047857;
+            transform: translateY(-1px);
+        }
+
+        /* Completed Phase Styling */
+        .completed-phase {
+            opacity: 0.7;
+            background: #f0f9ff;
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .completed-phase .phase-checkbox:disabled,
+        .completed-phase .status-select:disabled,
+        .completed-phase input[type="date"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Phase Edit Toggle */
+        .milestone-phase {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .milestone-phase:hover {
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: 4px;
+        }
+
+        /* Read-only Phase Styling */
+        .read-only-phase {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 6px;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phase-summary {
+            margin-bottom: 4px;
+        }
+
+        .phase-status-text {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+        }
+
+        .phase-date-text {
+            font-size: 0.6rem;
+            color: #6b7280;
+            margin-bottom: 1px;
+        }
+
+        .edit-hint {
+            font-size: 0.5rem;
+            color: #9ca3af;
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        /* New Phase Display Styles */
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .phase-status-badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .phase-status-badge.completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .phase-status-badge.in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .phase-status-badge.rejected {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .phase-status-badge.forecast {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .phase-status-badge.ready-for-qa {
+            background: #e0e7ff;
+            color: #5b21b6;
+        }
+
+        .phase-status-badge.being-developed {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .phase-status-badge.not-started {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .edit-icon:hover {
+            background: rgba(79, 70, 229, 0.1);
+            transform: scale(1.1);
+        }
+
+        .phase-dates-display {
+            margin-bottom: 4px;
+        }
+
+        .phase-date-item {
+            font-size: 0.6rem;
+            color: #6b7280;
+            margin-bottom: 1px;
+        }
+
+        .phase-disabled {
+            font-size: 0.6rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Edit Mode Styles */
+        .editing-phase {
+            background: #f8fafc;
+            border: 2px solid #4f46e5;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .edit-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .submit-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .submit-btn:hover {
+            background: #047857;
+        }
+
+        .cancel-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .cancel-btn:hover {
+            background: #b91c1c;
+        }
+
+        .edit-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .edit-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.6rem;
+            color: #374151;
+        }
+
+        .edit-dates {
+            display: flex;
+            gap: 4px;
+        }
+
+        .edit-date-input {
+            flex: 1;
+            font-size: 0.6rem;
+            padding: 2px 4px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+
+        .edit-status-select {
+            font-size: 0.6rem;
+            padding: 2px 4px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+
+        .rejection-section {
+            font-size: 0.6rem;
+            color: #dc2626;
+        }
+
+        /* Project Creation Modal */
+        .project-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .project-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .project-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .project-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .project-modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .close-project-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .close-project-modal:hover {
+            color: #374151;
+        }
+
+        /* Status Reason Modal */
+        .reason-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .reason-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reason-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .reason-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
         /* New Labels Table Dropdown Interface */
         .labels-container {
             max-width: 1200px;
@@ -1500,6 +2087,7 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
@@ -1538,6 +2126,10 @@
                     <div class="nav-item" data-tab="allprojects">
                         <span class="nav-icon" aria-label="Completed" title="Completed">✅</span>
                         <span>Completed</span>
+                    </div>
+                    <div class="nav-item" data-tab="milestones">
+                        <span class="nav-icon" aria-label="Project Milestones" title="Project Milestones">🎯</span>
+                        <span>Project Milestones</span>
                     </div>
                     <div class="nav-item dropdown-container" data-tab="labels">
                         <span class="nav-icon" aria-label="Labels" title="Labels">🏷️</span>
@@ -1591,6 +2183,14 @@
                             <div class="filter-group">
                                 <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
                                 <input type="date" class="date-filter" id="dateFilter" placeholder="Filter by due date">
+                                <button class="btn btn-info" onclick="openQAReportModal()">
+                                    <span class="btn-icon">📊</span>
+                                    QA Report
+                                </button>
+                                <button class="btn btn-warning" onclick="openRejectedProjectsModal()">
+                                    <span class="btn-icon">📋</span>
+                                    Rejected Projects
+                                </button>
                             </div>
                         </div>
                         <div class="table-scroll-container">
@@ -1899,6 +2499,51 @@
                     </div>
                 </div>
 
+                <div id="milestones" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">Project Milestones</h1>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openProjectModal()">
+                                <span class="btn-icon">➕</span>
+                                Create Project
+                            </button>
+                            <button class="btn btn-secondary" onclick="populateFromExistingTasks()">
+                                <span class="btn-icon">🔄</span>
+                                Populate from Tasks
+                            </button>
+                            <div class="search-container">
+                                <input type="text" id="milestonesSearch" placeholder="Search milestones..." class="search-input">
+                                <span class="search-icon">🔍</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="milestones-table" id="milestonesTable">
+                            <thead>
+                                <tr>
+                                    <th>SL No</th>
+                                    <th>Project Name</th>
+                                    <th>PC</th>
+                                    <th>Assigned To</th>
+                                    <th>Assigned To 2</th>
+                                    <th>Kickoff/KT Meeting</th>
+                                    <th>HTML Comparison</th>
+                                    <th>HTML Comparison Retest</th>
+                                    <th>Dev Test</th>
+                                    <th>Dev Retest</th>
+                                    <th>Before Live Test</th>
+                                    <th>Before Live Retest</th>
+                                    <th>After Live</th>
+                                    <th>After Live Retest</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="milestonesTableBody">
+                                <!-- Milestones will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <div id="labels" class="tab-content labels-tab" style="display: none;">
                     <div class="header">
                         <h1 class="page-title">Labels Table</h1>
@@ -2030,7 +2675,9 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Project Name</label>
-                        <input type="text" class="form-input" name="projectName" placeholder="Enter project name" required>
+                        <select class="form-input" name="projectName" id="projectNameSelect" required onchange="onProjectChange()">
+                            <option value="">Select Project</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Sub Phase</label>
@@ -2137,6 +2784,108 @@
         </div>
     </div>
 
+    <!-- Project Creation Modal -->
+    <div class="project-modal" id="projectModal">
+        <div class="project-modal-content">
+            <div class="project-modal-header">
+                <h2 class="project-modal-title">Create New Project</h2>
+                <button class="close-project-modal" onclick="closeProjectModal()">&times;</button>
+            </div>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label class="form-label">Project Name *</label>
+                    <input type="text" class="form-input" name="projectName" placeholder="Enter project name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">PC Name</label>
+                    <input type="text" class="form-input" name="pcName" placeholder="Enter PC name (optional)">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeProjectModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Status Reason Modal -->
+    <div class="reason-modal" id="reasonModal">
+        <div class="reason-modal-content">
+            <div class="project-modal-header">
+                <h2 class="project-modal-title">Enter Rejection Reason</h2>
+                <button class="close-project-modal" onclick="closeReasonModal()">&times;</button>
+            </div>
+            <form id="reasonForm">
+                <div class="form-group">
+                    <label class="form-label">Reason for Rejection</label>
+                    <textarea class="reason-textarea" name="rejectionReason" placeholder="Please provide a detailed reason for rejection..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeReasonModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Reason</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- QA Report Modal -->
+    <div class="project-modal" id="qaReportModal">
+        <div class="project-modal-content">
+            <div class="project-modal-header">
+                <h2 class="project-modal-title">Generate QA Report</h2>
+                <button class="close-project-modal" onclick="closeQAReportModal()">&times;</button>
+            </div>
+            <form id="qaReportForm">
+                <div class="form-group">
+                    <label class="form-label">Select QA</label>
+                    <select class="form-input" name="qaName" id="qaSelect" required>
+                        <option value="">Select QA</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">From Date</label>
+                        <input type="date" class="form-input" name="fromDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To Date</label>
+                        <input type="date" class="form-input" name="toDate" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeQAReportModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rejected Projects Modal -->
+    <div class="project-modal" id="rejectedProjectsModal">
+        <div class="project-modal-content">
+            <div class="project-modal-header">
+                <h2 class="project-modal-title">Export Rejected Projects</h2>
+                <button class="close-project-modal" onclick="closeRejectedProjectsModal()">&times;</button>
+            </div>
+            <form id="rejectedProjectsForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">From Date</label>
+                        <input type="date" class="form-input" name="fromDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To Date</label>
+                        <input type="date" class="form-input" name="toDate" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeRejectedProjectsModal()">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Export Rejected Projects</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="modal" id="reportModal">
         <div class="modal-content">
             <div style="text-align: center; margin-bottom: 2rem;">
@@ -2168,6 +2917,14 @@
                     </div>
                     <div class="report-arrow">→</div>
                 </div>
+                <div class="report-option" onclick="openScheduleTextModal()">
+                    <div class="report-icon">📝</div>
+                    <div class="report-content">
+                        <h3>Work Schedule Text</h3>
+                        <p>Generate work schedule as text for easy copying and sharing</p>
+                    </div>
+                    <div class="report-arrow">→</div>
+                </div>
             </div>
             <div style="text-align: center; margin-top: 2rem;">
                 <button class="btn btn-secondary" onclick="closeReportModal()">Close</button>
@@ -2190,6 +2947,47 @@
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                     <button class="btn btn-primary" onclick="generateScheduleReport()">Generate Report</button>
                     <button class="btn btn-secondary" onclick="closeScheduleDateModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Schedule Date Picker Modal -->
+    <div class="modal" id="scheduleTextModal">
+        <div class="modal-content">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="margin: 0; color: #1e293b; font-size: 1.75rem; font-weight: 700;">📝 Generate Work Schedule Text</h2>
+                <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 1rem;">Choose a date to generate work schedule as text for easy copying</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 300px;">
+                    <label style="color: #374151; font-weight: 600; font-size: 0.95rem;">Select Date:</label>
+                    <input type="date" id="scheduleTextDatePicker" class="form-input" style="width: 100%; padding: 0.875rem; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem;">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn btn-primary" onclick="generateScheduleText()">Generate Text</button>
+                    <button class="btn btn-secondary" onclick="closeScheduleTextModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Display Modal -->
+    <div class="modal" id="textDisplayModal">
+        <div class="modal-content" style="max-width: 800px; max-height: 80vh;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="margin: 0; color: #1e293b; font-size: 1.75rem; font-weight: 700;">📋 Work Schedule Text</h2>
+                <p style="margin: 0.5rem 0 0 0; color: #64748b; font-size: 1rem;">Copy the text below to share with your team</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="position: relative;">
+                    <textarea id="scheduleTextOutput" readonly style="width: 100%; height: 400px; padding: 1rem; border: 1px solid #d1d5db; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.9rem; resize: vertical; background: #f9fafb;"></textarea>
+                    <button onclick="copyScheduleText()" class="btn btn-primary" style="position: absolute; top: 0.5rem; right: 0.5rem; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                    <button class="btn btn-secondary" onclick="closeTextDisplayModal()">Close</button>
                 </div>
             </div>
         </div>
@@ -2442,6 +3240,1140 @@
             const completedDate = new Date(completed);
             const diff = (completedDate - endDate) / (1000 * 60 * 60 * 24);
             return diff > 0 ? `+${Math.round(diff)} days` : `${Math.round(diff)} days`;
+        }
+
+        /* Project Milestones Functions */
+        let projectMilestones = [];
+        let currentMilestoneId = null;
+        let currentPhase = null;
+        let currentField = null;
+
+        // Load Project Milestones from Supabase
+        async function loadProjectMilestones() {
+            try {
+                const { data, error } = await supabase
+                    .from('project_milestones')
+                    .select('*')
+                    .order('sl_number', { ascending: true });
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    if (error.message.includes('relation "project_milestones" does not exist')) {
+                        showToast('Please create the project_milestones table in Supabase first. Check the SQL script provided.');
+                        projectMilestones = [];
+                        renderMilestonesTable();
+                        populateProjectDropdown();
+                        return;
+                    }
+                    throw error;
+                }
+                
+                projectMilestones = data || [];
+                renderMilestonesTable();
+                populateProjectDropdown();
+            } catch (error) {
+                console.error('Error loading project milestones:', error);
+                projectMilestones = [];
+                showToast(`Error loading project milestones: ${error.message}`);
+                renderMilestonesTable();
+                populateProjectDropdown();
+            }
+        }
+
+        // Render milestones table
+        function renderMilestonesTable() {
+            const tbody = document.getElementById('milestonesTableBody');
+            if (!tbody) {
+                console.error('milestonesTableBody not found');
+                return;
+            }
+
+            console.log('Rendering milestones table with', projectMilestones.length, 'milestones');
+            console.log('Milestones data:', projectMilestones);
+
+            tbody.innerHTML = projectMilestones.map(milestone => `
+                <tr>
+                    <td>${milestone.sl_number}</td>
+                    <td>${milestone.project_name}</td>
+                    <td>${milestone.pc_name || '-'}</td>
+                    <td>${milestone.assigned_to || '-'}</td>
+                    <td>${milestone.assigned_to2 || '-'}</td>
+                    <td>${renderPhaseColumn(milestone, 'kickoff_meeting')}</td>
+                    <td>${renderPhaseColumn(milestone, 'html_comparison')}</td>
+                    <td>${renderPhaseColumn(milestone, 'html_comparison_retest')}</td>
+                    <td>${renderPhaseColumn(milestone, 'dev_test')}</td>
+                    <td>${renderPhaseColumn(milestone, 'dev_retest')}</td>
+                    <td>${renderPhaseColumn(milestone, 'before_live_test', true)}</td>
+                    <td>${renderPhaseColumn(milestone, 'before_live_retest')}</td>
+                    <td>${renderPhaseColumn(milestone, 'after_live')}</td>
+                    <td>${renderPhaseColumn(milestone, 'after_live_retest')}</td>
+                    <td>
+                        <button class="action-btn" onclick="editMilestone(${milestone.id})">Edit</button>
+                        <button class="action-btn" onclick="deleteMilestone(${milestone.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render individual phase column
+        function renderPhaseColumn(milestone, phasePrefix, hasApproval = false) {
+            const isEnabled = milestone[phasePrefix] || false;
+            const startDate = milestone[`${phasePrefix}_start_date`] || '';
+            const endDate = milestone[`${phasePrefix}_end_date`] || '';
+            const status = milestone[`${phasePrefix}_status`] || '';
+            const rejectionReason = milestone[`${phasePrefix}_rejection_reason`] || '';
+            const approval = hasApproval ? milestone[`${phasePrefix.replace('_test', '')}_approved`] || false : null;
+            const approvalReason = hasApproval ? milestone[`${phasePrefix.replace('_test', '')}_approval_reason`] || '' : '';
+            
+            // Get QA labels for this milestone
+            const qaLabels = getQALabels(milestone);
+            
+            // Check if this phase is in edit mode
+            const isEditing = milestone[`${phasePrefix}_editing`] === true;
+            
+            // Special handling for kickoff_meeting (simple Yes/No field)
+            if (phasePrefix === 'kickoff_meeting') {
+                if (!isEditing) {
+                    return `
+                        <div class="milestone-phase read-only-phase">
+                            <div class="phase-header">
+                                <div class="phase-status-badge ${isEnabled ? 'completed' : 'not-started'}">${isEnabled ? 'Yes' : 'No'}</div>
+                                <span class="edit-icon" onclick="startPhaseEdit(${milestone.id}, '${phasePrefix}')" title="Edit phase">✏️</span>
+                            </div>
+                            ${qaLabels}
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="milestone-phase editing-phase">
+                            <div class="edit-header">
+                                <span class="edit-title">Editing ${phasePrefix.replace('_', ' ')}</span>
+                                <div class="edit-actions">
+                                    <button class="submit-btn" onclick="submitPhaseEdit(${milestone.id}, '${phasePrefix}')">Submit</button>
+                                    <button class="cancel-btn" onclick="cancelPhaseEdit(${milestone.id}, '${phasePrefix}')">Cancel</button>
+                                </div>
+                            </div>
+                            <div class="edit-controls">
+                                <label class="edit-label">
+                                    <input type="checkbox" class="phase-checkbox" ${isEnabled ? 'checked' : ''} 
+                                           onchange="updatePhaseField(${milestone.id}, '${phasePrefix}', this.checked)">
+                                    Meeting Completed
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // If not editing, show read-only view
+            if (!isEditing) {
+                return `
+                    <div class="milestone-phase read-only-phase">
+                        <div class="phase-header">
+                            <div class="phase-status-badge ${getStatusClass(status)}">${status || 'Not Started'}</div>
+                            <span class="edit-icon" onclick="startPhaseEdit(${milestone.id}, '${phasePrefix}')" title="Edit phase">✏️</span>
+                        </div>
+                        <div class="phase-dates-display">
+                            ${startDate ? `<div class="phase-date-item">📅 ${startDate}</div>` : ''}
+                            ${endDate ? `<div class="phase-date-item">🏁 ${endDate}</div>` : ''}
+                        </div>
+                        ${qaLabels}
+                        ${isEnabled ? '' : '<div class="phase-disabled">Phase not enabled</div>'}
+                    </div>
+                `;
+            }
+
+            // Edit mode - show form controls
+            return `
+                <div class="milestone-phase editing-phase">
+                    <div class="edit-header">
+                        <span class="edit-title">Editing ${phasePrefix.replace('_', ' ')}</span>
+                        <div class="edit-actions">
+                            <button class="submit-btn" onclick="submitPhaseEdit(${milestone.id}, '${phasePrefix}')">Submit</button>
+                            <button class="cancel-btn" onclick="cancelPhaseEdit(${milestone.id}, '${phasePrefix}')">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="edit-controls">
+                        <label class="edit-label">
+                            <input type="checkbox" class="phase-checkbox" ${isEnabled ? 'checked' : ''} 
+                                   onchange="updatePhaseField(${milestone.id}, '${phasePrefix}', this.checked)">
+                            Enable Phase
+                        </label>
+                        <div class="edit-dates">
+                            <input type="date" value="${startDate}" placeholder="Start Date" 
+                                   onchange="updatePhaseField(${milestone.id}, '${phasePrefix}_start_date', this.value)"
+                                   class="edit-date-input">
+                            <input type="date" value="${endDate}" placeholder="End Date" 
+                                   onchange="updatePhaseField(${milestone.id}, '${phasePrefix}_end_date', this.value)"
+                                   class="edit-date-input">
+                        </div>
+                        <select class="edit-status-select" onchange="updatePhaseField(${milestone.id}, '${phasePrefix}_status', this.value)">
+                            <option value="">Select Status</option>
+                            <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="In Progress" ${status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Rejected" ${status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                            <option value="Forecast" ${status === 'Forecast' ? 'selected' : ''}>Forecast</option>
+                            <option value="Ready for QA" ${status === 'Ready for QA' ? 'selected' : ''}>Ready for QA</option>
+                            <option value="Being Developed" ${status === 'Being Developed' ? 'selected' : ''}>Being Developed</option>
+                        </select>
+                        ${status === 'Rejected' ? `
+                            <div class="rejection-section">
+                                <span class="rejection-icon" onclick="showRejectionReason(${milestone.id}, '${phasePrefix}_rejection_reason', '${rejectionReason}')">ℹ️ Rejection Reason</span>
+                            </div>
+                        ` : ''}
+                        ${hasApproval ? `
+                            <label class="edit-label">
+                                <input type="checkbox" ${approval ? 'checked' : ''} 
+                                       onchange="updatePhaseField(${milestone.id}, '${phasePrefix.replace('_test', '')}_approved', this.checked)">
+                                Approved
+                                ${!approval ? `
+                                    <span class="approval-icon" onclick="showApprovalReason(${milestone.id}, '${phasePrefix.replace('_test', '')}_approval_reason', '${approvalReason}')">ℹ️</span>
+                                ` : ''}
+                            </label>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update milestone phase enabled/disabled
+        async function updateMilestonePhase(milestoneId, field, value) {
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update({ [field]: value })
+                    .eq('id', milestoneId);
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    if (error.message.includes('relation "project_milestones" does not exist')) {
+                        showToast('Please create the project_milestones table in Supabase first. Check the SQL script provided.');
+                        return;
+                    }
+                    throw error;
+                }
+                
+                // Update local data
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (milestone) {
+                    milestone[field] = value;
+                }
+                
+                renderMilestonesTable();
+            } catch (error) {
+                console.error('Error updating milestone phase:', error);
+                showToast(`Error updating milestone phase: ${error.message}`);
+            }
+        }
+
+        // Update milestone date
+        async function updateMilestoneDate(milestoneId, field, value) {
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update({ [field]: value })
+                    .eq('id', milestoneId);
+                
+                if (error) throw error;
+                
+                // Update local data
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (milestone) {
+                    milestone[field] = value;
+                }
+            } catch (error) {
+                console.error('Error updating milestone date:', error);
+                showToast('Error updating milestone date.');
+            }
+        }
+
+        // Update milestone status
+        async function updateMilestoneStatus(milestoneId, field, value) {
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update({ [field]: value })
+                    .eq('id', milestoneId);
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    if (error.message.includes('relation "project_milestones" does not exist')) {
+                        showToast('Please create the project_milestones table in Supabase first. Check the SQL script provided.');
+                        return;
+                    }
+                    throw error;
+                }
+                
+                // Update local data
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (milestone) {
+                    milestone[field] = value;
+                }
+                
+                renderMilestonesTable();
+            } catch (error) {
+                console.error('Error updating milestone status:', error);
+                showToast(`Error updating milestone status: ${error.message}`);
+            }
+        }
+
+        // Update milestone approval
+        async function updateMilestoneApproval(milestoneId, field, value) {
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update({ [field]: value })
+                    .eq('id', milestoneId);
+                
+                if (error) throw error;
+                
+                // Update local data
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (milestone) {
+                    milestone[field] = value;
+                }
+                
+                renderMilestonesTable();
+            } catch (error) {
+                console.error('Error updating milestone approval:', error);
+                showToast('Error updating milestone approval.');
+            }
+        }
+
+        // Show rejection reason modal
+        function showRejectionReason(milestoneId, field, currentReason) {
+            currentMilestoneId = milestoneId;
+            currentField = field;
+            document.getElementById('reasonForm').elements.rejectionReason.value = currentReason;
+            document.getElementById('reasonModal').classList.add('active');
+        }
+
+        // Show approval reason modal
+        function showApprovalReason(milestoneId, field, currentReason) {
+            currentMilestoneId = milestoneId;
+            currentField = field;
+            document.getElementById('reasonForm').elements.rejectionReason.value = currentReason;
+            document.getElementById('reasonModal').classList.add('active');
+        }
+
+        // Save rejection/approval reason
+        async function saveReason() {
+            if (!currentMilestoneId || !currentField) return;
+
+            const reason = document.getElementById('reasonForm').elements.rejectionReason.value;
+            
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update({ [currentField]: reason })
+                    .eq('id', currentMilestoneId);
+                
+                if (error) throw error;
+                
+                // Update local data
+                const milestone = projectMilestones.find(m => m.id === currentMilestoneId);
+                if (milestone) {
+                    milestone[currentField] = reason;
+                }
+                
+                closeReasonModal();
+                renderMilestonesTable();
+                showToast('Reason saved successfully.');
+            } catch (error) {
+                console.error('Error saving reason:', error);
+                showToast('Error saving reason.');
+            }
+        }
+
+        // Add new project
+        async function addProject(projectData) {
+            try {
+                // Get next SL number
+                const maxSl = Math.max(0, ...projectMilestones.map(m => m.sl_number || 0));
+                
+                // Get QA assignments for this project from existing tasks
+                const { data: tasks, error: tasksError } = await supabase
+                    .from('tasks')
+                    .select('assigned_to, assigned_to2')
+                    .eq('project_name', projectData.projectName);
+                
+                let qaAssignments = [];
+                if (!tasksError && tasks) {
+                    const qaSet = new Set();
+                    tasks.forEach(task => {
+                        if (task.assigned_to) qaSet.add(task.assigned_to);
+                        if (task.assigned_to2) qaSet.add(task.assigned_to2);
+                    });
+                    qaAssignments = Array.from(qaSet);
+                }
+                
+                const { data, error } = await supabase
+                    .from('project_milestones')
+                    .insert([{
+                        sl_number: maxSl + 1,
+                        project_name: projectData.projectName,
+                        pc_name: projectData.pcName || null,
+                        assigned_to: qaAssignments[0] || null,
+                        assigned_to2: qaAssignments[1] || null,
+                        qa_assignments: qaAssignments
+                    }])
+                    .select();
+                
+                if (error) throw error;
+                
+                projectMilestones.push(data[0]);
+                renderMilestonesTable();
+                populateProjectDropdown();
+                showToast('Project created successfully.');
+                return true;
+            } catch (error) {
+                console.error('Error creating project:', error);
+                showToast('Error creating project.');
+                return false;
+            }
+        }
+
+        // Edit milestone
+        function editMilestone(milestoneId) {
+            const milestone = projectMilestones.find(m => m.id === milestoneId);
+            if (!milestone) return;
+
+            // For now, just show a simple edit form
+            const newProjectName = prompt('Enter new project name:', milestone.project_name);
+            if (newProjectName && newProjectName !== milestone.project_name) {
+                updateMilestoneField(milestoneId, 'project_name', newProjectName);
+            }
+
+            const newPcName = prompt('Enter new PC name:', milestone.pc_name || '');
+            if (newPcName !== milestone.pc_name) {
+                updateMilestoneField(milestoneId, 'pc_name', newPcName);
+            }
+        }
+
+        // Update milestone field
+        async function updateMilestoneField(milestoneId, field, value) {
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update({ [field]: value })
+                    .eq('id', milestoneId);
+                
+                if (error) throw error;
+                
+                // Update local data
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (milestone) {
+                    milestone[field] = value;
+                }
+                
+                renderMilestonesTable();
+            } catch (error) {
+                console.error('Error updating milestone field:', error);
+                showToast('Error updating milestone field.');
+            }
+        }
+
+        // Delete milestone
+        async function deleteMilestone(milestoneId) {
+            if (!confirm('Are you sure you want to delete this milestone?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .delete()
+                    .eq('id', milestoneId);
+                
+                if (error) throw error;
+                
+                projectMilestones = projectMilestones.filter(m => m.id !== milestoneId);
+                renderMilestonesTable();
+                showToast('Milestone deleted successfully.');
+            } catch (error) {
+                console.error('Error deleting milestone:', error);
+                showToast('Error deleting milestone.');
+            }
+        }
+
+        // Mark phase as done
+        async function markPhaseAsDone(milestoneId, phasePrefix) {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                
+                // Update status to Completed and set end date to today if not set
+                const updates = {
+                    [`${phasePrefix}_status`]: 'Completed'
+                };
+                
+                // Set end date to today if not already set
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (milestone && !milestone[`${phasePrefix}_end_date`]) {
+                    updates[`${phasePrefix}_end_date`] = today;
+                }
+                
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update(updates)
+                    .eq('id', milestoneId);
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    if (error.message.includes('relation "project_milestones" does not exist')) {
+                        showToast('Please create the project_milestones table in Supabase first. Check the SQL script provided.');
+                        return;
+                    }
+                    throw error;
+                }
+                
+                // Update local data
+                if (milestone) {
+                    milestone[`${phasePrefix}_status`] = 'Completed';
+                    if (!milestone[`${phasePrefix}_end_date`]) {
+                        milestone[`${phasePrefix}_end_date`] = today;
+                    }
+                }
+                
+                renderMilestonesTable();
+                showToast('Phase marked as completed!');
+            } catch (error) {
+                console.error('Error marking phase as done:', error);
+                showToast(`Error marking phase as done: ${error.message}`);
+            }
+        }
+
+        // Start phase edit mode
+        function startPhaseEdit(milestoneId, phasePrefix) {
+            const milestone = projectMilestones.find(m => m.id === milestoneId);
+            if (!milestone) return;
+            
+            // Set editing state
+            milestone[`${phasePrefix}_editing`] = true;
+            
+            // Re-render the table
+            renderMilestonesTable();
+        }
+
+        // Cancel phase edit
+        function cancelPhaseEdit(milestoneId, phasePrefix) {
+            const milestone = projectMilestones.find(m => m.id === milestoneId);
+            if (!milestone) return;
+            
+            // Remove editing state
+            milestone[`${phasePrefix}_editing`] = false;
+            
+            // Re-render the table
+            renderMilestonesTable();
+        }
+
+        // Update phase field (for edit mode)
+        function updatePhaseField(milestoneId, field, value) {
+            const milestone = projectMilestones.find(m => m.id === milestoneId);
+            if (!milestone) return;
+            
+            // Update local data
+            milestone[field] = value;
+        }
+
+        // Submit phase edit
+        async function submitPhaseEdit(milestoneId, phasePrefix) {
+            try {
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (!milestone) return;
+
+                // Prepare updates
+                const updates = {
+                    [phasePrefix]: milestone[phasePrefix] || false,
+                    [`${phasePrefix}_start_date`]: milestone[`${phasePrefix}_start_date`] || null,
+                    [`${phasePrefix}_end_date`]: milestone[`${phasePrefix}_end_date`] || null,
+                    [`${phasePrefix}_status`]: milestone[`${phasePrefix}_status`] || null
+                };
+
+                // Add approval fields if applicable
+                if (phasePrefix === 'before_live_test') {
+                    updates.before_live_approved = milestone.before_live_approved || false;
+                }
+
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update(updates)
+                    .eq('id', milestoneId);
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    if (error.message.includes('relation "project_milestones" does not exist')) {
+                        showToast('Please create the project_milestones table in Supabase first. Check the SQL script provided.');
+                        return;
+                    }
+                    throw error;
+                }
+                
+                // Remove editing state
+                milestone[`${phasePrefix}_editing`] = false;
+                
+                // Re-render the table
+                renderMilestonesTable();
+                showToast('Phase updated successfully!');
+                
+            } catch (error) {
+                console.error('Error updating phase:', error);
+                showToast(`Error updating phase: ${error.message}`);
+            }
+        }
+
+        // Add phase (placeholder function)
+        function addPhase(milestoneId, phasePrefix) {
+            showToast('Phase addition feature coming soon!');
+        }
+
+        // Modal functions
+        function openProjectModal() {
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function closeProjectModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            document.getElementById('projectForm').reset();
+        }
+
+        function closeReasonModal() {
+            document.getElementById('reasonModal').classList.remove('active');
+            document.getElementById('reasonForm').reset();
+            currentMilestoneId = null;
+            currentField = null;
+        }
+
+        // Get status class for styling
+        function getStatusClass(status) {
+            if (!status) return 'not-started';
+            return status.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        // Get QA labels for a milestone
+        function getQALabels(milestone) {
+            // Get QA assignments from the milestone
+            let qaAssignments = milestone.qa_assignments || [];
+            
+            // Debug logging
+            console.log('Milestone QA assignments:', milestone.project_name, qaAssignments);
+            
+            // If qa_assignments is empty, return empty string
+            if (qaAssignments.length === 0) {
+                console.log('No QA assignments found for milestone:', milestone.project_name);
+                return '';
+            }
+
+            const labels = qaAssignments.map(qa => {
+                const initials = getQAInitials(qa);
+                const isMultiple = qaAssignments.length > 1;
+                return `<span class="qa-label ${isMultiple ? 'multiple' : ''}" title="${qa}">${initials}</span>`;
+            }).join('');
+
+            return `<div class="qa-labels">${labels}</div>`;
+        }
+
+        // Get QA initials from full name
+        function getQAInitials(qaName) {
+            if (!qaName) return '';
+            
+            const words = qaName.trim().split(' ');
+            if (words.length === 1) {
+                return words[0].substring(0, 2).toUpperCase();
+            } else {
+                return words.map(word => word.charAt(0)).join('').toUpperCase().substring(0, 2);
+            }
+        }
+
+        // Update QA assignments for a milestone
+        async function updateQAAssignments(milestoneId, qaAssignments) {
+            try {
+                const { error } = await supabase
+                    .from('project_milestones')
+                    .update({ qa_assignments: qaAssignments })
+                    .eq('id', milestoneId);
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    if (error.message.includes('relation "project_milestones" does not exist')) {
+                        showToast('Please create the project_milestones table in Supabase first. Check the SQL script provided.');
+                        return;
+                    }
+                    throw error;
+                }
+                
+                // Update local data
+                const milestone = projectMilestones.find(m => m.id === milestoneId);
+                if (milestone) {
+                    milestone.qa_assignments = qaAssignments;
+                }
+                
+                renderMilestonesTable();
+            } catch (error) {
+                console.error('Error updating QA assignments:', error);
+                showToast(`Error updating QA assignments: ${error.message}`);
+            }
+        }
+
+        // Populate project dropdown
+        function populateProjectDropdown() {
+            const select = document.getElementById('projectNameSelect');
+            if (!select) return;
+
+            // Get unique projects from milestones
+            const uniqueProjects = [...new Map(projectMilestones.map(m => [m.project_name, m])).values()];
+            
+            select.innerHTML = '<option value="">Select Project</option>';
+            uniqueProjects.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.project_name;
+                option.textContent = project.project_name;
+                option.dataset.pcName = project.pc_name || '';
+                select.appendChild(option);
+            });
+        }
+
+        // Handle project selection change
+        function onProjectChange() {
+            const select = document.getElementById('projectNameSelect');
+            const pcInput = document.querySelector('input[name="pc"]');
+            
+            if (select && pcInput) {
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption.dataset.pcName) {
+                    pcInput.value = selectedOption.dataset.pcName;
+                }
+            }
+        }
+
+        // QA Report Functions
+        function openQAReportModal() {
+            populateQADropdown();
+            document.getElementById('qaReportModal').classList.add('active');
+        }
+
+        function closeQAReportModal() {
+            document.getElementById('qaReportModal').classList.remove('active');
+            document.getElementById('qaReportForm').reset();
+        }
+
+        // Open rejected projects modal
+        function openRejectedProjectsModal() {
+            document.getElementById('rejectedProjectsModal').classList.add('active');
+        }
+
+        function closeRejectedProjectsModal() {
+            document.getElementById('rejectedProjectsModal').classList.remove('active');
+            document.getElementById('rejectedProjectsForm').reset();
+        }
+
+        // Populate QA dropdown
+        async function populateQADropdown() {
+            const select = document.getElementById('qaSelect');
+            if (!select) {
+                console.error('QA select element not found');
+                return;
+            }
+
+            try {
+                // Get unique QA names from tasks table (assigned_to field)
+                const { data: tasks, error } = await supabase
+                    .from('tasks')
+                    .select('assigned_to, assigned_to2')
+                    .or('assigned_to.not.is.null,assigned_to2.not.is.null');
+                
+                console.log('Fetched tasks for QA dropdown:', tasks);
+                
+                if (error) {
+                    console.error('Error loading QA names:', error);
+                    showToast('Error loading QA names.');
+                    return;
+                }
+
+                // Extract unique QA names from both assigned_to and assigned_to2 fields
+                const uniqueQAs = [...new Set([
+                    ...tasks.map(t => t.assigned_to).filter(name => name && name.trim() !== ''),
+                    ...tasks.map(t => t.assigned_to2).filter(name => name && name.trim() !== '')
+                ])].sort();
+
+                console.log('Unique QAs found:', uniqueQAs);
+
+                select.innerHTML = '<option value="">Select QA</option>';
+                uniqueQAs.forEach(qa => {
+                    const option = document.createElement('option');
+                    option.value = qa;
+                    option.textContent = qa;
+                    select.appendChild(option);
+                });
+
+                console.log('QA dropdown populated with', uniqueQAs.length, 'options');
+            } catch (error) {
+                console.error('Error populating QA dropdown:', error);
+                showToast('Error loading QA names.');
+            }
+        }
+
+        // Generate QA Report
+        async function generateQAReport(reportData) {
+            try {
+                const { qaName, fromDate, toDate } = reportData;
+                
+                console.log('Generating QA report for:', qaName, 'from', fromDate, 'to', toDate);
+                
+                // Get tasks from the main tasks table for this QA
+                const { data: tasks, error } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .or(`assigned_to.eq.${qaName},assigned_to2.eq.${qaName}`)
+                    .gte('created_at', fromDate)
+                    .lte('created_at', toDate + 'T23:59:59')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error fetching tasks:', error);
+                    showToast('Error fetching tasks data.');
+                    return;
+                }
+
+                console.log('Fetched tasks for QA report:', tasks);
+
+                if (!tasks || tasks.length === 0) {
+                    showToast('No tasks found for the selected QA and date range.');
+                    return;
+                }
+
+                // Generate Excel report from tasks data
+                await generateQAExcelReportFromTasks(tasks, qaName, fromDate, toDate);
+                closeQAReportModal();
+                
+            } catch (error) {
+                console.error('Error generating QA report:', error);
+                showToast('Error generating QA report.');
+            }
+        }
+
+        // Generate Excel report for QA from tasks data
+        async function generateQAExcelReportFromTasks(tasks, qaName, fromDate, toDate) {
+            try {
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Prepare data for Excel
+                const excelData = [];
+                
+                // Add header row
+                excelData.push([
+                    'Task ID', 'Project Name', 'PC Name', 'QA Name', 'QA Name 2', 'Status', 
+                    'Priority', 'Created Date', 'Due Date', 'Description', 'Rejection Reason'
+                ]);
+
+                // Add data rows
+                tasks.forEach(task => {
+                    excelData.push([
+                        task.id || '',
+                        task.project_name || '',
+                        task.pc || '',
+                        task.assigned_to || '',
+                        task.assigned_to2 || '',
+                        task.status || '',
+                        task.priority || '',
+                        task.created_at ? new Date(task.created_at).toLocaleDateString('en-IN') : '',
+                        task.due_date || '',
+                        task.description || '',
+                        task.rejection_reason || ''
+                    ]);
+                });
+
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                XLSX.utils.book_append_sheet(wb, ws, 'QA Report');
+
+                // Generate filename
+                const filename = `QA_Report_${qaName}_${fromDate}_to_${toDate}.xlsx`;
+
+                // Save file
+                XLSX.writeFile(wb, filename);
+                
+                showToast(`QA Report generated successfully: ${filename}`);
+                
+            } catch (error) {
+                console.error('Error generating Excel report:', error);
+                showToast('Error generating Excel report.');
+            }
+        }
+
+        // Generate Excel report for QA (legacy function for milestones)
+        async function generateQAExcelReport(milestones, qaName, fromDate, toDate) {
+            try {
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Prepare data for Excel
+                const excelData = [];
+                
+                // Add header row
+                excelData.push([
+                    'SL No', 'Project Name', 'QA Assignments', 'Phase', 'Start Date', 'End Date', 
+                    'Status', 'Rejection Reason', 'Approval Status', 'Approval Reason'
+                ]);
+
+                // Add data rows
+                milestones.forEach(milestone => {
+                    const phasePrefixes = [
+                        { name: 'HTML Comparison', prefix: 'html_comparison' },
+                        { name: 'HTML Comparison Retest', prefix: 'html_comparison_retest' },
+                        { name: 'Dev Test', prefix: 'dev_test' },
+                        { name: 'Dev Retest', prefix: 'dev_retest' },
+                        { name: 'Before Live Test', prefix: 'before_live_test' },
+                        { name: 'Before Live Retest', prefix: 'before_live_retest' },
+                        { name: 'After Live', prefix: 'after_live' },
+                        { name: 'After Live Retest', prefix: 'after_live_retest' }
+                    ];
+
+                    phasePrefixes.forEach(phase => {
+                        const prefix = phase.prefix;
+                        const isEnabled = milestone[prefix];
+                        
+                        if (isEnabled) {
+                            const startDate = milestone[`${prefix}_start_date`] || '';
+                            const endDate = milestone[`${prefix}_end_date`] || '';
+                            const status = milestone[`${prefix}_status`] || '';
+                            const rejectionReason = milestone[`${prefix}_rejection_reason`] || '';
+                            
+                            // Check if this phase falls within the date range
+                            const phaseStart = startDate ? new Date(startDate) : null;
+                            const phaseEnd = endDate ? new Date(endDate) : null;
+                            const reportStart = new Date(fromDate);
+                            const reportEnd = new Date(toDate);
+                            
+                            const isInRange = !phaseStart || !phaseEnd || 
+                                (phaseStart >= reportStart && phaseStart <= reportEnd) ||
+                                (phaseEnd >= reportStart && phaseEnd <= reportEnd) ||
+                                (phaseStart <= reportStart && phaseEnd >= reportEnd);
+
+                            if (isInRange) {
+                                let approvalStatus = '';
+                                let approvalReason = '';
+                                
+                                if (prefix === 'before_live_test') {
+                                    approvalStatus = milestone.before_live_approved ? 'Approved' : 'Not Approved';
+                                    approvalReason = milestone.before_live_approval_reason || '';
+                                }
+
+                                excelData.push([
+                                    milestone.sl_number,
+                                    milestone.project_name,
+                                    (milestone.qa_assignments || []).join(', '),
+                                    phase.name,
+                                    startDate,
+                                    endDate,
+                                    status,
+                                    rejectionReason,
+                                    approvalStatus,
+                                    approvalReason
+                                ]);
+                            }
+                        }
+                    });
+                });
+
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                
+                // Set column widths
+                ws['!cols'] = [
+                    { wch: 8 },   // SL No
+                    { wch: 20 },  // Project Name
+                    { wch: 20 },  // QA Assignments
+                    { wch: 25 },  // Phase
+                    { wch: 12 },  // Start Date
+                    { wch: 12 },  // End Date
+                    { wch: 15 },  // Status
+                    { wch: 30 },  // Rejection Reason
+                    { wch: 15 },  // Approval Status
+                    { wch: 30 }   // Approval Reason
+                ];
+
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(wb, ws, 'QA Report');
+
+                // Generate filename
+                const filename = `QA_Report_${qaName}_${fromDate}_to_${toDate}.xlsx`;
+
+                // Save file
+                XLSX.writeFile(wb, filename);
+                
+                showToast(`QA Report generated successfully: ${filename}`);
+                
+            } catch (error) {
+                console.error('Error generating Excel report:', error);
+                showToast('Error generating Excel report.');
+            }
+        }
+
+        // Generate rejected projects report
+        async function generateRejectedProjectsReport(reportData) {
+            try {
+                console.log('Generating rejected projects report for date range:', reportData.fromDate, 'to', reportData.toDate);
+                
+                const { data: tasks, error } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .eq('status', 'Rejected')
+                    .gte('created_at', reportData.fromDate)
+                    .lte('created_at', reportData.toDate + 'T23:59:59');
+                
+                console.log('Fetched rejected tasks:', tasks);
+                
+                if (error) {
+                    console.error('Error fetching rejected tasks:', error);
+                    showToast('Error fetching rejected projects data.');
+                    return;
+                }
+
+                if (!tasks || tasks.length === 0) {
+                    showToast('No rejected projects found for the selected date range.');
+                    return;
+                }
+
+                // Process rejected projects data
+                const rejectedData = tasks.map(task => ({
+                    projectName: task.project_name || '',
+                    rejectedDate: task.created_at ? new Date(task.created_at).toLocaleDateString('en-IN') : '',
+                    qaName: task.assigned_to || '',
+                    pcName: task.pc || '',
+                    rejectedReason: task.rejection_reason || '',
+                    rejectedPhase: 'Task' // Since this is from tasks table, we'll use 'Task' as the phase
+                }));
+
+                console.log('Processed rejected data:', rejectedData);
+
+                // Generate Excel file
+                generateRejectedProjectsExcel(rejectedData, reportData);
+                
+            } catch (error) {
+                console.error('Error generating rejected projects report:', error);
+                showToast('Error generating rejected projects report.');
+            }
+        }
+
+        // Generate rejected projects Excel file
+        function generateRejectedProjectsExcel(rejectedData, reportData) {
+            const wb = XLSX.utils.book_new();
+            
+            // Create worksheet data
+            const wsData = [
+                ['Project Name', 'Rejected Date', 'QA Name', 'PC Name', 'Rejected Reason', 'Rejected Phase']
+            ];
+            
+            rejectedData.forEach(item => {
+                wsData.push([
+                    item.projectName,
+                    item.rejectedDate,
+                    item.qaName,
+                    item.pcName,
+                    item.rejectedReason,
+                    item.rejectedPhase
+                ]);
+            });
+            
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Rejected Projects');
+            
+            // Generate filename with date range
+            const fromDate = reportData.fromDate;
+            const toDate = reportData.toDate;
+            const filename = `Rejected_Projects_${fromDate}_to_${toDate}.xlsx`;
+            
+            XLSX.writeFile(wb, filename);
+            showToast('Rejected projects report generated successfully!');
+        }
+
+        // Populate from existing tasks
+        async function populateFromExistingTasks() {
+            if (!confirm('This will create milestones for all existing projects. Continue?')) return;
+
+            try {
+                // Get unique projects from tasks with QA assignments
+                const { data: tasks, error: tasksError } = await supabase
+                    .from('tasks')
+                    .select('project_name, pc, assigned_to, assigned_to2, status')
+                    .not('project_name', 'is', null);
+                
+                if (tasksError) throw tasksError;
+
+                // Group by project name and collect QA assignments
+                const projectMap = new Map();
+                tasks.forEach(task => {
+                    if (task.project_name) {
+                        if (!projectMap.has(task.project_name)) {
+                            projectMap.set(task.project_name, {
+                                project_name: task.project_name,
+                                pc_name: task.pc || null,
+                                assigned_to: task.assigned_to || null,
+                                assigned_to2: task.assigned_to2 || null,
+                                qa_assignments: new Set(),
+                                project_status: task.status || 'Not Started'
+                            });
+                        } else {
+                            // Update existing project with additional QA assignments
+                            const existing = projectMap.get(task.project_name);
+                            if (task.assigned_to && !existing.assigned_to) {
+                                existing.assigned_to = task.assigned_to;
+                            }
+                            if (task.assigned_to2 && !existing.assigned_to2) {
+                                existing.assigned_to2 = task.assigned_to2;
+                            }
+                        }
+                        
+                        // Add QA assignments
+                        if (task.assigned_to) {
+                            projectMap.get(task.project_name).qa_assignments.add(task.assigned_to);
+                        }
+                        if (task.assigned_to2) {
+                            projectMap.get(task.project_name).qa_assignments.add(task.assigned_to2);
+                        }
+                    }
+                });
+
+                // Create milestones for each project
+                const maxSl = Math.max(0, ...projectMilestones.map(m => m.sl_number || 0));
+                let slNumber = maxSl + 1;
+
+                for (const [projectName, projectData] of projectMap) {
+                    // Check if milestone already exists
+                    const exists = projectMilestones.some(m => m.project_name === projectName);
+                    if (exists) continue;
+
+                    // Convert Set to Array for JSON storage
+                    const qaAssignments = Array.from(projectData.qa_assignments);
+
+                    const { error } = await supabase
+                        .from('project_milestones')
+                        .insert([{
+                            sl_number: slNumber++,
+                            project_name: projectData.project_name,
+                            pc_name: projectData.pc_name,
+                            assigned_to: projectData.assigned_to,
+                            assigned_to2: projectData.assigned_to2,
+                            qa_assignments: qaAssignments,
+                            // Auto-populate status from tasks
+                            html_comparison_status: projectData.project_status,
+                            dev_test_status: projectData.project_status,
+                            before_live_test_status: projectData.project_status,
+                            after_live_status: projectData.project_status
+                        }]);
+                    
+                    if (error) {
+                        console.error(`Error creating milestone for ${projectName}:`, error);
+                        continue;
+                    }
+                }
+
+                // Reload milestones
+                await loadProjectMilestones();
+                showToast('Milestones populated from existing tasks successfully.');
+            } catch (error) {
+                console.error('Error populating from tasks:', error);
+                showToast('Error populating from tasks.');
+            }
         }
 
         function showToast(message) {
@@ -2896,6 +4828,53 @@
         
         // Attach dropdown listeners immediately
         attachDropdownListeners();
+
+        // Project form submission
+        document.getElementById('projectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const projectData = {
+                projectName: formData.get('projectName'),
+                pcName: formData.get('pcName')
+            };
+            
+            const success = await addProject(projectData);
+            if (success) {
+                closeProjectModal();
+            }
+        });
+
+        // Reason form submission
+        document.getElementById('reasonForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await saveReason();
+        });
+
+        // QA Report form submission
+        document.getElementById('qaReportForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const reportData = {
+                qaName: formData.get('qaName'),
+                fromDate: formData.get('fromDate'),
+                toDate: formData.get('toDate')
+            };
+            
+            await generateQAReport(reportData);
+        });
+
+        // Add event listener for rejected projects form
+        document.getElementById('rejectedProjectsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const reportData = {
+                fromDate: formData.get('fromDate'),
+                toDate: formData.get('toDate')
+            };
+            
+            await generateRejectedProjectsReport(reportData);
+            closeRejectedProjectsModal();
+        });
 
         function switchTab(tab) {
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -4098,6 +6077,125 @@ Generated on: ${new Date().toLocaleString()}`;
             await _captureScreenshotContainer('tomorrowScheduleScreenshotContainer', `Work_Schedule_${dateStr}.png`);
         }
 
+        // Text Schedule Functions
+        function openScheduleTextModal() {
+            closeReportModal();
+            const datePicker = document.getElementById('scheduleTextDatePicker');
+            // Set default to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            datePicker.value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('scheduleTextModal').classList.add('active');
+        }
+
+        function closeScheduleTextModal() {
+            document.getElementById('scheduleTextModal').classList.remove('active');
+        }
+
+        function closeTextDisplayModal() {
+            document.getElementById('textDisplayModal').classList.remove('active');
+        }
+
+        function generateScheduleText() {
+            const selectedDate = document.getElementById('scheduleTextDatePicker').value;
+            if (!selectedDate) {
+                showToast('Please select a date');
+                return;
+            }
+            
+            closeScheduleTextModal();
+            const scheduleDate = new Date(selectedDate);
+            scheduleDate.setHours(0,0,0,0);
+            
+            // Check if it's a weekend (Saturday or Sunday)
+            const dayOfWeek = scheduleDate.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Sunday = 0, Saturday = 6
+            const isHoliday = dayOfWeek === 0; // Only Sunday is considered holiday by default
+            
+            const scheduleTasks = tasks.filter(t => {
+                const start = t.startDate ? new Date(t.startDate) : null;
+                const end = t.endDate ? new Date(t.endDate) : null;
+                if (!start) return false;
+                start.setHours(0,0,0,0);
+                if (end) end.setHours(0,0,0,0);
+                
+                // Include tasks that are active on the schedule date
+                const isActiveOnDate = start <= scheduleDate && (!end || end >= scheduleDate);
+                
+                // Include overdue tasks (end date has passed but still in progress)
+                const inProgressStatuses = ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'];
+                const isOverdue = end && end < scheduleDate && inProgressStatuses.includes(t.status);
+                
+                return isActiveOnDate || isOverdue;
+            });
+
+            // Generate text content
+            const dateStr = scheduleDate.toLocaleDateString('en-IN', { 
+                timeZone: 'Asia/Kolkata',
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            let textContent = `📅 WORK SCHEDULE - ${dateStr.toUpperCase()}\n`;
+            textContent += `Generated on: ${new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}\n`;
+            textContent += `${'='.repeat(60)}\n\n`;
+            
+            if (isHoliday) {
+                textContent += `🏖️  HOLIDAY - No work scheduled for today\n`;
+                textContent += `All projects are on hold due to holiday.\n\n`;
+            } else if (scheduleTasks.length === 0) {
+                textContent += `📝 No tasks scheduled for this date.\n\n`;
+            } else {
+                textContent += `📋 SCHEDULED TASKS (${scheduleTasks.length} projects):\n\n`;
+                
+                scheduleTasks.forEach((task, index) => {
+                    const isOverdue = isTaskOverdue(task, scheduleDate);
+                    const overdueDays = calculateOverdueDaysForDate(task, scheduleDate);
+                    const statusDisplay = isOverdue ? `🚨 OVERDUE BY ${overdueDays} DAY${overdueDays > 1 ? 'S' : ''}` : (task.status || '');
+                    
+                    textContent += `${index + 1}. PROJECT: ${task.projectName || 'N/A'}\n`;
+                    textContent += `   Phase: ${task.subPhase || 'N/A'}\n`;
+                    textContent += `   Assigned To: ${[task.assignedTo, task.assignedTo2].filter(Boolean).join(', ') || 'N/A'}\n`;
+                    textContent += `   Status: ${statusDisplay}\n`;
+                    textContent += `   Start Date: ${task.startDate ? formatDate(task.startDate) : 'N/A'}\n`;
+                    textContent += `   End Date: ${task.endDate ? formatDate(task.endDate) : 'N/A'}\n`;
+                    if (task.comments) {
+                        textContent += `   Comments: ${task.comments}\n`;
+                    }
+                    textContent += `\n`;
+                });
+            }
+            
+            textContent += `${'='.repeat(60)}\n`;
+            textContent += `📧 Please review and confirm your availability for the assigned tasks.\n`;
+            textContent += `🔄 For any changes or updates, please contact the project manager.\n`;
+            textContent += `📞 For urgent matters, reach out directly to the assigned team members.\n`;
+            
+            // Display the text in modal
+            document.getElementById('scheduleTextOutput').value = textContent;
+            document.getElementById('textDisplayModal').classList.add('active');
+        }
+
+        function copyScheduleText() {
+            const textArea = document.getElementById('scheduleTextOutput');
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                document.execCommand('copy');
+                showToast('Text copied to clipboard!');
+            } catch (err) {
+                // Fallback for modern browsers
+                navigator.clipboard.writeText(textArea.value).then(() => {
+                    showToast('Text copied to clipboard!');
+                }).catch(() => {
+                    showToast('Failed to copy text. Please select and copy manually.');
+                });
+            }
+        }
+
         // 1. Tracker Table Screenshot
         async function generateTrackerScreenshot() {
             closeReportModal();
@@ -4331,6 +6429,7 @@ Generated on: ${new Date().toLocaleString()}`;
         document.addEventListener('DOMContentLoaded', async () => {
             await loadTasks();
             await loadAttendance();
+            await loadProjectMilestones();
 
             if (tasks.length === 0) {
                 const today = new Date();
