@@ -460,6 +460,25 @@
             border-radius: 16px;
             margin-top: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         .table-scroll-container {
@@ -1330,46 +1349,56 @@
         .milestones-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.875rem;
             min-width: 2000px;
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .milestones-table th {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
-            padding: 1rem 0.75rem;
-            text-align: center;
+            background: #f8fafc;
+            color: #374151;
+            padding: 0.75rem 0.5rem;
+            text-align: left;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             white-space: nowrap;
             position: sticky;
             top: 0;
             z-index: 10;
-            border: none;
+            border-bottom: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .milestones-table th:last-child {
+            border-right: none;
         }
 
         .milestones-table td {
             padding: 0.75rem 0.5rem;
-            border: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
             background: white;
-            text-align: center;
+            text-align: left;
             vertical-align: middle;
             max-width: 140px;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: unset;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .milestones-table td:last-child {
+            border-right: none;
         }
 
         .milestones-table tr:nth-child(even) td {
-            background: #f8fafc;
+            background: #f9fafb;
         }
 
         .milestones-table tr:hover td {
-            background: #f1f5f9;
+            background: #f3f4f6;
         }
 
         .milestones-table tr:last-child td {
@@ -1379,11 +1408,12 @@
         .milestone-phase {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             align-items: center;
-            padding: 4px;
-            min-height: 60px;
+            padding: 6px;
+            min-height: 50px;
             justify-content: center;
+            text-align: center;
         }
 
         .phase-checkbox {
@@ -2517,7 +2547,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="table-container">
+                    <div class="table-container" style="overflow-x: auto; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
                         <table class="milestones-table" id="milestonesTable">
                             <thead>
                                 <tr>
@@ -3588,6 +3618,8 @@
         // Add new project
         async function addProject(projectData) {
             try {
+                console.log('Creating project with data:', projectData);
+                
                 // Get next SL number
                 const maxSl = Math.max(0, ...projectMilestones.map(m => m.sl_number || 0));
                 
@@ -3607,20 +3639,32 @@
                     qaAssignments = Array.from(qaSet);
                 }
                 
+                const projectDataToInsert = {
+                    sl_number: maxSl + 1,
+                    project_name: projectData.projectName,
+                    pc_name: projectData.pcName || null,
+                    assigned_to: qaAssignments[0] || null,
+                    assigned_to2: qaAssignments[1] || null,
+                    qa_assignments: qaAssignments
+                };
+                
+                console.log('Inserting project data:', projectDataToInsert);
+                
                 const { data, error } = await supabase
                     .from('project_milestones')
-                    .insert([{
-                        sl_number: maxSl + 1,
-                        project_name: projectData.projectName,
-                        pc_name: projectData.pcName || null,
-                        assigned_to: qaAssignments[0] || null,
-                        assigned_to2: qaAssignments[1] || null,
-                        qa_assignments: qaAssignments
-                    }])
+                    .insert([projectDataToInsert])
                     .select();
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase error:', error);
+                    if (error.message.includes('relation "project_milestones" does not exist')) {
+                        showToast('Please create the project_milestones table in Supabase first. Check the SQL script provided.');
+                        return false;
+                    }
+                    throw error;
+                }
                 
+                console.log('Project created successfully:', data);
                 projectMilestones.push(data[0]);
                 renderMilestonesTable();
                 populateProjectDropdown();
@@ -3628,7 +3672,7 @@
                 return true;
             } catch (error) {
                 console.error('Error creating project:', error);
-                showToast('Error creating project.');
+                showToast(`Error creating project: ${error.message}`);
                 return false;
             }
         }
@@ -3779,13 +3823,17 @@
                 const milestone = projectMilestones.find(m => m.id === milestoneId);
                 if (!milestone) return;
 
-                // Prepare updates
+                // Prepare updates - only include fields that exist in the schema
                 const updates = {
-                    [phasePrefix]: milestone[phasePrefix] || false,
-                    [`${phasePrefix}_start_date`]: milestone[`${phasePrefix}_start_date`] || null,
-                    [`${phasePrefix}_end_date`]: milestone[`${phasePrefix}_end_date`] || null,
-                    [`${phasePrefix}_status`]: milestone[`${phasePrefix}_status`] || null
+                    [phasePrefix]: milestone[phasePrefix] || false
                 };
+
+                // Only add date and status fields for phases that have them (not kickoff_meeting)
+                if (phasePrefix !== 'kickoff_meeting') {
+                    updates[`${phasePrefix}_start_date`] = milestone[`${phasePrefix}_start_date`] || null;
+                    updates[`${phasePrefix}_end_date`] = milestone[`${phasePrefix}_end_date`] || null;
+                    updates[`${phasePrefix}_status`] = milestone[`${phasePrefix}_status`] || null;
+                }
 
                 // Add approval fields if applicable
                 if (phasePrefix === 'before_live_test') {
@@ -4022,9 +4070,9 @@
                     .from('tasks')
                     .select('*')
                     .or(`assigned_to.eq.${qaName},assigned_to2.eq.${qaName}`)
-                    .gte('created_at', fromDate)
-                    .lte('created_at', toDate + 'T23:59:59')
-                    .order('created_at', { ascending: false });
+                    .gte('start_date', fromDate)
+                    .lte('start_date', toDate + 'T23:59:59')
+                    .order('start_date', { ascending: false });
                 
                 if (error) {
                     console.error('Error fetching tasks:', error);
@@ -4061,7 +4109,8 @@
                 // Add header row
                 excelData.push([
                     'Task ID', 'Project Name', 'PC Name', 'QA Name', 'QA Name 2', 'Status', 
-                    'Priority', 'Created Date', 'Due Date', 'Description', 'Rejection Reason'
+                    'Priority', 'Start Date', 'End Date', 'Expected End Date', 'Actual End Date', 
+                    'Comments', 'Deviation Reasons', 'Rejection Reason'
                 ]);
 
                 // Add data rows
@@ -4074,9 +4123,12 @@
                         task.assigned_to2 || '',
                         task.status || '',
                         task.priority || '',
-                        task.created_at ? new Date(task.created_at).toLocaleDateString('en-IN') : '',
-                        task.due_date || '',
-                        task.description || '',
+                        task.start_date || '',
+                        task.end_date || '',
+                        task.expected_end_date || '',
+                        task.actual_end_date || '',
+                        task.comments || '',
+                        task.deviation_reasons || '',
                         task.rejection_reason || ''
                     ]);
                 });
@@ -4217,8 +4269,8 @@
                     .from('tasks')
                     .select('*')
                     .eq('status', 'Rejected')
-                    .gte('created_at', reportData.fromDate)
-                    .lte('created_at', reportData.toDate + 'T23:59:59');
+                    .gte('start_date', reportData.fromDate)
+                    .lte('start_date', reportData.toDate + 'T23:59:59');
                 
                 console.log('Fetched rejected tasks:', tasks);
                 
@@ -4236,10 +4288,19 @@
                 // Process rejected projects data
                 const rejectedData = tasks.map(task => ({
                     projectName: task.project_name || '',
+                    startDate: task.start_date || '',
+                    endDate: task.end_date || '',
+                    expectedEndDate: task.expected_end_date || '',
+                    actualEndDate: task.actual_end_date || '',
                     rejectedDate: task.created_at ? new Date(task.created_at).toLocaleDateString('en-IN') : '',
                     qaName: task.assigned_to || '',
+                    qaName2: task.assigned_to2 || '',
                     pcName: task.pc || '',
-                    rejectedReason: task.rejection_reason || '',
+                    status: task.status || '',
+                    priority: task.priority || '',
+                    comments: task.comments || '',
+                    deviationReasons: task.deviation_reasons || '',
+                    rejectedReason: task.comments || task.rejection_reason || '', // Use comments as rejected reason
                     rejectedPhase: 'Task' // Since this is from tasks table, we'll use 'Task' as the phase
                 }));
 
@@ -4260,15 +4321,26 @@
             
             // Create worksheet data
             const wsData = [
-                ['Project Name', 'Rejected Date', 'QA Name', 'PC Name', 'Rejected Reason', 'Rejected Phase']
+                ['Project Name', 'Start Date', 'End Date', 'Expected End Date', 'Actual End Date', 
+                 'Rejected Date', 'QA Name', 'QA Name 2', 'PC Name', 'Status', 'Priority', 
+                 'Comments', 'Deviation Reasons', 'Rejected Reason', 'Rejected Phase']
             ];
             
             rejectedData.forEach(item => {
                 wsData.push([
                     item.projectName,
+                    item.startDate,
+                    item.endDate,
+                    item.expectedEndDate,
+                    item.actualEndDate,
                     item.rejectedDate,
                     item.qaName,
+                    item.qaName2,
                     item.pcName,
+                    item.status,
+                    item.priority,
+                    item.comments,
+                    item.deviationReasons,
                     item.rejectedReason,
                     item.rejectedPhase
                 ]);
@@ -4295,7 +4367,8 @@
                 const { data: tasks, error: tasksError } = await supabase
                     .from('tasks')
                     .select('project_name, pc, assigned_to, assigned_to2, status')
-                    .not('project_name', 'is', null);
+                    .not('project_name', 'is', null)
+                    .order('created_at', { ascending: false });
                 
                 if (tasksError) throw tasksError;
 
@@ -4313,12 +4386,12 @@
                                 project_status: task.status || 'Not Started'
                             });
                         } else {
-                            // Update existing project with additional QA assignments
+                            // Update existing project with latest QA assignments (since tasks are ordered by created_at desc)
                             const existing = projectMap.get(task.project_name);
-                            if (task.assigned_to && !existing.assigned_to) {
+                            if (task.assigned_to) {
                                 existing.assigned_to = task.assigned_to;
                             }
-                            if (task.assigned_to2 && !existing.assigned_to2) {
+                            if (task.assigned_to2) {
                                 existing.assigned_to2 = task.assigned_to2;
                             }
                         }
@@ -4837,6 +4910,12 @@
                 projectName: formData.get('projectName'),
                 pcName: formData.get('pcName')
             };
+            
+            // Validate required fields
+            if (!projectData.projectName || projectData.projectName.trim() === '') {
+                showToast('Project name is required.');
+                return;
+            }
             
             const success = await addProject(projectData);
             if (success) {
