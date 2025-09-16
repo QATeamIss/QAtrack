@@ -2751,9 +2751,21 @@
                         <small style="color: #64748b; font-size: 0.8rem;">First working day of the task (optional)</small>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" class="form-input" name="startTime" value="09:30">
+                        <small style="color: #64748b; font-size: 0.8rem;">Start time (default: 9:30 AM)</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label class="form-label">End Date</label>
                         <input type="date" class="form-input" name="endDate">
                         <small style="color: #64748b; font-size: 0.8rem;">Last working day of the task (optional)</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time</label>
+                        <input type="time" class="form-input" name="endTime" value="18:30">
+                        <small style="color: #64748b; font-size: 0.8rem;">End time (default: 6:30 PM)</small>
                     </div>
                 </div>
                 <div class="form-row">
@@ -2763,10 +2775,24 @@
                         <small style="color: #64748b; font-size: 0.8rem;">Automatically calculated from start and end dates</small>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">Total Working Hours</label>
+                        <input type="number" class="form-input" name="totalWorkingHours" readonly style="background-color: #f8fafc;">
+                        <small style="color: #64748b; font-size: 0.8rem;">Automatically calculated (8 hours per day)</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label class="form-label">Include Saturday</label>
                         <select class="form-input" name="includeSaturday">
                             <option value="false">No (Monday-Friday only)</option>
                             <option value="true">Yes (Monday-Saturday)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Half Day Start</label>
+                        <select class="form-input" name="halfDayStart">
+                            <option value="false">No (Full day)</option>
+                            <option value="true">Yes (0.5 day for afternoon start)</option>
                         </select>
                     </div>
                 </div>
@@ -3182,7 +3208,7 @@
         }
 
         // Calculate working days between two dates
-        function calculateWorkingDays(startDate, endDate, includeSaturday = false) {
+        function calculateWorkingDays(startDate, endDate, includeSaturday = false, startTime = '09:30', endTime = '18:30', halfDayStart = false) {
             // Validate input dates
             if (!startDate || !endDate || startDate.trim() === '' || endDate.trim() === '') {
                 return 0;
@@ -3215,7 +3241,35 @@
                 currentDate.setDate(currentDate.getDate() + 1);
             }
             
-            return count;
+            // Apply half day logic for afternoon starts
+            if (halfDayStart && startTime) {
+                const [startHour, startMinute] = startTime.split(':').map(Number);
+                const startTimeInMinutes = startHour * 60 + startMinute;
+                const afternoonStartTime = 12 * 60 + 30; // 12:30 PM in minutes
+                
+                // If start time is after 12:30 PM, reduce by 0.5 days
+                if (startTimeInMinutes > afternoonStartTime) {
+                    count -= 0.5;
+                }
+            }
+            
+            return Math.max(0, count);
+        }
+
+        // Calculate total working hours based on working days and time
+        function calculateTotalWorkingHours(workingDays, startTime = '09:30', endTime = '18:30') {
+            if (!workingDays || workingDays <= 0) return 0;
+            
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+            
+            const startTimeInMinutes = startHour * 60 + startMinute;
+            const endTimeInMinutes = endHour * 60 + endMinute;
+            
+            // Calculate hours per day (8 working hours with 1 hour break)
+            const workingHoursPerDay = 8;
+            
+            return Math.round(workingDays * workingHoursPerDay * 10) / 10; // Round to 1 decimal place
         }
 
         // Calculate end date based on working days
@@ -6607,25 +6661,41 @@ Generated on: ${new Date().toLocaleString()}`;
             function calculateExpectedWorkingDays() {
                 const startDate = startDateInput?.value;
                 const endDate = endDateInput?.value;
+                const startTime = document.querySelector('input[name="startTime"]')?.value || '09:30';
+                const endTime = document.querySelector('input[name="endTime"]')?.value || '18:30';
                 const includeSaturday = includeSaturdaySelect?.value === 'true';
+                const halfDayStart = document.querySelector('select[name="halfDayStart"]')?.value === 'true';
 
                 if (startDate && endDate) {
-                    const workingDays = calculateWorkingDays(startDate, endDate, includeSaturday);
+                    const workingDays = calculateWorkingDays(startDate, endDate, includeSaturday, startTime, endTime, halfDayStart);
+                    const totalHours = calculateTotalWorkingHours(workingDays, startTime, endTime);
+                    
                     if (workingDaysInput) {
                         workingDaysInput.value = workingDays;
                     }
-                } else if (workingDaysInput) {
-                    workingDaysInput.value = '0';
+                    if (document.querySelector('input[name="totalWorkingHours"]')) {
+                        document.querySelector('input[name="totalWorkingHours"]').value = totalHours;
+                    }
+                } else {
+                    if (workingDaysInput) {
+                        workingDaysInput.value = '0';
+                    }
+                    if (document.querySelector('input[name="totalWorkingHours"]')) {
+                        document.querySelector('input[name="totalWorkingHours"]').value = '0';
+                    }
                 }
             }
 
             function calculateActualWorkingDays() {
                 const startDate = startDateInput?.value;
                 const actualEndDate = actualEndDateInput?.value;
+                const startTime = document.querySelector('input[name="startTime"]')?.value || '09:30';
+                const endTime = document.querySelector('input[name="endTime"]')?.value || '18:30';
                 const includeSaturday = includeSaturdaySelect?.value === 'true';
+                const halfDayStart = document.querySelector('select[name="halfDayStart"]')?.value === 'true';
 
                 if (startDate && actualEndDate) {
-                    const actualWorkingDays = calculateWorkingDays(startDate, actualEndDate, includeSaturday);
+                    const actualWorkingDays = calculateWorkingDays(startDate, actualEndDate, includeSaturday, startTime, endTime, halfDayStart);
                     if (actualWorkingDaysInput) {
                         actualWorkingDaysInput.value = actualWorkingDays;
                     }
@@ -6643,6 +6713,21 @@ Generated on: ${new Date().toLocaleString()}`;
             }
             if (includeSaturdaySelect) {
                 includeSaturdaySelect.addEventListener('change', calculateExpectedWorkingDays);
+            }
+            
+            // Add event listeners for time fields
+            const startTimeInput = document.querySelector('input[name="startTime"]');
+            const endTimeInput = document.querySelector('input[name="endTime"]');
+            const halfDayStartSelect = document.querySelector('select[name="halfDayStart"]');
+            
+            if (startTimeInput) {
+                startTimeInput.addEventListener('change', calculateExpectedWorkingDays);
+            }
+            if (endTimeInput) {
+                endTimeInput.addEventListener('change', calculateExpectedWorkingDays);
+            }
+            if (halfDayStartSelect) {
+                halfDayStartSelect.addEventListener('change', calculateExpectedWorkingDays);
             }
 
             // Event listeners for actual working days calculation
