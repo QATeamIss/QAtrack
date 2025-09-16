@@ -2776,8 +2776,14 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Total Working Hours</label>
-                        <input type="number" class="form-input" name="totalWorkingHours" readonly style="background-color: #f8fafc;">
-                        <small style="color: #64748b; font-size: 0.8rem;">Automatically calculated (8 hours per day)</small>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" class="form-input" name="totalWorkingHours" id="totalWorkingHoursInput" readonly style="background-color: #f8fafc; flex: 1;">
+                            <label style="display: flex; align-items: center; gap: 5px; font-size: 14px; color: #6b7280;">
+                                <input type="checkbox" id="manualHoursToggle" style="margin: 0;">
+                                Manual
+                            </label>
+                        </div>
+                        <small style="color: #64748b; font-size: 0.8rem;">Automatically calculated (9 hours per day) - Check "Manual" to edit</small>
                     </div>
                 </div>
                 <div class="form-row">
@@ -3237,11 +3243,18 @@
             const [endHour, endMinute] = endTime.split(':').map(Number);
             const startTimeInMinutes = startHour * 60 + startMinute;
             const endTimeInMinutes = endHour * 60 + endMinute;
-            const timeDiff = (endTimeInMinutes - startTimeInMinutes + 24 * 60) % (24 * 60);
             
-            // If the time span is within 24-33 hours (1 day + up to 9 hours), treat as 1 working day
-            // This covers cases like 4:30 PM to 5:30 PM next day (25 hours = 1 day + 1 hour)
-            if (timeDiff >= 0 && timeDiff <= 9 * 60) { // 0 to 9 hours
+            // Calculate the actual time difference in minutes
+            let timeDiff = endTimeInMinutes - startTimeInMinutes;
+            if (timeDiff < 0) {
+                timeDiff += 24 * 60; // Add 24 hours if end time is before start time
+            }
+            
+            // If the time span is within 0-9 hours OR 15-24 hours, treat as 1 working day
+            // This covers cases like:
+            // - 4:30 PM to 5:30 PM next day (1 hour = 1 day + 1 hour)
+            // - 4:30 PM to 3:30 PM next day (23 hours = 1 day - 1 hour)
+            if ((timeDiff >= 0 && timeDiff <= 9 * 60) || (timeDiff >= 15 * 60 && timeDiff <= 24 * 60)) {
                 return 1;
             }
             
@@ -6721,6 +6734,9 @@ Generated on: ${new Date().toLocaleString()}`;
 
             // Add working days calculation listeners
             setupWorkingDaysCalculation();
+            
+            // Add manual hours toggle functionality
+            setupManualHoursToggle();
 
             await renderCurrentTab();
         });
@@ -6809,6 +6825,40 @@ Generated on: ${new Date().toLocaleString()}`;
             // Event listeners for actual working days calculation
             if (actualEndDateInput) {
                 actualEndDateInput.addEventListener('change', calculateActualWorkingDays);
+            }
+        }
+
+        // Setup manual hours toggle functionality
+        function setupManualHoursToggle() {
+            const manualToggle = document.getElementById('manualHoursToggle');
+            const hoursInput = document.getElementById('totalWorkingHoursInput');
+            
+            if (manualToggle && hoursInput) {
+                manualToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        // Enable manual editing
+                        hoursInput.readOnly = false;
+                        hoursInput.style.backgroundColor = '#ffffff';
+                        hoursInput.style.borderColor = '#3b82f6';
+                        hoursInput.focus();
+                    } else {
+                        // Disable manual editing and recalculate
+                        hoursInput.readOnly = true;
+                        hoursInput.style.backgroundColor = '#f8fafc';
+                        hoursInput.style.borderColor = '#d1d5db';
+                        
+                        // Recalculate working hours
+                        const startTime = document.querySelector('input[name="startTime"]')?.value || '09:30';
+                        const endTime = document.querySelector('input[name="endTime"]')?.value || '18:30';
+                        const workingDaysInput = document.querySelector('input[name="workingDays"]');
+                        const workingDays = parseFloat(workingDaysInput?.value) || 0;
+                        
+                        if (workingDays > 0) {
+                            const totalHours = calculateTotalWorkingHours(workingDays, startTime, endTime);
+                            hoursInput.value = totalHours;
+                        }
+                    }
+                });
             }
         }
     </script>
