@@ -3227,6 +3227,24 @@
                 return 0;
             }
             
+            // Special case: if start and end times are the same, treat as 1 working day
+            if (startTime === endTime) {
+                return 1;
+            }
+            
+            // Calculate time difference to determine if it's within a reasonable working span
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+            const startTimeInMinutes = startHour * 60 + startMinute;
+            const endTimeInMinutes = endHour * 60 + endMinute;
+            const timeDiff = (endTimeInMinutes - startTimeInMinutes + 24 * 60) % (24 * 60);
+            
+            // If the time span is within 24-33 hours (1 day + up to 9 hours), treat as 1 working day
+            // This covers cases like 4:30 PM to 5:30 PM next day (25 hours = 1 day + 1 hour)
+            if (timeDiff >= 0 && timeDiff <= 9 * 60) { // 0 to 9 hours
+                return 1;
+            }
+            
             let count = 0;
             const currentDate = new Date(start); // Don't modify the original start date
             
@@ -3274,13 +3292,35 @@
                 actualDurationHours += 24;
             }
             
+            // If start and end times are the same, use default working hours per day
+            if (actualDurationHours === 0) {
+                const defaultHoursPerDay = 9; // 9:30 AM to 6:30 PM = 9 hours
+                return Math.round(workingDays * defaultHoursPerDay * 10) / 10; // Round to 1 decimal place
+            }
+            
             // If working days is 0.5 or less (indicating a partial day), use the actual duration
             if (workingDays <= 0.5) {
                 return Math.round(actualDurationHours * 10) / 10; // Round to 1 decimal place
             }
             
-            // For full working days, multiply by the actual duration
-            return Math.round(workingDays * actualDurationHours * 10) / 10; // Round to 1 decimal place
+            // For working days calculation
+            const fullWorkingDayHours = 9; // 9:30 AM to 6:30 PM = 9 hours
+            
+            // If it's exactly 1 working day, use 9 hours + any extra time
+            if (workingDays === 1) {
+                const totalHours = fullWorkingDayHours + actualDurationHours;
+                return Math.round(totalHours * 10) / 10; // Round to 1 decimal place
+            }
+            
+            // For multiple working days, calculate based on actual duration
+            // Each full day contributes 9 hours, plus any extra hours
+            const fullDays = Math.floor(workingDays);
+            const extraHours = (workingDays - fullDays) * fullWorkingDayHours;
+            
+            // Calculate total hours: full days + actual duration
+            const totalHours = (fullDays * fullWorkingDayHours) + actualDurationHours;
+            
+            return Math.round(totalHours * 10) / 10; // Round to 1 decimal place
         }
 
         // Calculate end date based on working days
@@ -4596,6 +4636,10 @@
                     actualStartDate: task.actual_start_date,
                     actualEndDate: task.actual_end_date,
                     actualWorkingDays: task.actual_working_days || task.working_days || 1,
+                    startTime: task.start_time || '09:30',
+                    endTime: task.end_time || '18:30',
+                    totalWorkingHours: task.total_working_hours || 0,
+                    actualWorkingHours: task.actual_working_hours || 0,
                     completedAt: task.completed_at,
                     comments: task.comments,
                     bugCount: task.bug_count,
@@ -4629,6 +4673,12 @@
                     calculateWorkingDays(startDate, actualEndDate, includeSaturday) : 
                     (expectedWorkingDays || 0);
                 
+                // Calculate total working hours
+                const startTime = taskData.startTime || '09:30';
+                const endTime = taskData.endTime || '18:30';
+                const totalWorkingHours = calculateTotalWorkingHours(expectedWorkingDays, startTime, endTime);
+                const actualWorkingHours = calculateTotalWorkingHours(actualWorkingDays, startTime, endTime);
+                
                 // Use the status directly since database constraint has been updated
                 const validStatus = taskData.status || 'Yet to Start';
                 
@@ -4646,6 +4696,10 @@
                     actual_start_date: startDate || null,
                     actual_end_date: actualEndDate || endDate || null,
                     actual_working_days: actualWorkingDays,
+                    start_time: startTime || null,
+                    end_time: endTime || null,
+                    total_working_hours: totalWorkingHours || null,
+                    actual_working_hours: actualWorkingHours || null,
                     comments: taskData.comments || null,
                     bug_count: parseInt(taskData.bugCount) || 0,
                     deviation_reason: taskData.deviationReason || null,
@@ -6069,6 +6123,11 @@
             const includeSaturday = get('includeSaturday') === 'true' ? 'Yes (Mon-Sat)' : 'No (Mon-Fri)';
             const actualEndDate = get('actualEndDate') && get('actualEndDate') !== '-' ? formatDate(get('actualEndDate')) : 'Not set';
             const actualWorkingDays = get('actualWorkingDays') && get('actualWorkingDays') !== '-' ? get('actualWorkingDays') : 'Not calculated';
+            
+            // Get working hours info
+            const totalWorkingHours = get('totalWorkingHours') && get('totalWorkingHours') !== '-' ? get('totalWorkingHours') : 'Not calculated';
+            const startTime = get('startTime') && get('startTime') !== '-' ? get('startTime') : 'Not set';
+            const endTime = get('endTime') && get('endTime') !== '-' ? get('endTime') : 'Not set';
 
             const summary = 
 `📋 TASK SUMMARY
@@ -6101,6 +6160,12 @@ Actual End Date: ${actualEndDate}
 Expected Working Days: ${workingDays}
 Actual Working Days: ${actualWorkingDays}
 Include Saturday: ${includeSaturday}
+
+⏰ WORKING HOURS
+───────────────────────────────────────────────────────────────
+Total Working Hours: ${totalWorkingHours}
+Start Time: ${startTime}
+End Time: ${endTime}
 
 🐛 QUALITY METRICS
 ───────────────────────────────────────────────────────────────
