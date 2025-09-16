@@ -3266,10 +3266,21 @@
             const startTimeInMinutes = startHour * 60 + startMinute;
             const endTimeInMinutes = endHour * 60 + endMinute;
             
-            // Calculate hours per day (8 working hours with 1 hour break)
-            const workingHoursPerDay = 8;
+            // Calculate actual duration in hours for the time period
+            let actualDurationHours = (endTimeInMinutes - startTimeInMinutes) / 60;
             
-            return Math.round(workingDays * workingHoursPerDay * 10) / 10; // Round to 1 decimal place
+            // If the duration is negative (end time is before start time), assume it's the next day
+            if (actualDurationHours < 0) {
+                actualDurationHours += 24;
+            }
+            
+            // If working days is 0.5 or less (indicating a partial day), use the actual duration
+            if (workingDays <= 0.5) {
+                return Math.round(actualDurationHours * 10) / 10; // Round to 1 decimal place
+            }
+            
+            // For full working days, multiply by the actual duration
+            return Math.round(workingDays * actualDurationHours * 10) / 10; // Round to 1 decimal place
         }
 
         // Calculate end date based on working days
