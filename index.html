@@ -3239,23 +3239,28 @@
             }
             
             // Calculate time difference to determine if it's within a reasonable working span
-            const [startHour, startMinute] = startTime.split(':').map(Number);
-            const [endHour, endMinute] = endTime.split(':').map(Number);
-            const startTimeInMinutes = startHour * 60 + startMinute;
-            const endTimeInMinutes = endHour * 60 + endMinute;
+            // Only apply time-based logic for consecutive days (same day or next day)
+            const daysDifference = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
             
-            // Calculate the actual time difference in minutes
-            let timeDiff = endTimeInMinutes - startTimeInMinutes;
-            if (timeDiff < 0) {
-                timeDiff += 24 * 60; // Add 24 hours if end time is before start time
-            }
-            
-            // If the time span is within 0-9 hours OR 15-24 hours, treat as 1 working day
-            // This covers cases like:
-            // - 4:30 PM to 5:30 PM next day (1 hour = 1 day + 1 hour)
-            // - 4:30 PM to 3:30 PM next day (23 hours = 1 day - 1 hour)
-            if ((timeDiff >= 0 && timeDiff <= 9 * 60) || (timeDiff >= 15 * 60 && timeDiff <= 24 * 60)) {
-                return 1;
+            if (daysDifference <= 1) {
+                const [startHour, startMinute] = startTime.split(':').map(Number);
+                const [endHour, endMinute] = endTime.split(':').map(Number);
+                const startTimeInMinutes = startHour * 60 + startMinute;
+                const endTimeInMinutes = endHour * 60 + endMinute;
+                
+                // Calculate the actual time difference in minutes
+                let timeDiff = endTimeInMinutes - startTimeInMinutes;
+                if (timeDiff < 0) {
+                    timeDiff += 24 * 60; // Add 24 hours if end time is before start time
+                }
+                
+                // If the time span is within 0-9 hours OR 15-24 hours, treat as 1 working day
+                // This covers cases like:
+                // - 4:30 PM to 5:30 PM next day (1 hour = 1 day + 1 hour)
+                // - 4:30 PM to 3:30 PM next day (23 hours = 1 day - 1 hour)
+                if ((timeDiff >= 0 && timeDiff <= 9 * 60) || (timeDiff >= 15 * 60 && timeDiff <= 24 * 60)) {
+                    return 1;
+                }
             }
             
             let count = 0;
@@ -5135,6 +5140,28 @@
                     }
                 }
             }
+            
+            // Recalculate working days and hours after populating the form
+            setTimeout(() => {
+                const startDate = form.elements.startDate?.value;
+                const endDate = form.elements.endDate?.value;
+                const startTime = form.elements.startTime?.value || '09:30';
+                const endTime = form.elements.endTime?.value || '18:30';
+                const includeSaturday = form.elements.includeSaturday?.value === 'true';
+                const halfDayStart = form.elements.halfDayStart?.value === 'true';
+                
+                if (startDate && endDate) {
+                    const workingDays = calculateWorkingDays(startDate, endDate, includeSaturday, startTime, endTime, halfDayStart);
+                    const totalHours = calculateTotalWorkingHours(workingDays, startTime, endTime);
+                    
+                    if (form.elements.workingDays) {
+                        form.elements.workingDays.value = workingDays;
+                    }
+                    if (form.elements.totalWorkingHours) {
+                        form.elements.totalWorkingHours.value = totalHours;
+                    }
+                }
+            }, 100);
         }
 
         function closeModal() {
@@ -6856,6 +6883,19 @@ Generated on: ${new Date().toLocaleString()}`;
                         if (workingDays > 0) {
                             const totalHours = calculateTotalWorkingHours(workingDays, startTime, endTime);
                             hoursInput.value = totalHours;
+                        }
+                        
+                        // Also trigger the working days calculation to ensure everything is in sync
+                        const startDate = document.querySelector('input[name="startDate"]')?.value;
+                        const endDate = document.querySelector('input[name="endDate"]')?.value;
+                        const includeSaturday = document.querySelector('select[name="includeSaturday"]')?.value === 'true';
+                        const halfDayStart = document.querySelector('select[name="halfDayStart"]')?.value === 'true';
+                        
+                        if (startDate && endDate) {
+                            const newWorkingDays = calculateWorkingDays(startDate, endDate, includeSaturday, startTime, endTime, halfDayStart);
+                            if (workingDaysInput) {
+                                workingDaysInput.value = newWorkingDays;
+                            }
                         }
                     }
                 });
