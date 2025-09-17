@@ -4716,7 +4716,7 @@
                     comments: task.comments || '',
                     deviationReasons: task.deviation_reasons || '',
                     rejectedReason: task.comments || task.rejection_reason || '', // Use comments as rejected reason
-                    rejectedPhase: 'Task' // Since this is from tasks table, we'll use 'Task' as the phase
+                    rejectedPhase: task.sub_phase || 'Task' // Use the sub_phase from task creation, fallback to 'Task'
                 }));
 
                 console.log('Processed rejected data:', rejectedData);
