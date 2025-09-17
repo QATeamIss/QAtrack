@@ -2456,6 +2456,7 @@
                                         <th>From Date</th>
                                         <th>Due Date</th>
                                         <th>Actual End Date</th>
+                                        <th>Bug Count</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -6103,7 +6104,7 @@
                 const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
                 const colorClass = getAssigneeColorClass(assignee, assigneesList);
-                html += `<tr><td colspan="8" class="${colorClass}" style="font-weight:bold;">${assignee}</td></tr>`;
+                html += `<tr><td colspan="9" class="${colorClass}" style="font-weight:bold;">${assignee}</td></tr>`;
                 html += pagedTasks.map(task => `
                     <tr>
                         <td data-label="Project">${task.project_name || '-'}</td>
@@ -6113,6 +6114,7 @@
                         <td data-label="From Date">${formatDate(task.start_date)}</td>
                         <td data-label="Due Date">${formatDate(task.end_date)}</td>
                         <td data-label="Actual End Date">${formatDate(task.actual_end_date)}</td>
+                        <td data-label="Bug Count">${task.bug_count || '0'}</td>
                         <td data-label="Actions">
                             ${isCRUDUnlocked ? `
                                 <button class="action-btn-icon edit" onclick="editTask(${task.id})" title="Edit Task">✏️</button>
@@ -6121,7 +6123,7 @@
                         </td>
                     </tr>
                 `).join('');
-                html += `<tr><td colspan="8">` +
+                html += `<tr><td colspan="9">` +
                     `<div class="pagination">` +
                     `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(dashboardAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderDashboard)">Prev</button>` +
                     `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
@@ -7081,10 +7083,10 @@ Generated on: ${new Date().toLocaleString()}`;
         function downloadSampleSheet() {
             // Create sample data for the Excel file
             const sampleData = [
-                ['Project Name', 'Sub Phase', 'PC', 'Assigned To', 'Assigned To 2', 'Status', 'Start Date', 'End Date', 'Comments'],
-                ['Sample Project 1', 'UI Design', 'John Doe', 'Alice Smith', 'Bob Johnson', 'In Progress', '2024-01-15', '2024-01-30', 'Working on wireframes'],
-                ['Sample Project 2', 'API Development', 'Jane Doe', 'Charlie Brown', '', 'Yet to Start', '2024-01-20', '2024-02-05', 'Backend API development'],
-                ['Sample Project 3', 'Testing', 'Mike Wilson', 'Diana Prince', 'Clark Kent', 'Completed', '2024-01-10', '2024-01-25', 'All tests passed']
+                ['Project Name', 'Sub Phase', 'PC', 'Assigned To', 'Assigned To 2', 'Status', 'Start Date', 'End Date', 'Bug Count', 'Comments'],
+                ['Sample Project 1', 'UI Design', 'John Doe', 'Alice Smith', 'Bob Johnson', 'In Progress', '2024-01-15', '2024-01-30', '3', 'Working on wireframes'],
+                ['Sample Project 2', 'API Development', 'Jane Doe', 'Charlie Brown', '', 'Yet to Start', '2024-01-20', '2024-02-05', '0', 'Backend API development'],
+                ['Sample Project 3', 'Testing', 'Mike Wilson', 'Diana Prince', 'Clark Kent', 'Completed', '2024-01-10', '2024-01-25', '1', 'All tests passed']
             ];
 
             // Create workbook and worksheet
@@ -7101,6 +7103,7 @@ Generated on: ${new Date().toLocaleString()}`;
                 { wch: 12 }, // Status
                 { wch: 12 }, // Start Date
                 { wch: 12 }, // End Date
+                { wch: 10 }, // Bug Count
                 { wch: 30 }  // Comments
             ];
 
@@ -7232,25 +7235,94 @@ Generated on: ${new Date().toLocaleString()}`;
                 errors: []
             };
 
+            // Helper function to convert Excel serial number to date
+            function convertExcelDate(excelDate) {
+                if (!excelDate || excelDate === '') return null;
+                
+                // If it's already a valid date string, return it
+                if (typeof excelDate === 'string' && !isNaN(Date.parse(excelDate))) {
+                    return new Date(excelDate).toISOString().split('T')[0];
+                }
+                
+                // If it's a number (Excel serial number), convert it
+                if (typeof excelDate === 'number') {
+                    // Excel serial date starts from 1900-01-01, but Excel incorrectly treats 1900 as a leap year
+                    // So we need to adjust for this
+                    const excelEpoch = new Date(1900, 0, 1);
+                    const date = new Date(excelEpoch.getTime() + (excelDate - 2) * 24 * 60 * 60 * 1000);
+                    return date.toISOString().split('T')[0];
+                }
+                
+                return null;
+            }
+
+            // Helper function to parse DD/MM/YYYY format
+            function parseDDMMYYYY(dateStr) {
+                if (!dateStr || dateStr === '') return null;
+                
+                // Handle DD/MM/YYYY format
+                const match = dateStr.toString().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                if (match) {
+                    const day = parseInt(match[1]);
+                    const month = parseInt(match[2]) - 1; // JavaScript months are 0-indexed
+                    const year = parseInt(match[3]);
+                    const date = new Date(year, month, day);
+                    return date.toISOString().split('T')[0];
+                }
+                
+                return null;
+            }
+
             for (const taskData of tasks) {
                 try {
+                    // Convert dates properly
+                    let startDate = null;
+                    let endDate = null;
+                    
+                    // Try to parse start_date
+                    if (taskData['start_date']) {
+                        startDate = convertExcelDate(taskData['start_date']) || parseDDMMYYYY(taskData['start_date']);
+                    }
+                    
+                    // Try to parse end_date
+                    if (taskData['end_date']) {
+                        endDate = convertExcelDate(taskData['end_date']) || parseDDMMYYYY(taskData['end_date']);
+                    }
+
                     // Map the imported data to our task structure
                     const task = {
+                        id: Date.now() + results.success + results.failed + results.skipped, // Generate unique integer ID
                         project_name: taskData['project_name'] || '',
                         sub_phase: taskData['sub_phase'] || '',
                         pc: taskData['pc'] || '',
                         assigned_to: taskData['assigned_to'] || '',
                         assigned_to2: taskData['assigned_to_2'] || '',
                         status: taskData['status'] || 'Yet to Start',
-                        start_date: taskData['start_date'] || null,
-                        end_date: taskData['end_date'] || null,
-                        comments: taskData['comments'] || ''
+                        start_date: startDate,
+                        end_date: endDate,
+                        bug_count: parseInt(taskData['bug_count']) || 0,
+                        comments: taskData['comments'] || '',
+                        created_at: new Date().toISOString(),
+                        completed_at: taskData['status'] === 'Completed' ? new Date().toISOString() : null
                     };
 
                     // Validate required fields
                     if (!task.project_name) {
                         results.skipped++;
                         results.errors.push(`Row ${results.success + results.failed + results.skipped}: Missing project name`);
+                        continue;
+                    }
+
+                    // Validate dates if provided
+                    if (taskData['start_date'] && !startDate) {
+                        results.failed++;
+                        results.errors.push(`Row ${results.success + results.failed + results.skipped}: Invalid start date format: "${taskData['start_date']}"`);
+                        continue;
+                    }
+                    
+                    if (taskData['end_date'] && !endDate) {
+                        results.failed++;
+                        results.errors.push(`Row ${results.success + results.failed + results.skipped}: Invalid end date format: "${taskData['end_date']}"`);
                         continue;
                     }
 
