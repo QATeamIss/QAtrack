@@ -2397,7 +2397,9 @@
                                         <th>Phase</th>
                                         <th>Assigned To</th>
                                         <th>Status</th>
+                                        <th>From Date</th>
                                         <th>Due Date</th>
+                                        <th>Actual End Date</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -5958,21 +5960,23 @@
                 const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
                 const colorClass = getAssigneeColorClass(assignee, assigneesList);
-                html += `<tr><td colspan="6" class="${colorClass}" style="font-weight:bold;">${assignee}</td></tr>`;
+                html += `<tr><td colspan="8" class="${colorClass}" style="font-weight:bold;">${assignee}</td></tr>`;
                 html += pagedTasks.map(task => `
                     <tr>
                         <td data-label="Project">${task.project_name || '-'}</td>
                         <td data-label="Phase">${task.sub_phase || '-'}</td>
                         <td data-label="Assigned To">${task.assigned_to || '-'}</td>
                         <td data-label="Status"><span class="status-badge status-${getDisplayStatus(task).toLowerCase().replace(/ /g, '')}">${getDisplayStatus(task)}</span></td>
+                        <td data-label="From Date">${formatDate(task.start_date)}</td>
                         <td data-label="Due Date">${formatDate(task.end_date)}</td>
+                        <td data-label="Actual End Date">${formatDate(task.completed_at)}</td>
                         <td data-label="Actions">
                             <button class="action-btn" onclick="editTask(${task.id})">Edit</button>
                             <button class="action-btn" onclick="deleteTask(${task.id})">Delete</button>
                         </td>
                     </tr>
                 `).join('');
-                html += `<tr><td colspan="6">` +
+                html += `<tr><td colspan="8">` +
                     `<div class="pagination">` +
                     `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(dashboardAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderDashboard)">Prev</button>` +
                     `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
