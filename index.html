@@ -7081,10 +7081,10 @@ Generated on: ${new Date().toLocaleString()}`;
         function downloadSampleSheet() {
             // Create sample data for the Excel file
             const sampleData = [
-                ['Project Name', 'Sub Phase', 'PC', 'Assigned To', 'Assigned To 2', 'Status', 'Start Date', 'End Date', 'Priority', 'Comments'],
-                ['Sample Project 1', 'UI Design', 'John Doe', 'Alice Smith', 'Bob Johnson', 'In Progress', '2024-01-15', '2024-01-30', 'High', 'Working on wireframes'],
-                ['Sample Project 2', 'API Development', 'Jane Doe', 'Charlie Brown', '', 'Yet to Start', '2024-01-20', '2024-02-05', 'Medium', 'Backend API development'],
-                ['Sample Project 3', 'Testing', 'Mike Wilson', 'Diana Prince', 'Clark Kent', 'Completed', '2024-01-10', '2024-01-25', 'High', 'All tests passed']
+                ['Project Name', 'Sub Phase', 'PC', 'Assigned To', 'Assigned To 2', 'Status', 'Start Date', 'End Date', 'Comments'],
+                ['Sample Project 1', 'UI Design', 'John Doe', 'Alice Smith', 'Bob Johnson', 'In Progress', '2024-01-15', '2024-01-30', 'Working on wireframes'],
+                ['Sample Project 2', 'API Development', 'Jane Doe', 'Charlie Brown', '', 'Yet to Start', '2024-01-20', '2024-02-05', 'Backend API development'],
+                ['Sample Project 3', 'Testing', 'Mike Wilson', 'Diana Prince', 'Clark Kent', 'Completed', '2024-01-10', '2024-01-25', 'All tests passed']
             ];
 
             // Create workbook and worksheet
@@ -7101,7 +7101,6 @@ Generated on: ${new Date().toLocaleString()}`;
                 { wch: 12 }, // Status
                 { wch: 12 }, // Start Date
                 { wch: 12 }, // End Date
-                { wch: 10 }, // Priority
                 { wch: 30 }  // Comments
             ];
 
@@ -7130,9 +7129,6 @@ Generated on: ${new Date().toLocaleString()}`;
             try {
                 const data = await readFileData(file);
                 const tasks = parseFileData(data);
-                
-                // Debug: Log the parsed data
-                console.log('Parsed tasks:', tasks);
                 
                 if (tasks.length === 0) {
                     throw new Error('No valid tasks found in the file.');
@@ -7238,9 +7234,6 @@ Generated on: ${new Date().toLocaleString()}`;
 
             for (const taskData of tasks) {
                 try {
-                    // Debug: Log each task data
-                    console.log('Processing task data:', taskData);
-                    
                     // Map the imported data to our task structure
                     const task = {
                         project_name: taskData['project_name'] || '',
@@ -7251,12 +7244,8 @@ Generated on: ${new Date().toLocaleString()}`;
                         status: taskData['status'] || 'Yet to Start',
                         start_date: taskData['start_date'] || null,
                         end_date: taskData['end_date'] || null,
-                        priority: taskData['priority'] || 'Medium',
                         comments: taskData['comments'] || ''
                     };
-
-                    // Debug: Log the mapped task
-                    console.log('Mapped task:', task);
 
                     // Validate required fields
                     if (!task.project_name) {
