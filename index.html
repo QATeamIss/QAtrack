@@ -290,6 +290,72 @@
             display: flex;
             flex-direction: column;
         }
+
+        /* Content Section Styling */
+        .content-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .criteria-section, .guidelines-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .criteria-section h2, .guidelines-section h2 {
+            color: #1e40af;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 0.5rem;
+        }
+
+        .guidelines-section h3 {
+            color: #374151;
+            margin: 1rem 0 0.5rem 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .criteria-section ul, .guidelines-section ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .criteria-section li, .guidelines-section li {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+
+        .criteria-section strong, .guidelines-section strong {
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .important-notice {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            border: 1px solid #fbbf24;
+        }
+
+        .important-notice h2 {
+            color: #92400e;
+            border-bottom-color: #f59e0b;
+        }
+
+        .important-notice p {
+            color: #92400e;
+            font-weight: 600;
+            margin: 0;
+        }
         
         /* Labels Tab Content */
         .tab-content.labels-tab {
@@ -2173,7 +2239,31 @@
                                 <span class="nav-icon">⏳</span>
                                 <span>Yet to Start</span>
                             </div>
+                            <div class="dropdown-item" data-tab="ready-for-qa">
+                                <span class="nav-icon">🔍</span>
+                                <span>Ready for QA</span>
+                            </div>
+                            <div class="dropdown-item" data-tab="in-progress">
+                                <span class="nav-icon">⚡</span>
+                                <span>In Progress</span>
+                            </div>
+                            <div class="dropdown-item" data-tab="completed">
+                                <span class="nav-icon">✅</span>
+                                <span>Completed</span>
+                            </div>
+                            <div class="dropdown-item" data-tab="rejected">
+                                <span class="nav-icon">❌</span>
+                                <span>Rejected</span>
+                            </div>
                         </div>
+                    </div>
+                    <div class="nav-item" data-tab="qa-rejection-criteria">
+                        <span class="nav-icon" aria-label="QA Rejection Criteria" title="QA Rejection Criteria">🚫</span>
+                        <span>QA Rejection Criteria</span>
+                    </div>
+                    <div class="nav-item" data-tab="qa-guidelines">
+                        <span class="nav-icon" aria-label="QA Team Guidelines" title="QA Team Guidelines">📋</span>
+                        <span>QA Team Guidelines</span>
                     </div>
                 </div>
             </div>
@@ -2666,6 +2756,224 @@
                         <!-- Clear All Data Button -->
                         <div style="text-align: center; margin-top: 2rem;">
                             <button class="btn btn-secondary" onclick="clearAllData()">Clear All Data (Reset)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QA Rejection Criteria Tab -->
+                <div id="qa-rejection-criteria" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">QA Test Rejection Criteria</h1>
+                    </div>
+                    <div class="content-section">
+                        <div class="criteria-section">
+                            <h2>1. KT Session</h2>
+                            <ul>
+                                <li>Reject if <strong>major bugs</strong> are found during KT session.</li>
+                            </ul>
+                        </div>
+
+                        <div class="criteria-section">
+                            <h2>2. Dev Test</h2>
+                            <ul>
+                                <li>Reject if <strong>more than 5 P0 bugs</strong> are found within the first 30 minutes of testing.</li>
+                                <li>Reject if <strong>more than 25 bugs</strong> are found when <strong>20% of the project</strong> has been tested.</li>
+                            </ul>
+                        </div>
+
+                        <div class="criteria-section">
+                            <h2>3. HTML Comparison</h2>
+                            <ul>
+                                <li>Reject if <strong>pages are not aligned with design expectations</strong>.</li>
+                                <li>Reject if the project is <strong>not responsive</strong>.</li>
+                                <li>Reject if <strong>full pages are not built</strong>.</li>
+                            </ul>
+                        </div>
+
+                        <div class="criteria-section">
+                            <h2>4. HTML & Dev Retest</h2>
+                            <ul>
+                                <li>Reject if <strong>all bugs are not labeled correctly</strong> (status must be updated to Fixed or relevant status).</li>
+                                <li>Reject if <strong>more than 5 bugs are reopened</strong>.</li>
+                                <li>Reject if <strong>more than 2 P0 bugs are reopened</strong>.</li>
+                                <li>Reject if <strong>more than 3 regression bugs</strong> are found.</li>
+                            </ul>
+                        </div>
+
+                        <div class="criteria-section">
+                            <h2>5. Before Live Test</h2>
+                            <ul>
+                                <li>Reject if <strong>any major bugs</strong> are found within the <strong>first hour of testing</strong>.</li>
+                            </ul>
+                        </div>
+
+                        <div class="criteria-section">
+                            <h2>6. Before Live Retest</h2>
+                            <ul>
+                                <li>Reject if <strong>more than 1 bug is reopened</strong>.</li>
+                            </ul>
+                        </div>
+
+                        <div class="criteria-section">
+                            <h2>7. After Live</h2>
+                            <ul>
+                                <li>Same criteria as <strong>Before Live Test</strong>.</li>
+                            </ul>
+                        </div>
+
+                        <div class="criteria-section">
+                            <h2>Bug Review Meeting Criteria</h2>
+                            <p>A bug review meeting must be conducted if QA finds:</p>
+                            <ul>
+                                <li><strong>CMS Basic</strong> project → More than <strong>40 bugs</strong>.</li>
+                                <li><strong>CMS Advanced</strong> project → More than <strong>50 bugs</strong>.</li>
+                                <li><strong>E-commerce</strong> project → More than <strong>50 bugs</strong>.</li>
+                                <li><strong>Shopify</strong> project → More than <strong>30 bugs</strong>.</li>
+                                <li>More than <strong>10 repeated bugs</strong>.</li>
+                                <li>If the project is <strong>rejected</strong> under any phase.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QA Team Guidelines Tab -->
+                <div id="qa-guidelines" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">QA Team Guidelines</h1>
+                    </div>
+                    <div class="content-section">
+                        <div class="guidelines-section">
+                            <h2>1. Attendance & Leave Policy</h2>
+                            <h3>Office Timing</h3>
+                            <ul>
+                                <li>All QA team members must reach the office by <strong>9:30 AM sharp</strong></li>
+                                <li>Being on time ensures proper handover of tasks, participation in daily stand-ups, and synchronization with development teams</li>
+                            </ul>
+
+                            <h3>Planned Leave</h3>
+                            <ul>
+                                <li>Submit leave requests at least <strong>2 days in advance</strong> to allow proper workload planning</li>
+                                <li>Planned leaves must be formally communicated via mail, with prior approval from the QA TL</li>
+                            </ul>
+
+                            <h3>Emergency Leave</h3>
+                            <ul>
+                                <li>In case of emergencies, inform the QA TL first before updating the office group</li>
+                                <li>Immediately send a formal leave mail to document the absence</li>
+                                <li>Emergency leaves should only be taken for genuine reasons, and frequent usage will be monitored</li>
+                            </ul>
+                        </div>
+
+                        <div class="guidelines-section">
+                            <h2>2. Work Assignments & Guidance</h2>
+                            <h3>Knowledge Transfer (KT)</h3>
+                            <ul>
+                                <li>Before starting a new project, ensure you have taken KT from the Project Coordinator (PC) or the QA TL</li>
+                                <li>This avoids misunderstandings, missed requirements, and incomplete coverage</li>
+                            </ul>
+
+                            <h3>Task Assignment</h3>
+                            <ul>
+                                <li>Only the QA TL is authorized to assign tasks</li>
+                                <li>Any change in deadlines or additional workload must be documented in the work status report</li>
+                            </ul>
+
+                            <h3>Work Status Updates</h3>
+                            <ul>
+                                <li>Always update the QA Tracker Portal daily</li>
+                                <li>Copy and paste the work status exactly as per the portal format to maintain uniformity</li>
+                            </ul>
+                        </div>
+
+                        <div class="guidelines-section">
+                            <h2>3. Task Execution & Deadlines</h2>
+                            <h3>Timely Completion</h3>
+                            <ul>
+                                <li>Tasks must be completed within the assigned timeline</li>
+                                <li>Sprint deviations (delays) will be monitored and recorded for performance analysis</li>
+                            </ul>
+
+                            <h3>If QA TL is Unavailable</h3>
+                            <ul>
+                                <li>If no work is assigned by the QA TL due to leave or other reasons:</li>
+                                <li>Inform Steve or Sunil immediately</li>
+                                <li>Start the project by entering all details in the QA Tracker</li>
+                                <li>For GitLab bug tracker setup, seek help from Saneesh, Sunil, or the responsible TL</li>
+                            </ul>
+                        </div>
+
+                        <div class="guidelines-section">
+                            <h2>4. Bug Reporting & Communication</h2>
+                            <h3>Developer Communication</h3>
+                            <ul>
+                                <li>Do not directly debate bugs with developers</li>
+                                <li>Escalate clarifications through the responsible TL or Project Coordinator to avoid conflicts and miscommunication</li>
+                            </ul>
+
+                            <h3>Smoke Testing</h3>
+                            <ul>
+                                <li>Perform a smoke test within the first hour of testing</li>
+                                <li>If the build fails to meet acceptance criteria (rejection criteria), immediately inform the QA TL and reject the build instead of proceeding with full testing</li>
+                            </ul>
+                        </div>
+
+                        <div class="guidelines-section">
+                            <h2>5. Professional Conduct</h2>
+                            <h3>Workplace Behavior</h3>
+                            <ul>
+                                <li>Avoid loose talk or personal conversations on the work floor</li>
+                                <li>Maintain professionalism and respect towards colleagues and developers</li>
+                            </ul>
+
+                            <h3>Quality of Work</h3>
+                            <ul>
+                                <li>Ensure all assigned tasks are completed with accuracy and attention to detail</li>
+                                <li>A rushed or careless approach will only increase rework and delays</li>
+                            </ul>
+                        </div>
+
+                        <div class="guidelines-section">
+                            <h2>6. Daily Activities</h2>
+                            <h3>Daily Stand-Ups</h3>
+                            <ul>
+                                <li>Attend and complete daily stand-ups before starting your work</li>
+                                <li>Share clear updates: yesterday's work, today's plan, and blockers</li>
+                            </ul>
+
+                            <h3>Hubstaff Tracking</h3>
+                            <ul>
+                                <li>Mandatory for all QA members</li>
+                                <li>Requirements:</li>
+                                <li>Minimum <strong>70% activity rate</strong> (to show consistent effort)</li>
+                                <li>At least <strong>8 hours of tracked work time</strong> daily</li>
+                                <li>Low Hubstaff activity without valid reason will be flagged</li>
+                            </ul>
+                        </div>
+
+                        <div class="guidelines-section">
+                            <h2>7. Meetings & Reporting</h2>
+                            <h3>QA Bug Review Meetings</h3>
+                            <ul>
+                                <li>May be conducted by the QA TL when necessary, but only after verification by Steve, Saneesh, or Sunil</li>
+                                <li>These meetings help finalize bug statuses, avoid duplication, and track unresolved issues</li>
+                            </ul>
+
+                            <h3>Project Reporting</h3>
+                            <ul>
+                                <li>Every project must follow the standard report format (shared earlier)</li>
+                                <li>Reports must include:</li>
+                                <li>Project Start Date</li>
+                                <li>Expected End Date & Actual End Date</li>
+                                <li>Login Credentials</li>
+                                <li>Bug Table (with Bug ID, Description, Priority, Status, etc.)</li>
+                                <li>Bug Summary (total bugs raised, fixed, pending)</li>
+                                <li>Actions to be Taken (recommendations, blockers, pending fixes)</li>
+                            </ul>
+                        </div>
+
+                        <div class="guidelines-section important-notice">
+                            <h2>Important Notice</h2>
+                            <p><strong>Non-compliance with these guidelines will be taken seriously and may impact performance reviews.</strong></p>
                         </div>
                     </div>
                 </div>
