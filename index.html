@@ -5437,8 +5437,8 @@
                         `"${task.assigned_to || ''}"`,
                         `"${task.sub_phase || ''}"`,
                         formatDate(task.start_date),
-                        calculateTimeTaken(task.start_date, task.completed_at),
-                        calculateDeviation(task.end_date, task.completed_at),
+                        calculateTimeTaken(task.start_date, task.actual_end_date),
+                        calculateDeviation(task.end_date, task.actual_end_date),
                         `"${task.sprint || ''}"`,
                         task.bug_count || '0'
                     ].join(','))
@@ -6084,12 +6084,11 @@
             
             tableTitle.textContent = titleText;
 
-            // Sort all filtered tasks
+            // Sort all filtered tasks by start date (most recent first)
             allFilteredTasks.sort((a, b) => {
-                const orderA = statusSortOrder(a.status);
-                const orderB = statusSortOrder(b.status);
-                if (orderA !== orderB) return orderA - orderB;
-                return b.id - a.id;
+                const dateA = a.start_date ? new Date(a.start_date) : new Date(0);
+                const dateB = b.start_date ? new Date(b.start_date) : new Date(0);
+                return dateB - dateA; // Most recent first
             });
 
             // Group by assignee
@@ -6113,7 +6112,7 @@
                         <td data-label="Status"><span class="status-badge status-${getDisplayStatus(task).toLowerCase().replace(/ /g, '')}">${getDisplayStatus(task)}</span></td>
                         <td data-label="From Date">${formatDate(task.start_date)}</td>
                         <td data-label="Due Date">${formatDate(task.end_date)}</td>
-                        <td data-label="Actual End Date">${formatDate(task.completed_at)}</td>
+                        <td data-label="Actual End Date">${formatDate(task.actual_end_date)}</td>
                         <td data-label="Actions">
                             ${isCRUDUnlocked ? `
                                 <button class="action-btn-icon edit" onclick="editTask(${task.id})" title="Edit Task">✏️</button>
@@ -6171,12 +6170,11 @@
             // Only show NOT completed
             allFilteredTasks = allFilteredTasks.filter(t => t.status !== 'Completed');
 
-            // Sort all filtered tasks
+            // Sort all filtered tasks by start date (most recent first)
             allFilteredTasks.sort((a, b) => {
-                const orderA = statusSortOrder(a.status);
-                const orderB = statusSortOrder(b.status);
-                if (orderA !== orderB) return orderA - orderB;
-                return b.id - a.id;
+                const dateA = a.start_date ? new Date(a.start_date) : new Date(0);
+                const dateB = b.start_date ? new Date(b.start_date) : new Date(0);
+                return dateB - dateA; // Most recent first
             });
 
             // Group by assignee
@@ -6202,10 +6200,10 @@
                         <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
                         <td data-label="Start Date">${formatDate(task.start_date)}</td>
                         <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
-                        <td data-label="Actual Completion Date">${formatDate(task.completed_at)}</td>
+                        <td data-label="Actual Completion Date">${formatDate(task.actual_end_date)}</td>
                         <td data-label="Comments">${task.comments || '-'}</td>
                         <td data-label="Bug Count">${task.bug_count || '0'}</td>
-                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
+                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.actual_end_date)}</td>
                         <td data-label="Reason">${task.deviation_reason || '-'}</td>
                         <td data-label="Actions">
                             <button class="action-btn" onclick="editTask(${task.id})">Edit</button>
@@ -6238,8 +6236,12 @@
                 allCompletedTasks = [];
             }
 
-            // Sort by id desc
-            allCompletedTasks.sort((a, b) => b.id - a.id);
+            // Sort by start date (most recent first)
+            allCompletedTasks.sort((a, b) => {
+                const dateA = a.start_date ? new Date(a.start_date) : new Date(0);
+                const dateB = b.start_date ? new Date(b.start_date) : new Date(0);
+                return dateB - dateA; // Most recent first
+            });
 
             // Group by assignee
             const groups = groupTasksByAssignee(allCompletedTasks);
@@ -6262,10 +6264,10 @@
                         <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
                         <td data-label="Start Date">${formatDate(task.start_date)}</td>
                         <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
-                        <td data-label="Actual Completion Date">${formatDate(task.completed_at)}</td>
+                        <td data-label="Actual Completion Date">${formatDate(task.actual_end_date)}</td>
                         <td data-label="Comments">${task.comments || '-'}</td>
                         <td data-label="Bug Count">${task.bug_count || '0'}</td>
-                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
+                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.actual_end_date)}</td>
                         <td data-label="Reason">${task.deviation_reason || '-'}</td>
                     </tr>
                 `).join('');
@@ -6682,8 +6684,8 @@
                         <td data-label="Resource">${task.assigned_to || '-'}</td>
                         <td data-label="Phase">${task.sub_phase || '-'}</td>
                         <td data-label="Start Date">${formatDate(task.start_date)}</td>
-                        <td data-label="Time Taken">${calculateTimeTaken(task.start_date, task.completed_at)}</td>
-                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.completed_at)}</td>
+                        <td data-label="Time Taken">${calculateTimeTaken(task.start_date, task.actual_end_date)}</td>
+                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.actual_end_date)}</td>
                         <td data-label="Sprint">${task.sprint || '-'}</td>
                         <td data-label="Bug Count">${task.bug_count || '0'}</td>
                     </tr>
@@ -6773,6 +6775,13 @@
                 document.getElementById('rejectedPagination').innerHTML = '';
                 return;
             }
+
+            // Sort rejected tasks by start date (most recent first)
+            rejectedTasks.sort((a, b) => {
+                const dateA = a.start_date ? new Date(a.start_date) : new Date(0);
+                const dateB = b.start_date ? new Date(b.start_date) : new Date(0);
+                return dateB - dateA; // Most recent first
+            });
 
             // Group by assignee for pagination
             const groupedByAssignee = {};
@@ -7122,6 +7131,9 @@ Generated on: ${new Date().toLocaleString()}`;
                 const data = await readFileData(file);
                 const tasks = parseFileData(data);
                 
+                // Debug: Log the parsed data
+                console.log('Parsed tasks:', tasks);
+                
                 if (tasks.length === 0) {
                     throw new Error('No valid tasks found in the file.');
                 }
@@ -7203,7 +7215,16 @@ Generated on: ${new Date().toLocaleString()}`;
                 const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                return jsonData;
+                
+                // Normalize field names to match our expected format
+                return jsonData.map(row => {
+                    const normalizedRow = {};
+                    Object.keys(row).forEach(key => {
+                        const normalizedKey = key.toLowerCase().replace(/\s+/g, '_');
+                        normalizedRow[normalizedKey] = row[key];
+                    });
+                    return normalizedRow;
+                });
             }
         }
 
@@ -7217,19 +7238,25 @@ Generated on: ${new Date().toLocaleString()}`;
 
             for (const taskData of tasks) {
                 try {
+                    // Debug: Log each task data
+                    console.log('Processing task data:', taskData);
+                    
                     // Map the imported data to our task structure
                     const task = {
-                        project_name: taskData['project_name'] || taskData['project name'] || '',
-                        sub_phase: taskData['sub_phase'] || taskData['sub phase'] || '',
+                        project_name: taskData['project_name'] || '',
+                        sub_phase: taskData['sub_phase'] || '',
                         pc: taskData['pc'] || '',
-                        assigned_to: taskData['assigned_to'] || taskData['assigned to'] || '',
-                        assigned_to2: taskData['assigned_to_2'] || taskData['assigned to 2'] || '',
+                        assigned_to: taskData['assigned_to'] || '',
+                        assigned_to2: taskData['assigned_to_2'] || '',
                         status: taskData['status'] || 'Yet to Start',
-                        start_date: taskData['start_date'] || taskData['start date'] || null,
-                        end_date: taskData['end_date'] || taskData['end date'] || null,
+                        start_date: taskData['start_date'] || null,
+                        end_date: taskData['end_date'] || null,
                         priority: taskData['priority'] || 'Medium',
                         comments: taskData['comments'] || ''
                     };
+
+                    // Debug: Log the mapped task
+                    console.log('Mapped task:', task);
 
                     // Validate required fields
                     if (!task.project_name) {
