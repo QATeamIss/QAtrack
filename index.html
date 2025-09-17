@@ -501,6 +501,31 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
+        .stats-card.clickable {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card.clickable:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card.clickable.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .stats-card.clickable.active .stat-number {
+            color: white;
+        }
+
+        .stats-card.clickable.active .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
         .stat-number {
             font-size: 3rem;
             font-weight: 800;
@@ -2264,6 +2289,10 @@
                         <span class="nav-icon" aria-label="Completed" title="Completed">✅</span>
                         <span>Completed</span>
                     </div>
+                    <div class="nav-item" data-tab="rejected">
+                        <span class="nav-icon" aria-label="Rejected" title="Rejected">❌</span>
+                        <span>Rejected</span>
+                    </div>
                     <div class="nav-item" data-tab="milestones">
                         <span class="nav-icon" aria-label="Project Milestones" title="Project Milestones">🎯</span>
                         <span>Project Milestones</span>
@@ -2320,19 +2349,19 @@
                     </div>
 
                     <div class="cards-grid">
-                        <div class="stats-card animate-in">
+                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('all')">
                             <div class="stat-number" id="totalTasks">0</div>
                             <div class="stat-label">Total Tasks</div>
                         </div>
-                        <div class="stats-card animate-in">
+                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('active')">
                             <div class="stat-number" id="activeTasks">0</div>
                             <div class="stat-label">Active Tasks</div>
                         </div>
-                        <div class="stats-card animate-in">
+                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('completed')">
                             <div class="stat-number" id="completedTasks">0</div>
                             <div class="stat-label">Completed</div>
                         </div>
-                        <div class="stats-card animate-in">
+                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('overdue')">
                             <div class="stat-number" id="overdueTasks">0</div>
                             <div class="stat-label">Overdue</div>
                         </div>
@@ -2657,6 +2686,42 @@
                             </table>
                         </div>
                         <div id="yetToStartPagination"></div>
+                    </div>
+                </div>
+
+                <div id="rejected" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">Rejected Projects</h1>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>All Rejected Projects</h3>
+                            <div class="filter-group">
+                                <input type="text" class="search-box" placeholder="Filter rejected projects..." id="rejectedSearch">
+                                <input type="date" class="date-filter" id="rejectedDateFilter" placeholder="Filter by rejection date">
+                            </div>
+                        </div>
+                        <div class="table-scroll-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Project</th>
+                                        <th>Phase</th>
+                                        <th>PC</th>
+                                        <th>Assigned To (1)</th>
+                                        <th>Assigned To (2)</th>
+                                        <th>Status</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Rejected Date</th>
+                                        <th>Rejected Reason</th>
+                                        <th>Sub Phase</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rejectedTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div id="rejectedPagination"></div>
                     </div>
                 </div>
 
@@ -3491,9 +3556,12 @@
         let forecastSearchTerm = '';
         let yetToStartSearchTerm = '';
         let labelsSearchTerm = '';
+        let rejectedSearchTerm = '';
+        let rejectedDateFilter = '';
         let trackerDateFilter = '';
+        let dashboardFilterType = 'all'; // 'all', 'active', 'completed', 'overdue'
         // Pagination state
-        let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1, allProjectsPage = 1;
+        let dashboardPage = 1, trackerPage = 1, summaryPage = 1, attendancePage = 1, allProjectsPage = 1, rejectedPage = 1;
         const PAGE_SIZE = 10;
 
         // Per-assignee pagination state
@@ -3503,6 +3571,7 @@
         let summaryAssigneePages = {};
         let forecastAssigneePages = {};
         let yetToStartAssigneePages = {};
+        let rejectedAssigneePages = {};
 
         // Helper: Get page for assignee
         function getAssigneePage(stateObj, assignee) {
@@ -5283,6 +5352,16 @@
             renderYetToStart();
         });
 
+        document.getElementById('rejectedSearch')?.addEventListener('input', (e) => {
+            rejectedSearchTerm = e.target.value;
+            renderRejected();
+        });
+
+        document.getElementById('rejectedDateFilter')?.addEventListener('input', (e) => {
+            rejectedDateFilter = e.target.value;
+            renderRejected();
+        });
+
         document.getElementById('labelsSearch')?.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             
@@ -5433,6 +5512,7 @@
                 case 'dashboard': await renderDashboard(); break;
                 case 'tracker': await renderTracker(); break;
                 case 'allprojects': await renderAllProjects(); break;
+                case 'rejected': await renderRejected(); break;
                 case 'schedule': await renderSchedule(); break;
                 case 'summary': await renderSummary(); break;
                 case 'analytics': await renderAnalytics(); break;
@@ -5767,6 +5847,23 @@
                 });
             }
 
+            // Apply dashboard filter type
+            if (dashboardFilterType !== 'all') {
+                allFilteredTasks = allFilteredTasks.filter(task => {
+                    const taskWithEndDate = { ...task, endDate: task.end_date };
+                    switch (dashboardFilterType) {
+                        case 'active':
+                            return ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA', 'Yet to Start', 'Forecast'].includes(task.status);
+                        case 'completed':
+                            return task.status === 'Completed';
+                        case 'overdue':
+                            return isTaskOverdue(taskWithEndDate);
+                        default:
+                            return true;
+                    }
+                });
+            }
+
             // Stats: filter by date if set, else all
             let statsTasks = allFilteredTasks;
             const stats = calculateStats(statsTasks.map(task => ({
@@ -5778,15 +5875,26 @@
             document.getElementById('completedTasks').textContent = stats.completed;
             document.getElementById('overdueTasks').textContent = stats.overdue;
 
-            // Set table title based on date filter
+            // Set table title based on filter
             const tableTitle = document.getElementById('dashboardTableTitle');
+            let titleText = "Recent Tasks";
+            
+            if (dashboardFilterType !== 'all') {
+                const filterLabels = {
+                    'active': 'Active Tasks',
+                    'completed': 'Completed Tasks', 
+                    'overdue': 'Overdue Tasks'
+                };
+                titleText = filterLabels[dashboardFilterType] || "Recent Tasks";
+            }
+            
             if (dashboardDateFilter) {
                 const dateObj = new Date(dashboardDateFilter);
                 const formatted = dateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
-                tableTitle.textContent = `${formatted} Tracker`;
-            } else {
-                tableTitle.textContent = "Recent Tasks";
+                titleText = `${formatted} - ${titleText}`;
             }
+            
+            tableTitle.textContent = titleText;
 
             // Sort all filtered tasks
             allFilteredTasks.sort((a, b) => {
@@ -5831,6 +5939,14 @@
             });
             tbody.innerHTML = html;
             document.getElementById('dashboardPagination').innerHTML = '';
+            
+            // Set initial active state
+            if (dashboardFilterType === 'all') {
+                const cards = document.querySelectorAll('.stats-card.clickable');
+                if (cards[0]) {
+                    cards[0].classList.add('active');
+                }
+            }
         }
 
         async function renderTracker() {
@@ -6406,6 +6522,112 @@
             renderAllProjects();
         }
 
+        function setRejectedPage(page) {
+            rejectedPage = page;
+            renderRejected();
+        }
+
+        function filterDashboardByType(filterType) {
+            dashboardFilterType = filterType;
+            dashboardPage = 1; // Reset to first page
+            
+            // Update active state of cards
+            document.querySelectorAll('.stats-card.clickable').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Add active class to clicked card
+            const filterMap = {
+                'all': 0,
+                'active': 1,
+                'completed': 2,
+                'overdue': 3
+            };
+            const cardIndex = filterMap[filterType];
+            if (cardIndex !== undefined) {
+                const cards = document.querySelectorAll('.stats-card.clickable');
+                if (cards[cardIndex]) {
+                    cards[cardIndex].classList.add('active');
+                }
+            }
+            
+            renderDashboard();
+        }
+
+        async function renderRejected() {
+            // Fetch all rejected tasks (status = 'Rejected')
+            let taskQuery = supabase
+                .from('tasks')
+                .select('*')
+                .eq('status', 'Rejected')
+                .or(`project_name.ilike.%${rejectedSearchTerm || ''}%,assigned_to.ilike.%${rejectedSearchTerm || ''}%,sub_phase.ilike.%${rejectedSearchTerm || ''}%`);
+            
+            if (rejectedDateFilter) {
+                taskQuery = taskQuery.gte('created_at', rejectedDateFilter + 'T00:00:00.000Z')
+                                  .lte('created_at', rejectedDateFilter + 'T23:59:59.999Z');
+            }
+            
+            let { data: rejectedTasks, error } = await taskQuery;
+            if (error) {
+                console.error('Error fetching rejected tasks:', error);
+                return;
+            }
+
+            const tbody = document.getElementById('rejectedTableBody');
+            if (!tbody) return;
+
+            if (!rejectedTasks || rejectedTasks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:2rem;color:#6b7280;font-style:italic;">No rejected projects found</td></tr>';
+                document.getElementById('rejectedPagination').innerHTML = '';
+                return;
+            }
+
+            // Group by assignee for pagination
+            const groupedByAssignee = {};
+            rejectedTasks.forEach(task => {
+                const assignee = task.assigned_to || 'Unassigned';
+                if (!groupedByAssignee[assignee]) {
+                    groupedByAssignee[assignee] = [];
+                }
+                groupedByAssignee[assignee].push(task);
+            });
+
+            let html = '';
+            Object.entries(groupedByAssignee).forEach(([assignee, tasks]) => {
+                const page = getAssigneePage(rejectedAssigneePages, assignee);
+                const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
+                const startIndex = (page - 1) * PAGE_SIZE;
+                const pagedTasks = tasks.slice(startIndex, startIndex + PAGE_SIZE);
+
+                html += pagedTasks.map(task => `
+                    <tr>
+                        <td data-label="Project">${task.project_name || '-'}</td>
+                        <td data-label="Phase">${task.sub_phase || '-'}</td>
+                        <td data-label="PC">${task.pc || '-'}</td>
+                        <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
+                        <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
+                        <td data-label="Status"><span class="status-badge status-rejected">${task.status || '-'}</span></td>
+                        <td data-label="Start Date">${formatDate(task.start_date)}</td>
+                        <td data-label="End Date">${formatDate(task.end_date)}</td>
+                        <td data-label="Rejected Date">${formatDate(task.created_at)}</td>
+                        <td data-label="Rejected Reason" class="rejected-reason-column">${task.comments || task.rejection_reason || '-'}</td>
+                        <td data-label="Sub Phase">${task.sub_phase || '-'}</td>
+                    </tr>
+                `).join('');
+                
+                if (totalPages > 1) {
+                    html += `<tr><td colspan="11">` +
+                        `<div class="pagination">` +
+                        `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(rejectedAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderRejected)">Previous</button>` +
+                        `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
+                        `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="setAssigneePage(rejectedAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page + 1}, renderRejected)">Next</button>` +
+                        `</div></td></tr>`;
+                }
+            });
+            tbody.innerHTML = html;
+            document.getElementById('rejectedPagination').innerHTML = '';
+        }
+
         function setSummaryPage(page) {
             summaryPage = page;
             renderSummary();
@@ -6921,20 +7143,20 @@ Generated on: ${new Date().toLocaleString()}`;
         // Helper: Render a table for screenshot
         function renderScreenshotTable(tableId, data, headers, rowFn) {
             const table = document.getElementById(tableId);
-            let html = '<thead><tr>' + headers.map(h => `<th style="border:1px solid #d1d5db;padding:12px 8px;background:#f9fafb;color:#374151;font-weight:600;text-align:left;font-size:0.9rem;">${h}</th>`).join('') + '</tr></thead>';
+            let html = '<thead><tr>' + headers.map(h => `<th style="border:1px solid #dee2e6;padding:1rem 1.5rem;background:#173a5e;color:white;font-weight:700;text-align:left;font-size:0.9rem;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${h}</th>`).join('') + '</tr></thead>';
             html += '<tbody>';
             if (data.length === 0) {
-                html += `<tr><td colspan="${headers.length}" style="text-align:center;padding:2rem;color:#6b7280;font-style:italic;background:#ffffff;">No data available</td></tr>`;
+                html += `<tr><td colspan="${headers.length}" style="text-align:center;padding:2rem;color:#6b7280;font-style:italic;background:#ffffff;border:1px solid #dee2e6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">No data available</td></tr>`;
             } else {
                 html += data.map((t, index) => {
-                    const bgColor = index % 2 === 0 ? '#ffffff' : '#f9fafb';
+                    const bgColor = index % 2 === 0 ? '#ffffff' : '#f8f9fa';
                     const rowData = rowFn(t);
                     return '<tr>' + rowData.map((val, colIndex) => {
                         // Check if this is the status column and contains "Overdue"
                         const isOverdueStatus = headers[colIndex] === 'Status' && val && val.toString().includes('Overdue');
                         const cellBgColor = isOverdueStatus ? '#fef3c7' : bgColor; // Yellow background for overdue
-                        const cellTextColor = isOverdueStatus ? '#dc2626' : '#374151'; // Red text for overdue
-                        return `<td style="border:1px solid #e5e7eb;padding:10px 8px;color:${cellTextColor};background:${cellBgColor};font-size:0.85rem;font-weight:${isOverdueStatus ? '600' : 'normal'};">${val}</td>`;
+                        const cellTextColor = isOverdueStatus ? '#dc2626' : '#333'; // Red text for overdue
+                        return `<td style="border:1px solid #dee2e6;padding:1rem 1.5rem;color:${cellTextColor};background:${cellBgColor};font-size:0.9rem;font-weight:${isOverdueStatus ? '600' : 'normal'};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${val}</td>`;
                     }).join('') + '</tr>';
                 }).join('');
             }
