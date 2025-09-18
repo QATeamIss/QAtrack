@@ -3139,7 +3139,7 @@
             position: fixed !important;
             top: 1rem !important;
             z-index: 9999 !important;
-            transform: translateX(-50%) !important;
+            transform: translateX(-50%) translateY(-100px) !important;
             margin: 0 !important;
             background: rgba(16, 185, 129, 0.95) !important;
             color: white !important;
@@ -3149,11 +3149,40 @@
             backdrop-filter: blur(10px) !important;
             font-weight: 600 !important;
             transition: all 0.3s ease !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
         }
 
         .mobile-device .toast.show {
-            transform: translateX(-50%) !important;
+            transform: translateX(-50%) translateY(0) !important;
             opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .mobile-device .toast {
+            cursor: pointer !important;
+            user-select: none !important;
+            position: relative !important;
+        }
+
+        .mobile-device .toast::after {
+            content: "Tap to close" !important;
+            position: absolute !important;
+            bottom: -20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            font-size: 0.7rem !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: 400 !important;
+        }
+
+        .mobile-device .toast:hover {
+            background: rgba(16, 185, 129, 1) !important;
+            transform: translateX(-50%) translateY(-5px) !important;
+        }
+
+        .mobile-device .toast.show:hover {
+            transform: translateX(-50%) translateY(-5px) !important;
         }
 
         /* Override any existing toast animations for mobile */
@@ -3242,6 +3271,14 @@
             position: relative;
             z-index: 1000;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .mobile-banner.show {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         .mobile-banner-content {
@@ -3285,8 +3322,12 @@
             opacity: 1;
         }
 
-        .mobile-device .mobile-banner {
+        .mobile-device .mobile-banner.show {
             display: block !important;
+        }
+
+        .mobile-device .mobile-banner {
+            display: none !important;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -4669,10 +4710,10 @@
                 document.body.classList.add('mobile-layout');
                 isMobileLayout = true;
                 
-                // Show mobile banner
+                // Show mobile banner initially (only if not previously dismissed)
                 const mobileBanner = document.getElementById('mobileBanner');
-                if (mobileBanner) {
-                    mobileBanner.style.display = 'block';
+                if (mobileBanner && !localStorage.getItem('mobileBannerDismissed')) {
+                    mobileBanner.classList.add('show');
                 }
                 
                 // Add mobile-specific meta tags
@@ -4706,7 +4747,18 @@
         function closeMobileBanner() {
             const mobileBanner = document.getElementById('mobileBanner');
             if (mobileBanner) {
-                mobileBanner.style.display = 'none';
+                mobileBanner.classList.remove('show');
+                // Remember that user dismissed the banner
+                localStorage.setItem('mobileBannerDismissed', 'true');
+            }
+        }
+
+        // Function to reset mobile banner (for testing)
+        function resetMobileBanner() {
+            localStorage.removeItem('mobileBannerDismissed');
+            const mobileBanner = document.getElementById('mobileBanner');
+            if (mobileBanner && isMobile) {
+                mobileBanner.classList.add('show');
             }
         }
 
@@ -6349,11 +6401,32 @@
             }
         }
 
-        function showToast(message) {
+        function showToast(message, duration = 3000) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            
+            // Clear any existing timeout
+            if (toast.timeoutId) {
+                clearTimeout(toast.timeoutId);
+            }
+            
+            // Add click to close functionality
+            toast.onclick = () => hideToast();
+            
+            // Set new timeout
+            toast.timeoutId = setTimeout(() => {
+                hideToast();
+            }, duration);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('show');
+            if (toast.timeoutId) {
+                clearTimeout(toast.timeoutId);
+                toast.timeoutId = null;
+            }
         }
 
         function renderPagination(containerId, page, total, onPageChange) {
