@@ -9604,16 +9604,50 @@ Generated on: ${new Date().toLocaleString()}`;
                 }
 
             // Group tasks by status (all tasks are for today)
-            const activeTasks = qaTasks.filter(task => task.status === 'In Progress' || task.status === 'Yet to Start');
             const completedTasks = qaTasks.filter(task => task.status === 'Completed');
             const rejectedTasks = qaTasks.filter(task => task.status === 'Rejected');
             const overdueTasks = qaTasks.filter(task => {
-                // For today's tasks, check if they're overdue based on end_date
-                if (!task.end_date || task.status === 'Completed' || task.status === 'Rejected') return false;
-                const endDate = new Date(task.end_date);
+                // Skip completed or rejected tasks
+                if (task.status === 'Completed' || task.status === 'Rejected') return false;
+                
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                return endDate < today;
+                
+                // Check if start date has passed or is today but task is still "Yet to Start"
+                if (task.start_date) {
+                    const startDate = new Date(task.start_date);
+                    startDate.setHours(0, 0, 0, 0);
+                    if (startDate <= today && task.status === 'Yet to Start') {
+                        return true;
+                    }
+                }
+                
+                // Check if end date has passed
+                if (task.end_date) {
+                    const endDate = new Date(task.end_date);
+                    endDate.setHours(0, 0, 0, 0);
+                    if (endDate < today) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            });
+
+            // Active tasks (not overdue, not completed, not rejected)
+            const activeTasks = qaTasks.filter(task => {
+                const isOverdue = overdueTasks.includes(task);
+                const isCompleted = task.status === 'Completed';
+                const isRejected = task.status === 'Rejected';
+                return !isOverdue && !isCompleted && !isRejected;
+            });
+
+            console.log('Work Status Debug:', {
+                totalTasks: qaTasks.length,
+                activeTasks: activeTasks.length,
+                completedTasks: completedTasks.length,
+                rejectedTasks: rejectedTasks.length,
+                overdueTasks: overdueTasks.length
             });
 
             let workStatusMessage = `Work Status - ${currentDate}\n`;
@@ -9682,6 +9716,30 @@ Generated on: ${new Date().toLocaleString()}`;
             if (overdueTasks.length > 0) {
                 workStatusMessage += `=== OVERDUE TASKS ===\n`;
                 overdueTasks.forEach(task => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    // Determine why the task is overdue
+                    let overdueReason = '';
+                    if (task.start_date) {
+                        const startDate = new Date(task.start_date);
+                        startDate.setHours(0, 0, 0, 0);
+                        if (startDate < today && task.status === 'Yet to Start') {
+                            overdueReason = 'Task not started despite start date being passed';
+                        } else if (startDate.getTime() === today.getTime() && task.status === 'Yet to Start') {
+                            overdueReason = 'Task not started despite start date being today';
+                        }
+                    }
+                    if (task.end_date) {
+                        const endDate = new Date(task.end_date);
+                        endDate.setHours(0, 0, 0, 0);
+                        if (endDate < today) {
+                            overdueReason = overdueReason ? 
+                                `${overdueReason} and end date has passed` : 
+                                'End date has passed';
+                        }
+                    }
+                    
                     workStatusMessage += `Phase: ${task.sub_phase || 'N/A'}\n`;
                     workStatusMessage += `Project: ${task.project_name}\n`;
                     workStatusMessage += `Start Date and Time: ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
@@ -9689,7 +9747,7 @@ Generated on: ${new Date().toLocaleString()}`;
                     workStatusMessage += `Actual End Date and Time: ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
                     workStatusMessage += `Status: ${task.status}\n`;
                     workStatusMessage += `Deviated: Yes\n`;
-                    workStatusMessage += `Deviation Reason: ${task.comments || 'Project overdue - no specific reason provided'}\n`;
+                    workStatusMessage += `Deviation Reason: ${task.comments || task.deviation_reason || overdueReason || 'Project overdue - no specific reason provided'}\n`;
                     workStatusMessage += `\n`;
                 });
             }
