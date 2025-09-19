@@ -7757,6 +7757,13 @@
                     });
                 }
                 
+                // Sort by start date (most recent first) - same as display
+                filteredTasks.sort((a, b) => {
+                    const dateA = a.start_date ? new Date(a.start_date) : new Date(0);
+                    const dateB = b.start_date ? new Date(b.start_date) : new Date(0);
+                    return dateB - dateA;
+                });
+                
                 // Create Excel workbook
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(filteredTasks.map(task => ({
@@ -7842,7 +7849,7 @@
                 taskQuery = taskQuery.or(`project_name.ilike.%${allProjectsSearchTerm}%,assigned_to.ilike.%${allProjectsSearchTerm}%,sub_phase.ilike.%${allProjectsSearchTerm}%`);
             }
             
-            // Apply date range filters
+            // Apply date range filters - use actual_end_date for completed projects
             if (fromDate) {
                 taskQuery = taskQuery.gte('actual_end_date', fromDate);
             }
@@ -7862,6 +7869,8 @@
                 allCompletedTasks = [];
             }
             
+            console.log('Fetched completed tasks:', allCompletedTasks.length);
+            
             // Apply month filter in JavaScript (since Supabase doesn't have month filtering)
             if (monthFilter) {
                 allCompletedTasks = allCompletedTasks.filter(task => {
@@ -7870,6 +7879,8 @@
                     return taskMonth.toString().padStart(2, '0') === monthFilter;
                 });
             }
+            
+            console.log('After filtering, completed tasks:', allCompletedTasks.length);
 
             // Sort by start date (most recent first)
             allCompletedTasks.sort((a, b) => {
@@ -7878,43 +7889,38 @@
                 return dateB - dateA; // Most recent first
             });
 
-            // Group by assignee
-            const groups = groupTasksByAssignee(allCompletedTasks);
-
+            // Show all completed projects without grouping by assignee
             const tbody = document.getElementById('allProjectsTableBody');
             let html = '';
-            Object.entries(groups).forEach(([assignee, tasks]) => {
-                const page = getAssigneePage(allProjectsAssigneePages, assignee);
-                const totalPages = Math.max(1, Math.ceil(tasks.length / PAGE_SIZE));
-                const pagedTasks = tasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-                html += `<tr><td colspan="13" style="font-weight:bold;background:#f1f5f9">${assignee}</td></tr>`;
-                html += pagedTasks.map(task => `
-                    <tr>
-                        <td data-label="Project">${task.project_name || '-'}</td>
-                        <td data-label="Phase">${task.sub_phase || '-'}</td>
-                        <td data-label="PC">${task.pc || '-'}</td>
-                        <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
-                        <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
-                        <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
-                        <td data-label="Start Date">${formatDate(task.start_date)}</td>
-                        <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
-                        <td data-label="Actual Completion Date">${formatDate(task.actual_end_date)}</td>
-                        <td data-label="Comments">${task.comments || '-'}</td>
-                        <td data-label="Bug Count">${task.bug_count || '0'}</td>
-                        <td data-label="HTML Bugs">${task.html_bugs || '0'}</td>
-                        <td data-label="Functional Bugs">${task.functional_bugs || '0'}</td>
-                        <td data-label="Deviation">${calculateDeviation(task.end_date, task.actual_end_date)}</td>
-                        <td data-label="Reason">${task.deviation_reason || '-'}</td>
-                    </tr>
+            
+            if (allCompletedTasks.length === 0) {
+                html += `<tr><td colspan="15" style="text-align:center;padding:2rem;color:#64748b;">No completed projects found matching the current filters.</td></tr>`;
+            } else {
+                // Add a summary row showing total count
+                html += `<tr><td colspan="15" style="font-weight:bold;background:#f1f5f9;text-align:center;">Total Completed Projects: ${allCompletedTasks.length}</td></tr>`;
+                
+                // Display all completed projects
+                html += allCompletedTasks.map(task => `
+                <tr>
+                    <td data-label="Project">${task.project_name || '-'}</td>
+                    <td data-label="Phase">${task.sub_phase || '-'}</td>
+                    <td data-label="PC">${task.pc || '-'}</td>
+                    <td data-label="Assigned To (1)">${task.assigned_to || '-'}</td>
+                    <td data-label="Assigned To (2)">${task.assigned_to2 || '-'}</td>
+                    <td data-label="Status"><span class="status-badge status-${(task.status || '').toLowerCase().replace(/ /g, '')}">${task.status || '-'}</span></td>
+                    <td data-label="Start Date">${formatDate(task.start_date)}</td>
+                    <td data-label="Expected End Date">${formatDate(task.end_date)}</td>
+                    <td data-label="Actual Completion Date">${formatDate(task.actual_end_date)}</td>
+                    <td data-label="Comments">${task.comments || '-'}</td>
+                    <td data-label="Bug Count">${task.bug_count || '0'}</td>
+                    <td data-label="HTML Bugs">${task.html_bugs || '0'}</td>
+                    <td data-label="Functional Bugs">${task.functional_bugs || '0'}</td>
+                    <td data-label="Deviation">${calculateDeviation(task.end_date, task.actual_end_date)}</td>
+                    <td data-label="Reason">${task.deviation_reason || '-'}</td>
+                </tr>
                 `).join('');
-                html += `<tr><td colspan="15">` +
-                    `<div class="pagination">` +
-                    `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(allProjectsAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderAllProjects)">Prev</button>` +
-                    `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
-                    `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="setAssigneePage(allProjectsAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page + 1}, renderAllProjects)">Next</button>` +
-                    `</div></td></tr>`;
-            });
+            }
+            
             tbody.innerHTML = html;
             document.getElementById('allProjectsPagination').innerHTML = '';
         }
