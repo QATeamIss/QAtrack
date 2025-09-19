@@ -643,9 +643,75 @@
             flex-wrap: wrap;
         }
 
-        .filter-group .btn {
-            margin: 0;
+        .filter-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
             white-space: nowrap;
+        }
+
+        .filter-input, .filter-select {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            color: #334155;
+            font-size: 0.875rem;
+            min-width: 120px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .filter-group .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        /* Responsive design for filter controls */
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+            
+            .filter-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .filter-input, .filter-select {
+                width: 100%;
+                min-width: auto;
+            }
         }
 
         table {
@@ -3692,7 +3758,47 @@
                     <div class="table-container">
                         <div class="table-header">
                             <h3>Completed Projects</h3>
-                            <input type="text" class="search-box" placeholder="Filter completed projects..." id="allProjectsSearch">
+                            <div class="filter-controls">
+                                <input type="text" class="search-box" placeholder="Filter completed projects..." id="allProjectsSearch">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label class="filter-label">From Date:</label>
+                                        <input type="date" class="filter-input" id="allProjectsFromDate">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">To Date:</label>
+                                        <input type="date" class="filter-input" id="allProjectsToDate">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">QA:</label>
+                                        <select class="filter-select" id="allProjectsQAFilter">
+                                            <option value="">All QAs</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label">Month:</label>
+                                        <select class="filter-select" id="allProjectsMonthFilter">
+                                            <option value="">All Months</option>
+                                            <option value="01">January</option>
+                                            <option value="02">February</option>
+                                            <option value="03">March</option>
+                                            <option value="04">April</option>
+                                            <option value="05">May</option>
+                                            <option value="06">June</option>
+                                            <option value="07">July</option>
+                                            <option value="08">August</option>
+                                            <option value="09">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <button class="btn btn-primary" onclick="exportCompletedProjectsToExcel()">Export to Excel</button>
+                                        <button class="btn btn-secondary" onclick="clearCompletedProjectsFilters()">Clear Filters</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="table-scroll-container">
                             <table>
@@ -3709,6 +3815,8 @@
                                         <th>Actual Completion Date</th>
                                         <th>Comments</th>
                                         <th>Bug Count</th>
+                                        <th>HTML Bugs</th>
+                                        <th>Functional Bugs</th>
                                         <th>Deviation</th>
                                         <th>Reason</th>
                                     </tr>
@@ -4311,6 +4419,14 @@
                     <div class="form-group">
                         <label class="form-label">Bug Count</label>
                         <input type="number" class="form-input" name="bugCount" placeholder="e.g., 5" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">HTML Bugs</label>
+                        <input type="number" class="form-input" name="htmlBugs" placeholder="e.g., 2" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Functional Bugs</label>
+                        <input type="number" class="form-input" name="functionalBugs" placeholder="e.g., 3" value="0">
                     </div>
                 </div>
                 <div class="form-group">
@@ -6519,6 +6635,8 @@
                     completedAt: task.completed_at,
                     comments: task.comments,
                     bugCount: task.bug_count,
+                    htmlBugs: task.html_bugs,
+                    functionalBugs: task.functional_bugs,
                     deviationReason: task.deviation_reason,
                     sprint: task.sprint,
                     createdAt: task.created_at
@@ -6561,6 +6679,8 @@
                     end_time: endTime || null,
                     comments: taskData.comments || null,
                     bug_count: parseInt(taskData.bugCount) || 0,
+                    html_bugs: parseInt(taskData.htmlBugs) || 0,
+                    functional_bugs: parseInt(taskData.functionalBugs) || 0,
                     deviation_reason: taskData.deviationReason || null,
                     sprint: taskData.sprint || null
                 };
@@ -6790,6 +6910,23 @@
             renderAllProjects();
         });
 
+        // Add event listeners for completed projects filters
+        document.getElementById('allProjectsFromDate')?.addEventListener('change', () => {
+            renderAllProjects();
+        });
+
+        document.getElementById('allProjectsToDate')?.addEventListener('change', () => {
+            renderAllProjects();
+        });
+
+        document.getElementById('allProjectsQAFilter')?.addEventListener('change', () => {
+            renderAllProjects();
+        });
+
+        document.getElementById('allProjectsMonthFilter')?.addEventListener('change', () => {
+            renderAllProjects();
+        });
+
         document.getElementById('forecastSearch')?.addEventListener('input', (e) => {
             forecastSearchTerm = e.target.value;
             renderForecast();
@@ -6959,7 +7096,10 @@
             switch (currentTab) {
                 case 'dashboard': await renderDashboard(); break;
                 case 'tracker': await renderTracker(); break;
-                case 'allprojects': await renderAllProjects(); break;
+                case 'allprojects': 
+                    await populateCompletedProjectsQA();
+                    await renderAllProjects(); 
+                    break;
                 case 'rejected': await renderRejected(); break;
                 case 'schedule': await renderSchedule(); break;
                 case 'summary': await renderSummary(); break;
@@ -7526,18 +7666,209 @@
             document.getElementById('trackerPagination').innerHTML = '';
         }
 
+        // Populate QA dropdown for completed projects
+        async function populateCompletedProjectsQA() {
+            const select = document.getElementById('allProjectsQAFilter');
+            if (!select) return;
+            
+            try {
+                const { data: tasks, error } = await supabase
+                    .from('tasks')
+                    .select('assigned_to, assigned_to2')
+                    .eq('status', 'Completed');
+                
+                if (error) throw error;
+                
+                const qaNames = new Set();
+                tasks.forEach(task => {
+                    if (task.assigned_to) qaNames.add(task.assigned_to);
+                    if (task.assigned_to2) qaNames.add(task.assigned_to2);
+                });
+                
+                const uniqueQANames = Array.from(qaNames).sort();
+                
+                // Clear existing options except "All QAs"
+                select.innerHTML = '<option value="">All QAs</option>';
+                
+                uniqueQANames.forEach(qaName => {
+                    const option = document.createElement('option');
+                    option.value = qaName;
+                    option.textContent = qaName;
+                    select.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error populating QA dropdown:', error);
+            }
+        }
+
+        // Clear all filters for completed projects
+        function clearCompletedProjectsFilters() {
+            document.getElementById('allProjectsFromDate').value = '';
+            document.getElementById('allProjectsToDate').value = '';
+            document.getElementById('allProjectsQAFilter').value = '';
+            document.getElementById('allProjectsMonthFilter').value = '';
+            document.getElementById('allProjectsSearch').value = '';
+            allProjectsSearchTerm = '';
+            renderAllProjects();
+        }
+
+        // Export completed projects to Excel with active filters
+        async function exportCompletedProjectsToExcel() {
+            try {
+                // Get current filter values
+                const fromDate = document.getElementById('allProjectsFromDate')?.value;
+                const toDate = document.getElementById('allProjectsToDate')?.value;
+                const qaFilter = document.getElementById('allProjectsQAFilter')?.value;
+                const monthFilter = document.getElementById('allProjectsMonthFilter')?.value;
+                const searchTerm = document.getElementById('allProjectsSearch')?.value;
+                
+                // Build query with same filters as renderAllProjects
+                let taskQuery = supabase
+                    .from('tasks')
+                    .select('*')
+                    .eq('status', 'Completed');
+                
+                if (searchTerm) {
+                    taskQuery = taskQuery.or(`project_name.ilike.%${searchTerm}%,assigned_to.ilike.%${searchTerm}%,sub_phase.ilike.%${searchTerm}%`);
+                }
+                
+                if (fromDate) {
+                    taskQuery = taskQuery.gte('actual_end_date', fromDate);
+                }
+                if (toDate) {
+                    taskQuery = taskQuery.lte('actual_end_date', toDate + 'T23:59:59');
+                }
+                
+                if (qaFilter) {
+                    taskQuery = taskQuery.or(`assigned_to.eq.${qaFilter},assigned_to2.eq.${qaFilter}`);
+                }
+                
+                const { data: allCompletedTasks, error } = await taskQuery;
+                if (error) throw error;
+                
+                // Apply month filter
+                let filteredTasks = allCompletedTasks;
+                if (monthFilter) {
+                    filteredTasks = allCompletedTasks.filter(task => {
+                        if (!task.actual_end_date) return false;
+                        const taskMonth = new Date(task.actual_end_date).getMonth() + 1;
+                        return taskMonth.toString().padStart(2, '0') === monthFilter;
+                    });
+                }
+                
+                // Create Excel workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(filteredTasks.map(task => ({
+                    'Project Name': task.project_name || '',
+                    'Phase': task.sub_phase || '',
+                    'PC': task.pc || '',
+                    'Assigned To (1)': task.assigned_to || '',
+                    'Assigned To (2)': task.assigned_to2 || '',
+                    'Status': task.status || '',
+                    'Start Date': task.start_date ? new Date(task.start_date).toLocaleDateString('en-IN') : '',
+                    'Expected End Date': task.end_date ? new Date(task.end_date).toLocaleDateString('en-IN') : '',
+                    'Actual Completion Date': task.actual_end_date ? new Date(task.actual_end_date).toLocaleDateString('en-IN') : '',
+                    'Comments': task.comments || '',
+                    'Bug Count': task.bug_count || 0,
+                    'HTML Bugs': task.html_bugs || 0,
+                    'Functional Bugs': task.functional_bugs || 0,
+                    'Deviation': calculateDeviation(task.end_date, task.actual_end_date),
+                    'Deviation Reason': task.deviation_reason || ''
+                })));
+                
+                // Set column widths
+                ws['!cols'] = [
+                    { wch: 25 }, // Project Name
+                    { wch: 20 }, // Phase
+                    { wch: 15 }, // PC
+                    { wch: 20 }, // Assigned To (1)
+                    { wch: 20 }, // Assigned To (2)
+                    { wch: 15 }, // Status
+                    { wch: 15 }, // Start Date
+                    { wch: 18 }, // Expected End Date
+                    { wch: 20 }, // Actual Completion Date
+                    { wch: 30 }, // Comments
+                    { wch: 12 }, // Bug Count
+                    { wch: 12 }, // HTML Bugs
+                    { wch: 15 }, // Functional Bugs
+                    { wch: 12 }, // Deviation
+                    { wch: 30 }  // Deviation Reason
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Completed Projects');
+                
+                // Generate filename with filter info
+                let filename = 'Completed_Projects';
+                if (fromDate || toDate) {
+                    const from = fromDate || 'Start';
+                    const to = toDate || 'End';
+                    filename += `_${from}_to_${to}`;
+                }
+                if (qaFilter) {
+                    filename += `_${qaFilter.replace(/\s+/g, '_')}`;
+                }
+                if (monthFilter) {
+                    const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June', 
+                                     'July', 'August', 'September', 'October', 'November', 'December'];
+                    filename += `_${monthNames[parseInt(monthFilter)]}`;
+                }
+                filename += '.xlsx';
+                
+                XLSX.writeFile(wb, filename);
+                showToast(`Excel file exported successfully: ${filename}`);
+                
+            } catch (error) {
+                console.error('Error exporting to Excel:', error);
+                showToast('Error exporting to Excel');
+            }
+        }
+
         async function renderAllProjects() {
-            // Fetch all filtered tasks (no range)
+            // Get filter values
+            const fromDate = document.getElementById('allProjectsFromDate')?.value;
+            const toDate = document.getElementById('allProjectsToDate')?.value;
+            const qaFilter = document.getElementById('allProjectsQAFilter')?.value;
+            const monthFilter = document.getElementById('allProjectsMonthFilter')?.value;
+            
+            // Build query with filters
             let taskQuery = supabase
                 .from('tasks')
                 .select('*')
-                .eq('status', 'Completed')
-                .or(`project_name.ilike.%${allProjectsSearchTerm}%,assigned_to.ilike.%${allProjectsSearchTerm}%,sub_phase.ilike.%${allProjectsSearchTerm}%`);
+                .eq('status', 'Completed');
+            
+            // Apply search term filter
+            if (allProjectsSearchTerm) {
+                taskQuery = taskQuery.or(`project_name.ilike.%${allProjectsSearchTerm}%,assigned_to.ilike.%${allProjectsSearchTerm}%,sub_phase.ilike.%${allProjectsSearchTerm}%`);
+            }
+            
+            // Apply date range filters
+            if (fromDate) {
+                taskQuery = taskQuery.gte('actual_end_date', fromDate);
+            }
+            if (toDate) {
+                taskQuery = taskQuery.lte('actual_end_date', toDate + 'T23:59:59');
+            }
+            
+            // Apply QA filter
+            if (qaFilter) {
+                taskQuery = taskQuery.or(`assigned_to.eq.${qaFilter},assigned_to2.eq.${qaFilter}`);
+            }
+            
             let { data: allCompletedTasks, error } = await taskQuery;
             if (error) {
                 console.error('Error searching completed tasks:', error);
                 showToast('Error searching completed tasks.');
                 allCompletedTasks = [];
+            }
+            
+            // Apply month filter in JavaScript (since Supabase doesn't have month filtering)
+            if (monthFilter) {
+                allCompletedTasks = allCompletedTasks.filter(task => {
+                    if (!task.actual_end_date) return false;
+                    const taskMonth = new Date(task.actual_end_date).getMonth() + 1;
+                    return taskMonth.toString().padStart(2, '0') === monthFilter;
+                });
             }
 
             // Sort by start date (most recent first)
@@ -7571,11 +7902,13 @@
                         <td data-label="Actual Completion Date">${formatDate(task.actual_end_date)}</td>
                         <td data-label="Comments">${task.comments || '-'}</td>
                         <td data-label="Bug Count">${task.bug_count || '0'}</td>
+                        <td data-label="HTML Bugs">${task.html_bugs || '0'}</td>
+                        <td data-label="Functional Bugs">${task.functional_bugs || '0'}</td>
                         <td data-label="Deviation">${calculateDeviation(task.end_date, task.actual_end_date)}</td>
                         <td data-label="Reason">${task.deviation_reason || '-'}</td>
                     </tr>
                 `).join('');
-                html += `<tr><td colspan="13">` +
+                html += `<tr><td colspan="15">` +
                     `<div class="pagination">` +
                     `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="setAssigneePage(allProjectsAssigneePages, '${assignee.replace(/'/g, "\\'")}', ${page - 1}, renderAllProjects)">Prev</button>` +
                     `<span class="pagination-info">Page ${page} of ${totalPages}</span>` +
@@ -8882,7 +9215,7 @@ Generated on: ${new Date().toLocaleString()}`;
                 todayDayNameElement.textContent = dayName;
             }
             
-            // Tasks active today (start <= today <= end) OR overdue tasks (end < today but still in progress)
+            // Tasks active today (start <= today <= end) OR overdue tasks (end < today but still in progress) OR rejected tasks for today
             const todayTasks = tasks.filter(t => {
                 const start = t.startDate ? new Date(t.startDate) : null;
                 const end = t.endDate ? new Date(t.endDate) : null;
@@ -8897,7 +9230,10 @@ Generated on: ${new Date().toLocaleString()}`;
                 const inProgressStatuses = ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'];
                 const isOverdue = end && end < today && inProgressStatuses.includes(t.status);
                 
-                return isActiveToday || isOverdue;
+                // Include rejected tasks for today
+                const isRejectedToday = t.status === 'Rejected' && start <= today && (!end || end >= today);
+                
+                return isActiveToday || isOverdue || isRejectedToday;
             });
             renderScreenshotTable(
                 'todayStatusScreenshotTable',
@@ -9264,9 +9600,10 @@ Generated on: ${new Date().toLocaleString()}`;
             // Group tasks by status (all tasks are for today)
             const activeTasks = qaTasks.filter(task => task.status === 'In Progress' || task.status === 'Yet to Start');
             const completedTasks = qaTasks.filter(task => task.status === 'Completed');
+            const rejectedTasks = qaTasks.filter(task => task.status === 'Rejected');
             const overdueTasks = qaTasks.filter(task => {
                 // For today's tasks, check if they're overdue based on end_date
-                if (!task.end_date || task.status === 'Completed') return false;
+                if (!task.end_date || task.status === 'Completed' || task.status === 'Rejected') return false;
                 const endDate = new Date(task.end_date);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -9320,6 +9657,21 @@ Generated on: ${new Date().toLocaleString()}`;
                 });
             }
 
+            // Rejected Tasks
+            if (rejectedTasks.length > 0) {
+                workStatusMessage += `=== REJECTED TASKS ===\n`;
+                rejectedTasks.forEach(task => {
+                    workStatusMessage += `Phase: ${task.sub_phase || 'N/A'}\n`;
+                    workStatusMessage += `Project: ${task.project_name}\n`;
+                    workStatusMessage += `Start Date and Time: ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
+                    workStatusMessage += `Expected End Date and Time: ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
+                    workStatusMessage += `Actual End Date and Time: ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
+                    workStatusMessage += `Status: ${task.status}\n`;
+                    workStatusMessage += `Rejection Reason: ${task.comments || task.deviation_reason || 'No reason provided'}\n`;
+                    workStatusMessage += `\n`;
+                });
+            }
+
             // Overdue Tasks
             if (overdueTasks.length > 0) {
                 workStatusMessage += `=== OVERDUE TASKS ===\n`;
@@ -9341,6 +9693,7 @@ Generated on: ${new Date().toLocaleString()}`;
             workStatusMessage += `Total Tasks for Today: ${qaTasks.length}\n`;
             workStatusMessage += `Active Tasks: ${activeTasks.length}\n`;
             workStatusMessage += `Completed Today: ${completedTasks.length}\n`;
+            workStatusMessage += `Rejected Tasks: ${rejectedTasks.length}\n`;
             workStatusMessage += `Overdue Tasks: ${overdueTasks.length}\n`;
 
             document.getElementById('workStatusText').value = workStatusMessage;
