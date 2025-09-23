@@ -7407,10 +7407,12 @@
             const completed = tasksList.filter(task => task.status === 'Completed').length;
             const active = tasksList.filter(task => ['In Progress', 'Yet to Start', 'On Hold', 'Being Developed', 'Ready for QA', 'Assigned to QA'].includes(task.status)).length;
             const overdue = tasksList.filter(task => {
-                if (!task.endDate || task.status !== 'In Progress') return false;
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                return new Date(task.endDate) < today;
+                if (!task.endDate) return false;
+                // Include both "In Progress" and "Yet to Start" statuses for overdue check
+                const overdueStatuses = ['In Progress', 'Yet to Start'];
+                if (!overdueStatuses.includes(task.status)) return false;
+                
+                return isTaskOverdue(task);
             }).length;
             return { total, completed, active, overdue };
         }
@@ -7452,12 +7454,17 @@
                         case 'completed':
                             return task.status === 'Completed';
                         case 'overdue':
-                            if (!task.end_date || task.status !== 'In Progress') return false;
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-                            const endDate = new Date(task.end_date);
-                            endDate.setHours(0, 0, 0, 0);
-                            return endDate < today;
+                            if (!task.end_date) return false;
+                            // Include both "In Progress" and "Yet to Start" statuses for overdue check
+                            const overdueStatuses = ['In Progress', 'Yet to Start'];
+                            if (!overdueStatuses.includes(task.status)) return false;
+                            
+                            const taskWithDates = { 
+                                ...task, 
+                                endDate: task.end_date, 
+                                startDate: task.start_date 
+                            };
+                            return isTaskOverdue(taskWithDates);
                         default:
                             return true;
                     }
@@ -9319,8 +9326,38 @@ Generated on: ${new Date().toLocaleString()}`;
         // Helper: Calculate overdue days for a task
         function calculateOverdueDays(task) {
             if (!task.endDate) return 0;
+            
+            // Only calculate overdue days for tasks that are "In Progress" or "Yet to Start"
+            const overdueStatuses = ['In Progress', 'Yet to Start'];
+            if (!overdueStatuses.includes(task.status)) return 0;
+            
             const endDate = new Date(task.endDate);
             const today = new Date();
+            
+            // For same day scenario: if start date = end date
+            if (task.startDate && task.startDate === task.endDate) {
+                const startDate = new Date(task.startDate);
+                const sameDay = startDate.toDateString() === endDate.toDateString();
+                
+                if (sameDay) {
+                    const isSameDay = today.toDateString() === endDate.toDateString();
+                    
+                    if (isSameDay) {
+                        const currentHour = today.getHours();
+                        // If it's after 6:00 PM on the same day, it's overdue by 0 days (same day overdue)
+                        return currentHour >= 18 ? 0 : 0;
+                    }
+                    
+                    // If we're past the end date, calculate the difference
+                    today.setHours(0, 0, 0, 0);
+                    endDate.setHours(0, 0, 0, 0);
+                    const diffTime = today - endDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays > 0 ? diffDays : 0;
+                }
+            }
+            
+            // For multi-day scenario: calculate days past end date
             today.setHours(0, 0, 0, 0);
             endDate.setHours(0, 0, 0, 0);
             
@@ -9332,8 +9369,38 @@ Generated on: ${new Date().toLocaleString()}`;
         // Helper: Calculate overdue days for a specific date (for reports)
         function calculateOverdueDaysForDate(task, reportDate) {
             if (!task.endDate) return 0;
+            
+            // Only calculate overdue days for tasks that are "In Progress" or "Yet to Start"
+            const overdueStatuses = ['In Progress', 'Yet to Start'];
+            if (!overdueStatuses.includes(task.status)) return 0;
+            
             const endDate = new Date(task.endDate);
             const checkDate = new Date(reportDate);
+            
+            // For same day scenario: if start date = end date
+            if (task.startDate && task.startDate === task.endDate) {
+                const startDate = new Date(task.startDate);
+                const sameDay = startDate.toDateString() === endDate.toDateString();
+                
+                if (sameDay) {
+                    const isSameDay = checkDate.toDateString() === endDate.toDateString();
+                    
+                    if (isSameDay) {
+                        // For reports, we assume it's after 6:00 PM if checking the same day
+                        // This is because reports are typically generated at the end of the day
+                        return 0; // Same day overdue
+                    }
+                    
+                    // If we're past the end date, calculate the difference
+                    endDate.setHours(0, 0, 0, 0);
+                    checkDate.setHours(0, 0, 0, 0);
+                    const diffTime = checkDate - endDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays > 0 ? diffDays : 0;
+                }
+            }
+            
+            // For multi-day scenario: calculate days past end date
             endDate.setHours(0, 0, 0, 0);
             checkDate.setHours(0, 0, 0, 0);
             
@@ -9345,11 +9412,114 @@ Generated on: ${new Date().toLocaleString()}`;
         // Helper: Check if task is overdue
         function isTaskOverdue(task, reportDate = null) {
             if (!task.endDate || task.status === 'Completed') return false;
+            
+            // Only consider tasks that are "In Progress" or "Yet to Start" as potentially overdue
+            const overdueStatuses = ['In Progress', 'Yet to Start'];
+            if (!overdueStatuses.includes(task.status)) return false;
+            
             const checkDate = reportDate ? new Date(reportDate) : new Date();
-            checkDate.setHours(0, 0, 0, 0);
             const endDate = new Date(task.endDate);
+            
+            // For same day scenario: if start date = end date, check if current time is after 6:00 PM
+            if (task.startDate && task.startDate === task.endDate) {
+                const startDate = new Date(task.startDate);
+                const sameDay = startDate.toDateString() === endDate.toDateString();
+                
+                if (sameDay) {
+                    // Check if we're on the same day
+                    const today = new Date();
+                    const isSameDay = today.toDateString() === endDate.toDateString();
+                    
+                    if (isSameDay) {
+                        const currentHour = today.getHours();
+                        // Only overdue if it's after 6:00 PM (18:00) on the same day
+                        return currentHour >= 18;
+                    }
+                    
+                    // If we're past the end date (next day or later), it's overdue
+                    return today > endDate;
+                }
+            }
+            
+            // For multi-day scenario: if current date is past end date, it's overdue
+            checkDate.setHours(0, 0, 0, 0);
             endDate.setHours(0, 0, 0, 0);
             return endDate < checkDate;
+        }
+
+        // Test function to verify overdue logic (for debugging)
+        function testOverdueLogic() {
+            console.log('Testing Overdue Logic:');
+            
+            // Test 1: Same day scenario - start date = end date = 23 Sep, current time 10:19 AM (should NOT be overdue)
+            const testTask1 = {
+                startDate: '2025-09-23',
+                endDate: '2025-09-23',
+                status: 'Yet to Start'
+            };
+            
+            // Simulate current time as 10:19 AM on 23 Sep 2025
+            const mockDate = new Date('2025-09-23T10:19:00');
+            const originalDate = Date;
+            global.Date = class extends Date {
+                constructor(...args) {
+                    if (args.length === 0) {
+                        super(mockDate);
+                    } else {
+                        super(...args);
+                    }
+                }
+            };
+            
+            console.log('Test 1 - Same day at 10:19 AM (should be FALSE):', isTaskOverdue(testTask1));
+            console.log('Test 1 - Overdue days:', calculateOverdueDays(testTask1));
+            
+            // Test 2: Multi-day scenario - start 23 Sep, end 24 Sep, current date 23 Sep 10:19 AM (should NOT be overdue)
+            const testTask2 = {
+                startDate: '2025-09-23',
+                endDate: '2025-09-24',
+                status: 'Yet to Start'
+            };
+            
+            console.log('Test 2 - Multi-day task on start day (should be FALSE):', isTaskOverdue(testTask2));
+            console.log('Test 2 - Overdue days:', calculateOverdueDays(testTask2));
+            
+            // Test 3: Same day scenario - start date = end date = 23 Sep, current time after 6:00 PM (should be overdue)
+            global.Date = class extends Date {
+                constructor(...args) {
+                    if (args.length === 0) {
+                        super('2025-09-23T19:00:00'); // 7:00 PM
+                    } else {
+                        super(...args);
+                    }
+                }
+            };
+            
+            console.log('Test 3 - Same day after 6:00 PM (should be TRUE):', isTaskOverdue(testTask1));
+            console.log('Test 3 - Overdue days:', calculateOverdueDays(testTask1));
+            
+            // Test 4: Multi-day scenario - start 22 Sep, end 23 Sep, current date 24 Sep (should be overdue)
+            const testTask3 = {
+                startDate: '2025-09-22',
+                endDate: '2025-09-23',
+                status: 'Yet to Start'
+            };
+            
+            global.Date = class extends Date {
+                constructor(...args) {
+                    if (args.length === 0) {
+                        super('2025-09-24T10:00:00');
+                    } else {
+                        super(...args);
+                    }
+                }
+            };
+            
+            console.log('Test 4 - Multi-day overdue (should be TRUE):', isTaskOverdue(testTask3));
+            console.log('Test 4 - Overdue days:', calculateOverdueDays(testTask3));
+            
+            // Restore original Date
+            global.Date = originalDate;
         }
 
         // Helper: Render a table for screenshot
@@ -9610,28 +9780,38 @@ Generated on: ${new Date().toLocaleString()}`;
                 // Skip completed or rejected tasks
                 if (task.status === 'Completed' || task.status === 'Rejected') return false;
                 
+                // Only consider tasks that are "In Progress" or "Yet to Start" as potentially overdue
+                const overdueStatuses = ['In Progress', 'Yet to Start'];
+                if (!overdueStatuses.includes(task.status)) return false;
+                
                 const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const endDate = task.end_date ? new Date(task.end_date) : null;
                 
-                // Check if start date has passed or is today but task is still "Yet to Start"
-                if (task.start_date) {
+                if (!endDate) return false;
+                
+                // For same day scenario: if start date = end date, check if current time is after 6:00 PM
+                if (task.start_date && task.start_date === task.end_date) {
                     const startDate = new Date(task.start_date);
-                    startDate.setHours(0, 0, 0, 0);
-                    if (startDate <= today && task.status === 'Yet to Start') {
-                        return true;
+                    const sameDay = startDate.toDateString() === endDate.toDateString();
+                    
+                    if (sameDay) {
+                        const isSameDay = today.toDateString() === endDate.toDateString();
+                        
+                        if (isSameDay) {
+                            const currentHour = today.getHours();
+                            // Only overdue if it's after 6:00 PM (18:00) on the same day
+                            return currentHour >= 18;
+                        }
+                        
+                        // If we're past the end date (next day or later), it's overdue
+                        return today > endDate;
                     }
                 }
                 
-                // Check if end date has passed
-                if (task.end_date) {
-                    const endDate = new Date(task.end_date);
-                    endDate.setHours(0, 0, 0, 0);
-                    if (endDate < today) {
-                        return true;
-                    }
-                }
-                
-                return false;
+                // For multi-day scenario: if current date is past end date, it's overdue
+                today.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
+                return endDate < today;
             });
 
             // Active tasks (not overdue, not completed, not rejected)
@@ -9650,19 +9830,19 @@ Generated on: ${new Date().toLocaleString()}`;
                 overdueTasks: overdueTasks.length
             });
 
-            let workStatusMessage = `Work Status - ${currentDate}\n`;
-            workStatusMessage += `QA Name: ${selectedQA}\n\n`;
+            let workStatusMessage = `📋 *Work Status - ${currentDate}*\n`;
+            workStatusMessage += `👤 *QA Name:* ${selectedQA}\n\n`;
 
             // Active/In Progress Tasks
             if (activeTasks.length > 0) {
-                workStatusMessage += `=== ACTIVE TASKS ===\n`;
-                activeTasks.forEach(task => {
-                    workStatusMessage += `Phase: ${task.sub_phase || 'N/A'}\n`;
-                    workStatusMessage += `Project: ${task.project_name}\n`;
-                    workStatusMessage += `Start Date and Time: ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
-                    workStatusMessage += `Expected End Date and Time: ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
-                    workStatusMessage += `Actual End Date and Time: ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
-                    workStatusMessage += `Status: ${task.status}\n`;
+                workStatusMessage += `🔄 *=== ACTIVE TASKS ===*\n`;
+                activeTasks.forEach((task, index) => {
+                    workStatusMessage += `\n*${index + 1}. ${task.sub_phase || 'N/A'}*\n`;
+                    workStatusMessage += `📁 *Project:* ${task.project_name}\n`;
+                    workStatusMessage += `📅 *Start Date:* ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
+                    workStatusMessage += `⏰ *Expected End Date:* ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
+                    workStatusMessage += `✅ *Actual End Date:* ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
+                    workStatusMessage += `📊 *Status:* ${task.status}\n`;
                     
                     // Check if overdue
                     if (task.end_date) {
@@ -9670,52 +9850,49 @@ Generated on: ${new Date().toLocaleString()}`;
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
                         if (endDate < today && task.status !== 'Completed') {
-                            workStatusMessage += `Deviated: Yes\n`;
-                            workStatusMessage += `Deviation Reason: ${task.comments || 'No reason provided'}\n`;
+                            workStatusMessage += `⚠️ *Deviated:* Yes\n`;
+                            workStatusMessage += `📝 *Deviation Reason:* ${task.comments || 'No reason provided'}\n`;
                         } else {
-                            workStatusMessage += `Deviated: No\n`;
+                            workStatusMessage += `✅ *Deviated:* No\n`;
                         }
                     } else {
-                        workStatusMessage += `Deviated: No\n`;
+                        workStatusMessage += `✅ *Deviated:* No\n`;
                     }
-                    workStatusMessage += `\n`;
                 });
             }
 
             // Completed Tasks (Today)
             if (completedTasks.length > 0) {
-                workStatusMessage += `=== COMPLETED TODAY ===\n`;
-                completedTasks.forEach(task => {
-                    workStatusMessage += `Phase: ${task.sub_phase || 'N/A'}\n`;
-                    workStatusMessage += `Project: ${task.project_name}\n`;
-                    workStatusMessage += `Start Date and Time: ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
-                    workStatusMessage += `Expected End Date and Time: ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
-                    workStatusMessage += `Actual End Date and Time: ${task.actual_end_date ? formatDate(task.actual_end_date) : 'N/A'}\n`;
-                    workStatusMessage += `Status: ${task.status}\n`;
-                    workStatusMessage += `Deviated: No\n`;
-                    workStatusMessage += `\n`;
+                workStatusMessage += `\n🎉 *=== COMPLETED TODAY ===*\n`;
+                completedTasks.forEach((task, index) => {
+                    workStatusMessage += `\n*${index + 1}. ${task.sub_phase || 'N/A'}*\n`;
+                    workStatusMessage += `📁 *Project:* ${task.project_name}\n`;
+                    workStatusMessage += `📅 *Start Date:* ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
+                    workStatusMessage += `⏰ *Expected End Date:* ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
+                    workStatusMessage += `✅ *Actual End Date:* ${task.actual_end_date ? formatDate(task.actual_end_date) : 'N/A'}\n`;
+                    workStatusMessage += `📊 *Status:* ${task.status}\n`;
+                    workStatusMessage += `✅ *Deviated:* No\n`;
                 });
             }
 
             // Rejected Tasks
             if (rejectedTasks.length > 0) {
-                workStatusMessage += `=== REJECTED TASKS ===\n`;
-                rejectedTasks.forEach(task => {
-                    workStatusMessage += `Phase: ${task.sub_phase || 'N/A'}\n`;
-                    workStatusMessage += `Project: ${task.project_name}\n`;
-                    workStatusMessage += `Start Date and Time: ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
-                    workStatusMessage += `Expected End Date and Time: ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
-                    workStatusMessage += `Actual End Date and Time: ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
-                    workStatusMessage += `Status: ${task.status}\n`;
-                    workStatusMessage += `Rejection Reason: ${task.comments || task.deviation_reason || 'No reason provided'}\n`;
-                    workStatusMessage += `\n`;
+                workStatusMessage += `\n❌ *=== REJECTED TASKS ===*\n`;
+                rejectedTasks.forEach((task, index) => {
+                    workStatusMessage += `\n*${index + 1}. ${task.sub_phase || 'N/A'}*\n`;
+                    workStatusMessage += `📁 *Project:* ${task.project_name}\n`;
+                    workStatusMessage += `📅 *Start Date:* ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
+                    workStatusMessage += `⏰ *Expected End Date:* ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
+                    workStatusMessage += `✅ *Actual End Date:* ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
+                    workStatusMessage += `📊 *Status:* ${task.status}\n`;
+                    workStatusMessage += `📝 *Rejection Reason:* ${task.comments || task.deviation_reason || 'No reason provided'}\n`;
                 });
             }
 
             // Overdue Tasks
             if (overdueTasks.length > 0) {
-                workStatusMessage += `=== OVERDUE TASKS ===\n`;
-                overdueTasks.forEach(task => {
+                workStatusMessage += `\n🚨 *=== OVERDUE TASKS ===*\n`;
+                overdueTasks.forEach((task, index) => {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     
@@ -9740,25 +9917,24 @@ Generated on: ${new Date().toLocaleString()}`;
                         }
                     }
                     
-                    workStatusMessage += `Phase: ${task.sub_phase || 'N/A'}\n`;
-                    workStatusMessage += `Project: ${task.project_name}\n`;
-                    workStatusMessage += `Start Date and Time: ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
-                    workStatusMessage += `Expected End Date and Time: ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
-                    workStatusMessage += `Actual End Date and Time: ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
-                    workStatusMessage += `Status: ${task.status}\n`;
-                    workStatusMessage += `Deviated: Yes\n`;
-                    workStatusMessage += `Deviation Reason: ${task.comments || task.deviation_reason || overdueReason || 'Project overdue - no specific reason provided'}\n`;
-                    workStatusMessage += `\n`;
+                    workStatusMessage += `\n*${index + 1}. ${task.sub_phase || 'N/A'}*\n`;
+                    workStatusMessage += `📁 *Project:* ${task.project_name}\n`;
+                    workStatusMessage += `📅 *Start Date:* ${task.start_date ? formatDate(task.start_date) : 'N/A'}\n`;
+                    workStatusMessage += `⏰ *Expected End Date:* ${task.end_date ? formatDate(task.end_date) : 'N/A'}\n`;
+                    workStatusMessage += `✅ *Actual End Date:* ${task.actual_end_date ? formatDate(task.actual_end_date) : 'Not completed'}\n`;
+                    workStatusMessage += `📊 *Status:* ${task.status}\n`;
+                    workStatusMessage += `⚠️ *Deviated:* Yes\n`;
+                    workStatusMessage += `📝 *Deviation Reason:* ${task.comments || task.deviation_reason || overdueReason || 'Project overdue - no specific reason provided'}\n`;
                 });
             }
 
             // Summary
-            workStatusMessage += `=== SUMMARY ===\n`;
-            workStatusMessage += `Total Tasks for Today: ${qaTasks.length}\n`;
-            workStatusMessage += `Active Tasks: ${activeTasks.length}\n`;
-            workStatusMessage += `Completed Today: ${completedTasks.length}\n`;
-            workStatusMessage += `Rejected Tasks: ${rejectedTasks.length}\n`;
-            workStatusMessage += `Overdue Tasks: ${overdueTasks.length}\n`;
+            workStatusMessage += `\n📊 *=== SUMMARY ===*\n`;
+            workStatusMessage += `📋 *Total Tasks for Today:* ${qaTasks.length}\n`;
+            workStatusMessage += `🔄 *Active Tasks:* ${activeTasks.length}\n`;
+            workStatusMessage += `🎉 *Completed Today:* ${completedTasks.length}\n`;
+            workStatusMessage += `❌ *Rejected Tasks:* ${rejectedTasks.length}\n`;
+            workStatusMessage += `🚨 *Overdue Tasks:* ${overdueTasks.length}\n`;
 
             document.getElementById('workStatusText').value = workStatusMessage;
             document.getElementById('workStatusMessage').style.display = 'block';
