@@ -4088,8 +4088,10 @@
                         <div class="criteria-section">
                             <h2>2. Dev Test</h2>
                             <ul>
-                                <li>Reject if <strong>more than 5 P0 bugs</strong> are found within the first 30 minutes of testing.</li>
+                                <li>Reject if <strong>more than 10 P0 bugs</strong> are found within the first 30 minutes of testing.</li>
                                 <li>Reject if <strong>more than 25 bugs</strong> are found when <strong>20% of the project</strong> has been tested.</li>
+                                <li>Reject if <strong>any blockers or functionality breaks</strong> are found.</li>
+                                <li>Reject if <strong>the responsive site is broken on any other devices</strong>.</li>
                             </ul>
                         </div>
 
@@ -4098,7 +4100,7 @@
                             <ul>
                                 <li>Reject if <strong>pages are not aligned with design expectations</strong>.</li>
                                 <li>Reject if the project is <strong>not responsive</strong>.</li>
-                                <li>Reject if <strong>full pages are not built</strong>.</li>
+                                <li>Reject if <strong>pages are not properly linked</strong>.</li>
                             </ul>
                         </div>
 
@@ -4107,8 +4109,8 @@
                             <ul>
                                 <li>Reject if <strong>all bugs are not labeled correctly</strong> (status must be updated to Fixed or relevant status).</li>
                                 <li>Reject if <strong>more than 5 bugs are reopened</strong>.</li>
-                                <li>Reject if <strong>more than 2 P0 bugs are reopened</strong>.</li>
-                                <li>Reject if <strong>more than 3 regression bugs</strong> are found.</li>
+                                <li>Reject if <strong>more than 3 P0 bugs are reopened</strong>.</li>
+                                <li>Reject if <strong>more than 2 regression bugs</strong> are found.</li>
                             </ul>
                         </div>
 
@@ -4220,6 +4222,23 @@
                             <ul>
                                 <li>Do not directly debate bugs with developers</li>
                                 <li>Escalate clarifications through the responsible TL or Project Coordinator to avoid conflicts and miscommunication</li>
+                            </ul>
+
+                            <h3>Bug Reporting Guidelines</h3>
+                            <h4>HTML Comparison</h4>
+                            <ul>
+                                <li>Report bugs on <strong>Google Doc</strong></li>
+                                <li>Make sure to report <strong>deviations</strong> and complete in <strong>4 hours for 10 pages comparison</strong></li>
+                                <li>Use <strong>AI tools</strong> to make the flow easy</li>
+                                <li>Report <strong>common bugs in a tab</strong>, <strong>deviations in a tab</strong></li>
+                            </ul>
+
+                            <h4>Dev Testing</h4>
+                            <ul>
+                                <li>Report bugs on <strong>GitLab</strong></li>
+                                <li>Report bugs only as <strong>individual issues</strong></li>
+                                <li><strong>Common bugs</strong> should be marked as a <strong>single issue</strong></li>
+                                <li>All <strong>enhancements</strong> should be marked as a <strong>single issue</strong></li>
                             </ul>
 
                             <h3>Smoke Testing</h3>
