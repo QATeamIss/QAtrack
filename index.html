@@ -9547,40 +9547,44 @@ Generated on: ${new Date().toLocaleString()}`;
                 day: 'numeric'
             });
             
-            let textContent = `📅 WORK SCHEDULE - ${dateStr.toUpperCase()}\n`;
-            textContent += `Generated on: ${new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}\n`;
-            textContent += `${'='.repeat(60)}\n\n`;
+            let textContent = `🎯 *WORK SCHEDULE REPORT*\n`;
+            textContent += `📅 *${dateStr.toUpperCase()}*\n`;
+            textContent += `⏰ Generated: ${new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}\n`;
+            textContent += `\n${'═'.repeat(50)}\n\n`;
             
             if (isHoliday) {
-                textContent += `🏖️  HOLIDAY - No work scheduled for today\n`;
+                textContent += `🏖️  *HOLIDAY* - No work scheduled for today\n`;
                 textContent += `All projects are on hold due to holiday.\n\n`;
             } else if (scheduleTasks.length === 0) {
-                textContent += `📝 No tasks scheduled for this date.\n\n`;
+                textContent += `📝 *No tasks scheduled for this date.*\n\n`;
             } else {
-                textContent += `📋 SCHEDULED TASKS (${scheduleTasks.length} projects):\n\n`;
+                textContent += `📋 *SCHEDULED TASKS* (${scheduleTasks.length} projects)\n\n`;
                 
                 scheduleTasks.forEach((task, index) => {
                     const isOverdue = isTaskOverdue(task, scheduleDate);
                     const overdueDays = calculateOverdueDaysForDate(task, scheduleDate);
-                    const statusDisplay = isOverdue ? `🚨 OVERDUE BY ${overdueDays} DAY${overdueDays > 1 ? 'S' : ''}` : (task.status || '');
+                    const statusDisplay = isOverdue ? `🚨 *OVERDUE BY ${overdueDays} DAY${overdueDays > 1 ? 'S' : ''}*` : `*${task.status || ''}*`;
                     
-                    textContent += `${index + 1}. PROJECT: ${task.projectName || 'N/A'}\n`;
-                    textContent += `   Phase: ${task.subPhase || 'N/A'}\n`;
-                    textContent += `   Assigned To: ${[task.assignedTo, task.assignedTo2].filter(Boolean).join(', ') || 'N/A'}\n`;
-                    textContent += `   Status: ${statusDisplay}\n`;
-                    textContent += `   Start Date: ${task.startDate ? formatDate(task.startDate) : 'N/A'}\n`;
-                    textContent += `   End Date: ${task.endDate ? formatDate(task.endDate) : 'N/A'}\n`;
+                    textContent += `🔹 *${index + 1}. PROJECT: ${task.projectName || 'N/A'}*\n`;
+                    textContent += `   📋 Phase: ${task.subPhase || 'N/A'}\n`;
+                    textContent += `   👥 Assigned To: ${[task.assignedTo, task.assignedTo2].filter(Boolean).join(', ') || 'N/A'}\n`;
+                    textContent += `   📊 Status: ${statusDisplay}\n`;
+                    textContent += `   📅 Start Date: ${task.startDate ? formatDate(task.startDate) : 'N/A'}\n`;
+                    textContent += `   🎯 End Date: ${task.endDate ? formatDate(task.endDate) : 'N/A'}\n`;
                     if (task.comments) {
-                        textContent += `   Comments: ${task.comments}\n`;
+                        textContent += `   💬 Comments: *${task.comments}*\n`;
                     }
                     textContent += `\n`;
                 });
             }
             
-            textContent += `${'='.repeat(60)}\n`;
-            textContent += `📧 Please review and confirm your availability for the assigned tasks.\n`;
-            textContent += `🔄 For any changes or updates, please contact the project manager.\n`;
-            textContent += `📞 For urgent matters, reach out directly to the assigned team members.\n`;
+            textContent += `\n${'═'.repeat(50)}\n`;
+            textContent += `\n📧 *Please review and confirm your availability for the assigned tasks.*\n`;
+            textContent += `🔄 *For any changes or updates, please contact the project manager.*\n`;
+            textContent += `📞 *For urgent matters, reach out directly to the assigned team members.*\n\n`;
+            textContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            textContent += `📱 *QA Tracker Pro* - Automated Work Schedule Report\n`;
+            textContent += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
             
             // Display the text in modal
             document.getElementById('scheduleTextOutput').value = textContent;
