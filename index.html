@@ -1137,6 +1137,79 @@
             overflow-x: auto;
         }
 
+        /* Single Day View Styles */
+        .day-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .current-day-info {
+            flex: 1;
+            text-align: center;
+        }
+
+        .single-day-tasks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+            min-height: auto;
+        }
+
+        .single-day-task-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .single-day-task-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .task-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-card-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .task-card-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .task-card-details {
+            color: #64748b;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
         .calendar-day {
             background: rgba(255, 255, 255, 0.6);
             border: 1px solid rgba(0, 0, 0, 0.07);
@@ -3611,11 +3684,72 @@
                     <div class="header">
                         <h1 class="page-title">Work Schedule</h1>
                         <div style="display: flex; gap: 1rem; margin-left:auto;">
-                            <select class="form-select" id="monthSelect" style="width: auto;">
-                                <!-- Options populated by JS -->
-                            </select>
+                            <input type="date" class="form-input" id="scheduleDateFilter" onchange="filterByDate()" style="width: auto;">
+                            <button class="btn btn-secondary" id="viewModeToggle" onclick="
+                                console.log('=== BUTTON CLICKED ===');
+                                console.log('Current time:', new Date().toISOString());
+                                
+                                const singleDayView = document.getElementById('singleDayView');
+                                const calendarView = document.getElementById('calendarView');
+                                const toggleButton = document.getElementById('viewModeToggle');
+                                
+                                console.log('Elements found:', {
+                                    singleDayView: !!singleDayView,
+                                    calendarView: !!calendarView,
+                                    toggleButton: !!toggleButton
+                                });
+                                
+                                if (singleDayView && calendarView && toggleButton) {
+                                    console.log('Current display states:', {
+                                        singleDayDisplay: singleDayView.style.display,
+                                        calendarDisplay: calendarView.style.display
+                                    });
+                                    
+                                    if (singleDayView.style.display === 'none') {
+                                        // Switch to single day view
+                                        console.log('Switching to single day view...');
+                                        singleDayView.style.display = 'block';
+                                        calendarView.style.display = 'none';
+                                        toggleButton.textContent = '📅 Calendar View';
+                                        isCalendarView = false;
+                                        console.log('Switched to single day view');
+                                        if (typeof renderSingleDayView === 'function') {
+                                            renderSingleDayView();
+                                        } else {
+                                            console.error('renderSingleDayView function not found');
+                                        }
+                                    } else {
+                                        // Switch to calendar view
+                                        console.log('Switching to calendar view...');
+                                        singleDayView.style.display = 'none';
+                                        calendarView.style.display = 'block';
+                                        toggleButton.textContent = '📅 Single Day View';
+                                        isCalendarView = true;
+                                        console.log('Switched to calendar view');
+                                        if (typeof renderCalendarView === 'function') {
+                                            renderCalendarView();
+                                        } else {
+                                            console.error('renderCalendarView function not found');
+                                        }
+                                    }
+                                } else {
+                                    console.error('Required elements not found:', {singleDayView, calendarView, toggleButton});
+                                }
+                                console.log('=== BUTTON CLICK COMPLETE ===');
+                            " style="cursor: pointer;">📅 Calendar View</button>
                             <input type="text" class="search-box" id="assignedToSearch" placeholder="Filter by assignee...">
                         </div>
+                    </div>
+                    
+                    <!-- Single Day View -->
+                    <div id="singleDayView">
+                        <div class="day-navigation">
+                            <button class="btn btn-secondary" onclick="navigateDay(-1)">← Previous Day</button>
+                            <div class="current-day-info">
+                                <h2 id="currentDayTitle" style="margin: 0; text-align: center; color: #1e293b;"></h2>
+                                <p id="currentDaySubtitle" style="margin: 0.5rem 0 0 0; text-align: center; color: #64748b;"></p>
+                            </div>
+                            <button class="btn btn-secondary" onclick="navigateDay(1)">Next Day →</button>
                     </div>
                     <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
                         <span style="display:flex;align-items:center;gap:0.5rem;">
@@ -3655,8 +3789,56 @@
                             Rejected
                         </span>
                     </div>
-                    <div id="calendarMonthHeader" style="font-size:1.3rem;font-weight:700;text-align:center;margin-bottom:1rem;"></div>
+                    <div id="singleDayTasks" class="single-day-tasks"></div>
+                </div>
+
+                    <!-- Calendar View (30-day mode) -->
+                    <div id="calendarView" style="display: none;">
+                        <div class="calendar-header">
+                            <button class="btn btn-secondary" onclick="navigateMonth(-1)">← Previous Month</button>
+                            <div id="calendarMonthHeader" style="font-size:1.3rem;font-weight:700;text-align:center;"></div>
+                            <button class="btn btn-secondary" onclick="navigateMonth(1)">Next Month →</button>
+                        </div>
+                        <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-completed" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Completed
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-beingdeveloped" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Being Developed
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-readyforqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Ready for QA
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-assignedtoqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Assigned to QA
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-inprogress" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                In Progress
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-onhold" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                On Hold
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-yettostart" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Yet to Start
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-forecast" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Forecast
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-rejected" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Rejected
+                            </span>
+                        </div>
                     <div class="calendar-grid" id="calendarGrid"></div>
+                    </div>
                 </div>
 
                 <div id="summary" class="tab-content" style="display: none;">
@@ -7202,6 +7384,11 @@
         /* Calendar Functions */
         function populateMonthSelect() {
             const monthSelect = document.getElementById('monthSelect');
+            if (!monthSelect) {
+                console.log('monthSelect element not found - skipping population');
+                return;
+            }
+            
             const currentYear = new Date().getFullYear();
             const months = [
                 'January', 'February', 'March', 'April', 'May', 'June',
@@ -7221,10 +7408,93 @@
             }
         }
 
+        // Global variables for schedule view
+        let currentScheduleDate = new Date();
+        let isCalendarView = false;
+
         async function renderSchedule() {
+            // Initialize date filter with current schedule date
+            const dateFilter = document.getElementById('scheduleDateFilter');
+            if (dateFilter && !dateFilter.value) {
+                dateFilter.value = currentScheduleDate.toISOString().split('T')[0];
+            }
+            
+            if (isCalendarView) {
+                await renderCalendarView();
+            } else {
+                await renderSingleDayView();
+            }
+        }
+
+        async function renderSingleDayView() {
+            const currentDayTitle = document.getElementById('currentDayTitle');
+            const currentDaySubtitle = document.getElementById('currentDaySubtitle');
+            const singleDayTasks = document.getElementById('singleDayTasks');
+
+            // Update day info
+            const dayName = currentScheduleDate.toLocaleDateString('en-US', { weekday: 'long' });
+            const dateStr = currentScheduleDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            currentDayTitle.textContent = `${dayName}, ${dateStr}`;
+            currentDaySubtitle.textContent = `Work Schedule for ${dateStr}`;
+
+            // Get tasks for this day
+            const dayTasks = getTasksForDate(currentScheduleDate);
+            
+            if (dayTasks.length === 0) {
+                singleDayTasks.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #64748b;">
+                        <p>No tasks scheduled for this day</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render task cards
+            const tasksHtml = dayTasks.map(task => {
+                const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
+                const statusClass = task.status.toLowerCase().replace(/ /g, '');
+                
+                return `
+                    <div class="single-day-task-card" onclick="editTask(${task.id})">
+                        <div class="task-card-header">
+                            <h3 class="task-card-title">${task.projectName}</h3>
+                            <span class="task-card-status calendar-task-${statusClass}">${task.status}</span>
+                        </div>
+                        <div class="task-card-details">
+                            <p><strong>Phase:</strong> ${task.subPhase || 'N/A'}</p>
+                            <p><strong>Assigned To:</strong> ${assignees || 'N/A'}</p>
+                            <p><strong>Start Date:</strong> ${task.startDate ? formatDate(task.startDate) : 'N/A'}</p>
+                            <p><strong>End Date:</strong> ${task.endDate ? formatDate(task.endDate) : 'N/A'}</p>
+                            ${task.comments ? `<p><strong>Comments:</strong> ${task.comments}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            singleDayTasks.innerHTML = tasksHtml;
+        }
+
+        async function renderCalendarView() {
+            console.log('renderCalendarView called');
+            console.log('tasks available:', tasks ? tasks.length : 'undefined');
+            console.log('calendarYear:', calendarYear, 'calendarMonth:', calendarMonth);
+            
             populateMonthSelect();
             const monthHeader = document.getElementById('calendarMonthHeader');
             const calendarGrid = document.getElementById('calendarGrid');
+            
+            console.log('Elements found:', { monthHeader, calendarGrid });
+            
+            if (!monthHeader || !calendarGrid) {
+                console.error('Required elements not found!');
+                return;
+            }
+            
             const months = [
                 'January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December'
@@ -7237,6 +7507,8 @@
             const firstDayOfWeek = firstDay.getDay();
             const totalDays = lastDay.getDate();
 
+            console.log('Calendar setup:', { firstDay, lastDay, firstDayOfWeek, totalDays });
+
             // Generate day headers
             const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             let html = daysOfWeek.map(day => `
@@ -7248,8 +7520,38 @@
                 html += `<div class="calendar-day"></div>`;
             }
 
+            // Generate calendar days with basic structure first
+            for (let day = 1; day <= totalDays; day++) {
+                html += `
+                    <div class="calendar-day">
+                        <div class="day-number">${day}</div>
+                        <div class="day-tasks">
+                            <!-- Tasks will be added here -->
+                        </div>
+                    </div>
+                `;
+            }
+
+            console.log('Generated basic HTML length:', html.length);
+            console.log('Setting calendarGrid.innerHTML');
+            calendarGrid.innerHTML = html;
+            console.log('Basic calendar view rendered successfully');
+            
+            // Now try to add tasks if available
+            if (tasks && tasks.length > 0) {
+                console.log('Adding tasks to calendar...');
+                await addTasksToCalendar();
+            }
+        }
+        
+        async function addTasksToCalendar() {
+            console.log('addTasksToCalendar called');
+
             // Filter tasks by month and assignee
-            const filteredTasks = tasks.filter(task => {
+            const assignedToFilter = document.getElementById('assignedToSearch')?.value?.toLowerCase() || '';
+            console.log('assignedToFilter:', assignedToFilter);
+            
+            const tasksToShow = tasks ? tasks.filter(task => {
                 if (!task.startDate) return false;
                 const taskStart = new Date(task.startDate);
                 const taskEnd = task.endDate ? new Date(task.endDate) : new Date(task.startDate);
@@ -7268,13 +7570,14 @@
                     task.assignedTo?.toLowerCase().includes(assignedToFilter) ||
                     task.assignedTo2?.toLowerCase().includes(assignedToFilter)
                 );
-            });
+            }) : [];
+            
+            console.log('tasksToShow count:', tasksToShow.length);
 
-            // Generate calendar days
-            for (let day = 1; day <= totalDays; day++) {
+            // Add tasks to each day
+            for (let day = 1; day <= new Date(calendarYear, calendarMonth + 1, 0).getDate(); day++) {
                 const date = new Date(calendarYear, calendarMonth, day);
-                const dateStr = date.toISOString().split('T')[0];
-                const dayTasks = filteredTasks.filter(task => {
+                const dayTasks = tasksToShow.filter(task => {
                     const taskStart = task.startDate ? new Date(task.startDate) : null;
                     if (!taskStart) return false;
                     
@@ -7298,10 +7601,13 @@
                     // Include task if date is within startDate and endDate (or completedAt)
                     return taskStart <= date && taskEnd >= date;
                 });
-                html += `
-                    <div class="calendar-day">
-                        <div class="day-number">${day}</div>
-                        ${dayTasks.map(task => {
+                
+                if (dayTasks.length > 0) {
+                    const dayElement = document.querySelector(`.calendar-day:nth-child(${day + 7})`); // +7 for headers
+                    if (dayElement) {
+                        const dayTasksDiv = dayElement.querySelector('.day-tasks');
+                        if (dayTasksDiv) {
+                            dayTasksDiv.innerHTML = dayTasks.map(task => {
                             const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
                             return `
                                 <div class="task-item calendar-task-${task.status.toLowerCase().replace(/ /g, '')}" 
@@ -7311,12 +7617,118 @@
                                     <span class="task-assignee">${assignees}</span>
                                 </div>
                             `;
-                        }).join('')}
-                    </div>
-                `;
+                            }).join('');
+                        }
+                    }
+                }
             }
+            
+            console.log('Tasks added to calendar successfully');
+        }
 
-            calendarGrid.innerHTML = html;
+        function getTasksForDate(date) {
+            return tasks.filter(task => {
+                if (!task.startDate) return false;
+                const taskStart = task.startDate ? new Date(task.startDate) : null;
+                if (!taskStart) return false;
+                
+                // Check if this date is a working day for this task
+                const includeSaturday = task.include_saturday || false;
+                if (!isWorkingDay(date, includeSaturday)) {
+                    return false;
+                }
+                
+                // For completed tasks, use completedAt if earlier than endDate
+                let taskEnd;
+                if (task.status === 'Completed' && task.completedAt) {
+                    taskEnd = new Date(task.completedAt);
+                } else {
+                    taskEnd = task.endDate ? new Date(task.endDate) : taskStart;
+                }
+                
+                // Normalize dates to start of day for comparison
+                taskStart.setHours(0, 0, 0, 0);
+                taskEnd.setHours(0, 0, 0, 0);
+                date.setHours(0, 0, 0, 0);
+                
+                // Include task if date is within startDate and endDate (or completedAt)
+                const isInRange = taskStart <= date && taskEnd >= date;
+                
+                if (!isInRange) return false;
+                
+                // Apply assignee filter
+                if (!assignedToFilter) return true;
+                return (
+                    task.assignedTo?.toLowerCase().includes(assignedToFilter) ||
+                    task.assignedTo2?.toLowerCase().includes(assignedToFilter)
+                );
+            });
+        }
+
+        function navigateDay(direction) {
+            currentScheduleDate.setDate(currentScheduleDate.getDate() + direction);
+            renderSchedule();
+        }
+
+        function navigateMonth(direction) {
+            calendarMonth += direction;
+            if (calendarMonth < 0) {
+                calendarMonth = 11;
+                calendarYear--;
+            } else if (calendarMonth > 11) {
+                calendarMonth = 0;
+                calendarYear++;
+            }
+            renderSchedule();
+        }
+
+        function toggleViewMode() {
+            console.log('toggleViewMode called, current isCalendarView:', isCalendarView);
+            isCalendarView = !isCalendarView;
+            const singleDayView = document.getElementById('singleDayView');
+            const calendarView = document.getElementById('calendarView');
+            const toggleButton = document.getElementById('viewModeToggle');
+            
+            console.log('Elements found:', { singleDayView, calendarView, toggleButton });
+            
+            if (!singleDayView || !calendarView || !toggleButton) {
+                console.error('Required elements not found:', { singleDayView, calendarView, toggleButton });
+                return;
+            }
+            
+            if (isCalendarView) {
+                singleDayView.style.display = 'none';
+                calendarView.style.display = 'block';
+                toggleButton.textContent = '📅 Single Day View';
+                console.log('Switched to calendar view');
+            } else {
+                singleDayView.style.display = 'block';
+                calendarView.style.display = 'none';
+                toggleButton.textContent = '📅 Calendar View';
+                console.log('Switched to single day view');
+            }
+            
+            renderSchedule();
+        }
+
+        // Make functions globally accessible
+        window.toggleViewMode = toggleViewMode;
+        window.renderSchedule = renderSchedule;
+        window.renderCalendarView = renderCalendarView;
+        window.renderSingleDayView = renderSingleDayView;
+
+        // Simple test function
+        function testToggle() {
+            console.log('Test function called');
+            alert('Button click is working!');
+        }
+
+        function filterByDate() {
+            const dateFilter = document.getElementById('scheduleDateFilter').value;
+            if (dateFilter) {
+                currentScheduleDate = new Date(dateFilter);
+                renderSchedule();
+            }
         }
 
         /* Analytics Functions */
@@ -9596,6 +10008,8 @@ Generated on: ${new Date().toLocaleString()}`;
             await loadTasks();
             await loadAttendance();
             await loadProjectMilestones();
+            
+            // Event listener removed - using inline onclick instead
 
             if (tasks.length === 0) {
                 const today = new Date();
