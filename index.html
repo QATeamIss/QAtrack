@@ -7492,12 +7492,35 @@
             const tasksHtml = dayTasks.map(task => {
                 const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
                 
-                // Check if task is overdue
+                // Check if task is overdue based on time logic
                 let isOverdue = false;
                 if (task.actualEndDate && task.endDate) {
                     const actualEnd = new Date(task.actualEndDate);
                     const expectedEnd = new Date(task.endDate);
-                    isOverdue = actualEnd > expectedEnd;
+                    actualEnd.setHours(0, 0, 0, 0);
+                    expectedEnd.setHours(0, 0, 0, 0);
+                    
+                    // Task is overdue if actual end date > expected end date
+                    if (actualEnd > expectedEnd) {
+                        isOverdue = true;
+                    }
+                } else if (task.endDate && task.status !== 'Completed') {
+                    // For tasks without actual end date, check if overdue on expected end date
+                    const expectedEnd = new Date(task.endDate);
+                    const expectedEndTime = task.endTime || '18:30'; // Default 6:30 PM
+                    const [hours, minutes] = expectedEndTime.split(':');
+                    expectedEnd.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                    
+                    const currentTime = new Date();
+                    const isExpectedEndDate = currentScheduleDate.toDateString() === expectedEnd.toDateString();
+                    
+                    // Only mark as overdue if:
+                    // 1. We're on the expected end date, AND
+                    // 2. Current time is after expected end time, AND
+                    // 3. Task is not completed
+                    if (isExpectedEndDate && currentTime > expectedEnd) {
+                        isOverdue = true;
+                    }
                 }
                 
                 const statusClass = isOverdue ? 'overdue' : task.status.toLowerCase().replace(/ /g, '');
@@ -7636,7 +7659,7 @@
                         return false;
                     }
                     
-                    // Determine the actual end date for display
+                    // Determine the actual end date for display and overdue status
                     let taskEnd;
                     let isOverdue = false;
                     
@@ -7644,10 +7667,15 @@
                         // If actual end date exists, use it
                         taskEnd = new Date(task.actualEndDate);
                         
-                        // Check if task is overdue (actual end date > expected end date)
+                        // Check if task is overdue: actual end date > expected end date
                         if (task.endDate) {
                             const expectedEnd = new Date(task.endDate);
-                            isOverdue = taskEnd > expectedEnd;
+                            expectedEnd.setHours(0, 0, 0, 0);
+                            taskEnd.setHours(0, 0, 0, 0);
+                            
+                            if (taskEnd > expectedEnd) {
+                                isOverdue = true;
+                            }
                         }
                     } else if (task.status === 'Completed' && task.completedAt) {
                         // For completed tasks without actual end date, use completedAt
@@ -7655,6 +7683,25 @@
                     } else {
                         // Use expected end date
                         taskEnd = task.endDate ? new Date(task.endDate) : taskStart;
+                        
+                        // Check if task is overdue on expected end date after end time
+                        if (task.endDate) {
+                            const expectedEnd = new Date(task.endDate);
+                            const expectedEndTime = task.endTime || '18:30'; // Default 6:30 PM
+                            const [hours, minutes] = expectedEndTime.split(':');
+                            expectedEnd.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                            
+                            const currentTime = new Date();
+                            const isExpectedEndDate = date.toDateString() === expectedEnd.toDateString();
+                            
+                            // Only mark as overdue if:
+                            // 1. We're on the expected end date, AND
+                            // 2. Current time is after expected end time, AND
+                            // 3. Task is not completed
+                            if (isExpectedEndDate && currentTime > expectedEnd && task.status !== 'Completed') {
+                                isOverdue = true;
+                            }
+                        }
                     }
                     
                     // Normalize dates to start of day for comparison
