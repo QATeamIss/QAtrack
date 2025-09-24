@@ -1320,6 +1320,13 @@
             background: #a21caf !important;   /* Purple */
             color: #fff !important;
         }
+        
+        .calendar-task-overdue {
+            background: #ffc107 !important;   /* Yellow */
+            color: #dc3545 !important;       /* Red text */
+            border: 2px solid #dc3545 !important;  /* Red border */
+            font-weight: bold !important;
+        }
 
         /* Toast Notification */
         .toast {
@@ -3788,6 +3795,10 @@
                             <span class="task-item calendar-task-rejected" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
                             Rejected
                         </span>
+                        <span style="display:flex;align-items:center;gap:0.5rem;">
+                            <span class="task-item calendar-task-overdue" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                            Overdue
+                        </span>
                     </div>
                     <div id="singleDayTasks" class="single-day-tasks"></div>
                 </div>
@@ -3835,6 +3846,10 @@
                             <span style="display:flex;align-items:center;gap:0.5rem;">
                                 <span class="task-item calendar-task-rejected" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
                                 Rejected
+                            </span>
+                            <span style="display:flex;align-items:center;gap:0.5rem;">
+                                <span class="task-item calendar-task-overdue" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
+                                Overdue
                             </span>
                         </div>
                     <div class="calendar-grid" id="calendarGrid"></div>
@@ -7476,19 +7491,30 @@
             // Render task cards
             const tasksHtml = dayTasks.map(task => {
                 const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
-                const statusClass = task.status.toLowerCase().replace(/ /g, '');
+                
+                // Check if task is overdue
+                let isOverdue = false;
+                if (task.actualEndDate && task.endDate) {
+                    const actualEnd = new Date(task.actualEndDate);
+                    const expectedEnd = new Date(task.endDate);
+                    isOverdue = actualEnd > expectedEnd;
+                }
+                
+                const statusClass = isOverdue ? 'overdue' : task.status.toLowerCase().replace(/ /g, '');
+                const statusText = isOverdue ? 'Overdue' : task.status;
                 
                 return `
                     <div class="single-day-task-card" onclick="editTask(${task.id})">
                         <div class="task-card-header">
                             <h3 class="task-card-title">${task.projectName}</h3>
-                            <span class="task-card-status calendar-task-${statusClass}">${task.status}</span>
+                            <span class="task-card-status calendar-task-${statusClass}">${statusText}</span>
                         </div>
                         <div class="task-card-details">
                             <p><strong>Phase:</strong> ${task.subPhase || 'N/A'}</p>
                             <p><strong>Assigned To:</strong> ${assignees || 'N/A'}</p>
                             <p><strong>Start Date:</strong> ${task.startDate ? formatDate(task.startDate) : 'N/A'}</p>
                             <p><strong>End Date:</strong> ${task.endDate ? formatDate(task.endDate) : 'N/A'}</p>
+                            ${task.actualEndDate ? `<p><strong>Actual End Date:</strong> ${formatDate(task.actualEndDate)}</p>` : ''}
                             ${task.comments ? `<p><strong>Comments:</strong> ${task.comments}</p>` : ''}
                         </div>
                     </div>
@@ -7610,19 +7636,41 @@
                         return false;
                     }
                     
-                    // For completed tasks, use completedAt if earlier than endDate
+                    // Determine the actual end date for display
                     let taskEnd;
-                    if (task.status === 'Completed' && task.completedAt) {
+                    let isOverdue = false;
+                    
+                    if (task.actualEndDate) {
+                        // If actual end date exists, use it
+                        taskEnd = new Date(task.actualEndDate);
+                        
+                        // Check if task is overdue (actual end date > expected end date)
+                        if (task.endDate) {
+                            const expectedEnd = new Date(task.endDate);
+                            isOverdue = taskEnd > expectedEnd;
+                        }
+                    } else if (task.status === 'Completed' && task.completedAt) {
+                        // For completed tasks without actual end date, use completedAt
                         taskEnd = new Date(task.completedAt);
                     } else {
+                        // Use expected end date
                         taskEnd = task.endDate ? new Date(task.endDate) : taskStart;
                     }
+                    
                     // Normalize dates to start of day for comparison
                     taskStart.setHours(0, 0, 0, 0);
                     taskEnd.setHours(0, 0, 0, 0);
                     date.setHours(0, 0, 0, 0);
-                    // Include task if date is within startDate and endDate (or completedAt)
-                    return taskStart <= date && taskEnd >= date;
+                    
+                    // Include task if date is within startDate and actualEndDate
+                    const isInRange = taskStart <= date && taskEnd >= date;
+                    
+                    // Add overdue flag to task for styling
+                    if (isInRange) {
+                        task._isOverdue = isOverdue;
+                    }
+                    
+                    return isInRange;
                 });
                 
                 console.log(`Day ${day} has ${dayTasks.length} tasks:`, dayTasks.map(t => t.projectName));
@@ -7640,9 +7688,11 @@
                         if (dayTasksDiv) {
                             dayTasksDiv.innerHTML = dayTasks.map(task => {
                             const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
+                                const statusClass = task._isOverdue ? 'overdue' : task.status.toLowerCase().replace(/ /g, '');
+                                const statusText = task._isOverdue ? 'Overdue' : task.status;
                             return `
-                                <div class="task-item calendar-task-${task.status.toLowerCase().replace(/ /g, '')}" 
-                                     title="${task.projectName} (${task.status}) - ${assignees}"
+                                    <div class="task-item calendar-task-${statusClass}" 
+                                         title="${task.projectName} (${statusText}) - ${assignees}"
                                      onclick="editTask(${task.id})">
                                     ${task.projectName}
                                     <span class="task-assignee">${assignees}</span>
