@@ -1208,6 +1208,23 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
+            height: 3rem; /* Fixed height for consistent alignment */
+            padding: 0 1rem; /* Add horizontal padding for better spacing */
+            gap: 1rem; /* Add gap between elements */
+        }
+        
+        .calendar-header .btn {
+            height: 2.5rem; /* Consistent button height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #calendarMonthHeader {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5rem; /* Match button height */
         }
 
         .calendar-day {
@@ -6891,7 +6908,7 @@
                     end_date: endDate || null,
                     include_saturday: includeSaturday,
                     actual_start_date: startDate || null,
-                    actual_end_date: actualEndDate || endDate || null,
+                    actual_end_date: actualEndDate || null,
                     start_time: startTime || null,
                     end_time: endTime || null,
                     comments: taskData.comments || null,
@@ -7184,21 +7201,36 @@
         });
 
         /* Navigation */
-        document.querySelectorAll('.nav-item').forEach(item => {
+        function setupNavigation() {
+            console.log('Setting up navigation...');
+            const navItems = document.querySelectorAll('.nav-item');
+            console.log('Found nav items:', navItems.length);
+            
+            navItems.forEach((item, index) => {
+                console.log(`Nav item ${index}:`, item.dataset.tab, item.textContent.trim());
             item.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log('Nav item clicked:', item.dataset.tab);
+                    console.log('Nav item clicked:', item.dataset.tab);
                 const tab = item.dataset.tab;
                 if (tab) {
-                    console.log('Switching to tab:', tab);
+                        console.log('Switching to tab:', tab);
                 switchTab(tab);
-                } else {
-                    console.error('No tab data found for clicked item');
-                }
+                    } else {
+                        console.error('No tab data found for clicked item');
+                    }
+                });
             });
-        });
+            
+            console.log('Navigation event listeners attached to', navItems.length, 'items');
+        }
         
-        console.log('Navigation event listeners attached to', document.querySelectorAll('.nav-item').length, 'items');
+        // Setup navigation immediately
+        setupNavigation();
+        
+        // Also setup navigation after DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(setupNavigation, 100);
+        });
 
         // Handle dropdown container clicks (toggle dropdown visibility)
         document.querySelectorAll('.dropdown-container').forEach(container => {
@@ -7304,28 +7336,49 @@
         });
 
         function switchTab(tab) {
-            console.log('switchTab called with:', tab);
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            console.log('=== switchTab called with:', tab, '===');
+            
+            // Remove active class from all nav items
+            const allNavItems = document.querySelectorAll('.nav-item');
+            console.log('Removing active class from', allNavItems.length, 'nav items');
+            allNavItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to target nav item
             const targetNavItem = document.querySelector(`[data-tab="${tab}"]`);
             if (targetNavItem) {
                 targetNavItem.classList.add('active');
-                console.log('Added active class to nav item');
+                console.log('Added active class to nav item:', tab);
             } else {
                 console.error('Nav item not found for tab:', tab);
+                console.log('Available nav items:', Array.from(document.querySelectorAll('.nav-item')).map(item => item.dataset.tab));
             }
 
-            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            // Hide all tab content
+            const allTabContents = document.querySelectorAll('.tab-content');
+            console.log('Hiding', allTabContents.length, 'tab contents');
+            allTabContents.forEach(content => content.style.display = 'none');
+            
+            // Show target tab content
             const activeTab = document.getElementById(tab);
             if (activeTab) {
                 activeTab.style.display = 'block';
                 console.log('Displayed tab content for:', tab);
             } else {
                 console.error('Tab content not found for:', tab);
+                console.log('Available tab contents:', Array.from(document.querySelectorAll('.tab-content')).map(content => content.id));
             }
 
             currentTab = tab;
             console.log('Current tab set to:', currentTab);
+            
+            try {
             renderCurrentTab();
+                console.log('renderCurrentTab completed successfully');
+            } catch (error) {
+                console.error('Error in renderCurrentTab:', error);
+            }
+            
+            console.log('=== switchTab completed ===');
         }
 
         async function renderCurrentTab() {
@@ -7492,17 +7545,20 @@
             const tasksHtml = dayTasks.map(task => {
                 const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
                 
-                // Check if task is overdue based on time logic
+                // Check if task is overdue based on time logic (same as calendar view)
                 let isOverdue = false;
-                if (task.actualEndDate && task.endDate) {
-                    const actualEnd = new Date(task.actualEndDate);
-                    const expectedEnd = new Date(task.endDate);
-                    actualEnd.setHours(0, 0, 0, 0);
-                    expectedEnd.setHours(0, 0, 0, 0);
-                    
-                    // Task is overdue if actual end date > expected end date
-                    if (actualEnd > expectedEnd) {
-                        isOverdue = true;
+                
+                if (task.actualEndDate) {
+                    // If actual end date exists, check if overdue: actual end date > expected end date
+                    if (task.endDate) {
+                        const actualEnd = new Date(task.actualEndDate);
+                        const expectedEnd = new Date(task.endDate);
+                        actualEnd.setHours(0, 0, 0, 0);
+                        expectedEnd.setHours(0, 0, 0, 0);
+                        
+                        if (actualEnd > expectedEnd) {
+                            isOverdue = true;
+                        }
                     }
                 } else if (task.endDate && task.status !== 'Completed') {
                     // For tasks without actual end date, check if overdue on expected end date
@@ -7664,7 +7720,7 @@
                     let isOverdue = false;
                     
                     if (task.actualEndDate) {
-                        // If actual end date exists, use it
+                        // If actual end date exists, use it as the display end date
                         taskEnd = new Date(task.actualEndDate);
                         
                         // Check if task is overdue: actual end date > expected end date
@@ -7771,11 +7827,17 @@
                     return false;
                 }
                 
-                // For completed tasks, use completedAt if earlier than endDate
+                // Determine the actual end date for display (same logic as calendar view)
                 let taskEnd;
-                if (task.status === 'Completed' && task.completedAt) {
+                
+                if (task.actualEndDate) {
+                    // If actual end date exists, use it as the display end date
+                    taskEnd = new Date(task.actualEndDate);
+                } else if (task.status === 'Completed' && task.completedAt) {
+                    // For completed tasks without actual end date, use completedAt
                     taskEnd = new Date(task.completedAt);
                 } else {
+                    // Use expected end date
                     taskEnd = task.endDate ? new Date(task.endDate) : taskStart;
                 }
                 
@@ -7784,7 +7846,7 @@
                 taskEnd.setHours(0, 0, 0, 0);
                 date.setHours(0, 0, 0, 0);
                 
-                // Include task if date is within startDate and endDate (or completedAt)
+                // Include task if date is within startDate and actualEndDate
                 const isInRange = taskStart <= date && taskEnd >= date;
                 
                 if (!isInRange) return false;
