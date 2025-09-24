@@ -3493,35 +3493,35 @@
             <div class="logo">QA Tracker Pro</div>
             <div class="sidebar-nav">
                 <div class="nav-items">
-                    <div class="nav-item active" data-tab="dashboard">
+                    <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard'); console.log('Dashboard clicked via onclick');">
                         <span class="nav-icon" aria-label="Dashboard" title="Dashboard">📊</span>
                         <span>Dashboard</span>
                     </div>
-                    <div class="nav-item" data-tab="tracker">
+                    <div class="nav-item" data-tab="tracker" onclick="switchTab('tracker'); console.log('Tracker clicked via onclick');">
                         <span class="nav-icon" aria-label="Tracker" title="Tracker">📋</span>
                         <span>Tracker</span>
                     </div>
-                    <div class="nav-item" data-tab="schedule">
+                    <div class="nav-item" data-tab="schedule" onclick="switchTab('schedule'); console.log('Schedule clicked via onclick');">
                         <span class="nav-icon" aria-label="Schedule" title="Schedule">📅</span>
                         <span>Schedule</span>
                     </div>
-                    <div class="nav-item" data-tab="summary">
+                    <div class="nav-item" data-tab="summary" onclick="switchTab('summary'); console.log('Summary clicked via onclick');">
                         <span class="nav-icon" aria-label="Summary" title="Summary">📈</span>
                         <span>Summary</span>
                     </div>
-                    <div class="nav-item" data-tab="analytics">
+                    <div class="nav-item" data-tab="analytics" onclick="switchTab('analytics'); console.log('Analytics clicked via onclick');">
                         <span class="nav-icon" aria-label="Analytics" title="Analytics">🔍</span>
                         <span>Analytics</span>
                     </div>
-                    <div class="nav-item" data-tab="attendance">
+                    <div class="nav-item" data-tab="attendance" onclick="switchTab('attendance'); console.log('Attendance clicked via onclick');">
                         <span class="nav-icon" aria-label="Attendance" title="Attendance">🗓️</span>
                         <span>Attendance</span>
                     </div>
-                    <div class="nav-item" data-tab="allprojects">
+                    <div class="nav-item" data-tab="allprojects" onclick="switchTab('allprojects'); console.log('Completed clicked via onclick');">
                         <span class="nav-icon" aria-label="Completed" title="Completed">✅</span>
                         <span>Completed</span>
                     </div>
-                    <div class="nav-item" data-tab="rejected">
+                    <div class="nav-item" data-tab="rejected" onclick="switchTab('rejected'); console.log('Rejected clicked via onclick');">
                         <span class="nav-icon" aria-label="Rejected" title="Rejected">❌</span>
                         <span>Rejected</span>
                     </div>
@@ -7172,12 +7172,18 @@
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
+                console.log('Nav item clicked:', item.dataset.tab);
                 const tab = item.dataset.tab;
                 if (tab) {
+                    console.log('Switching to tab:', tab);
                 switchTab(tab);
+                } else {
+                    console.error('No tab data found for clicked item');
                 }
             });
         });
+        
+        console.log('Navigation event listeners attached to', document.querySelectorAll('.nav-item').length, 'items');
 
         // Handle dropdown container clicks (toggle dropdown visibility)
         document.querySelectorAll('.dropdown-container').forEach(container => {
@@ -7283,14 +7289,27 @@
         });
 
         function switchTab(tab) {
+            console.log('switchTab called with:', tab);
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            const targetNavItem = document.querySelector(`[data-tab="${tab}"]`);
+            if (targetNavItem) {
+                targetNavItem.classList.add('active');
+                console.log('Added active class to nav item');
+            } else {
+                console.error('Nav item not found for tab:', tab);
+            }
 
             document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
             const activeTab = document.getElementById(tab);
-            if (activeTab) activeTab.style.display = 'block';
+            if (activeTab) {
+                activeTab.style.display = 'block';
+                console.log('Displayed tab content for:', tab);
+            } else {
+                console.error('Tab content not found for:', tab);
+            }
 
             currentTab = tab;
+            console.log('Current tab set to:', currentTab);
             renderCurrentTab();
         }
 
@@ -7546,6 +7565,8 @@
         
         async function addTasksToCalendar() {
             console.log('addTasksToCalendar called');
+            console.log('calendarYear:', calendarYear, 'calendarMonth:', calendarMonth);
+            console.log('Total tasks available:', tasks ? tasks.length : 'undefined');
 
             // Filter tasks by month and assignee
             const assignedToFilter = document.getElementById('assignedToSearch')?.value?.toLowerCase() || '';
@@ -7577,6 +7598,8 @@
             // Add tasks to each day
             for (let day = 1; day <= new Date(calendarYear, calendarMonth + 1, 0).getDate(); day++) {
                 const date = new Date(calendarYear, calendarMonth, day);
+                console.log(`Processing day ${day}, date: ${date.toDateString()}`);
+                
                 const dayTasks = tasksToShow.filter(task => {
                     const taskStart = task.startDate ? new Date(task.startDate) : null;
                     if (!taskStart) return false;
@@ -7602,8 +7625,16 @@
                     return taskStart <= date && taskEnd >= date;
                 });
                 
+                console.log(`Day ${day} has ${dayTasks.length} tasks:`, dayTasks.map(t => t.projectName));
+                
                 if (dayTasks.length > 0) {
-                    const dayElement = document.querySelector(`.calendar-day:nth-child(${day + 7})`); // +7 for headers
+                    // Calculate the correct day element index (accounting for headers and offset)
+                    const firstDayOfWeek = new Date(calendarYear, calendarMonth, 1).getDay();
+                    const dayElementIndex = day + 7 + firstDayOfWeek; // +7 for headers, +offset for first day
+                    const dayElement = document.querySelector(`.calendar-day:nth-child(${dayElementIndex})`);
+                    
+                    console.log(`Looking for day element at index ${dayElementIndex}:`, !!dayElement);
+                    
                     if (dayElement) {
                         const dayTasksDiv = dayElement.querySelector('.day-tasks');
                         if (dayTasksDiv) {
@@ -7618,7 +7649,12 @@
                                 </div>
                             `;
                             }).join('');
+                            console.log(`Added ${dayTasks.length} tasks to day ${day}`);
+                        } else {
+                            console.log(`No .day-tasks div found for day ${day}`);
                         }
+                    } else {
+                        console.log(`No day element found for day ${day} at index ${dayElementIndex}`);
                     }
                 }
             }
@@ -7716,6 +7752,7 @@
         window.renderSchedule = renderSchedule;
         window.renderCalendarView = renderCalendarView;
         window.renderSingleDayView = renderSingleDayView;
+        window.switchTab = switchTab;
 
         // Simple test function
         function testToggle() {
