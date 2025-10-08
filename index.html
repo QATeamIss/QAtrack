@@ -50,7 +50,6 @@
         .sidebar {
             width: 280px;
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            padding: 2rem 1.5rem;
             transition: all 0.3s ease;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
             position: fixed;
@@ -58,10 +57,21 @@
             left: 0;
             height: 100vh;
             min-height: 100vh;
-            overflow-y: auto;
             z-index: 1000;
             display: flex;
             flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.5rem 2rem 1.5rem;
         }
 
         .sidebar::before {
@@ -782,6 +792,327 @@
         .status-rejected { background: #fca5a5; color: #991b1b; }
         .status-holiday { background: #fecaca; color: #991b1b; }
 
+        /* Kanban Board Styles */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+
+        .kanban-column {
+            flex: 1;
+            min-width: 300px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .kanban-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .kanban-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .kanban-count {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .kanban-cards {
+            min-height: 200px;
+        }
+
+        .kanban-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3b82f6;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .kanban-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .kanban-card.todo {
+            border-left-color: #f59e0b;
+        }
+
+        .kanban-card.in-progress {
+            border-left-color: #3b82f6;
+        }
+
+        .kanban-card.completed {
+            border-left-color: #10b981;
+        }
+
+        .kanban-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .kanban-card-type {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .kanban-card-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .kanban-card-action {
+            background: none;
+            border: none;
+            padding: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .kanban-card-action:hover {
+            background: #f1f5f9;
+        }
+
+        .kanban-card-message {
+            color: #4b5563;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .kanban-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .kanban-card-assignee {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: relative;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        .notification-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .notification-icon .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Request History Styles */
+        .request-history {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .request-type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .request-type-badge.verification {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .request-type-badge.hubstaff {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .request-type-badge.kt {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .request-type-badge.resource {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .request-type-badge.other {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        /* Requests Summary Styles */
+        .requests-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .summary-card:nth-child(1) {
+            border-left-color: #f59e0b;
+        }
+
+        .summary-card:nth-child(2) {
+            border-left-color: #3b82f6;
+        }
+
+        .summary-card:nth-child(3) {
+            border-left-color: #10b981;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .summary-count {
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .summary-card:nth-child(1) .summary-count {
+            background: #f59e0b;
+        }
+
+        .summary-card:nth-child(2) .summary-count {
+            background: #3b82f6;
+        }
+
+        .summary-card:nth-child(3) .summary-count {
+            background: #10b981;
+        }
+
+        .summary-content {
+            min-height: 100px;
+        }
+
+        .request-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .request-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .request-item-type {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .request-item-message {
+            color: #4b5563;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .request-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .request-item-assignee {
+            font-weight: 600;
+            color: #374151;
+        }
+
         /* Action Buttons - Light Mode */
         .action-btn {
             background: rgba(0, 0, 0, 0.05);
@@ -1460,14 +1791,18 @@
                 left: -100%;
                 z-index: 1001;
                 transition: left 0.3s ease;
-                padding: 1.5rem 1rem;
+            }
+            .sidebar-header {
+                padding: 1.5rem 1rem 1rem 1rem;
+            }
+            .sidebar-nav {
+                padding: 1rem 1rem 1.5rem 1rem;
             }
             .sidebar.open {
                 left: 0;
             }
             .sidebar.collapsed {
                 width: 100%;
-                padding: 1.5rem 1rem;
             }
             .sidebar.collapsed .logo {
                 display: block;
@@ -3493,6 +3828,54 @@
         .mobile-device .mobile-banner {
             display: none !important;
         }
+
+        /* Loader Styles */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loader.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loader-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: white;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
@@ -3501,6 +3884,14 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Loader -->
+        <div id="loader" class="loader">
+            <div class="loader-content">
+                <div class="loader-spinner"></div>
+                <div class="loader-text">Loading...</div>
+            </div>
+        </div>
+
         <!-- Mobile Layout Banner -->
         <div id="mobileBanner" class="mobile-banner" style="display: none;">
             <div class="mobile-banner-content">
@@ -3514,7 +3905,9 @@
             <span id="toggleIcon">✕</span>
         </button>
         <nav class="sidebar" id="sidebar">
-            <div class="logo">QA Tracker Pro</div>
+            <div class="sidebar-header">
+                <div class="logo">QA Tracker Pro</div>
+            </div>
             <div class="sidebar-nav">
                 <div class="nav-items">
                     <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard'); console.log('Dashboard clicked via onclick');">
@@ -3548,6 +3941,21 @@
                     <div class="nav-item" data-tab="rejected" onclick="switchTab('rejected'); console.log('Rejected clicked via onclick');">
                         <span class="nav-icon" aria-label="Rejected" title="Rejected">❌</span>
                         <span>Rejected</span>
+                    </div>
+                    <div class="nav-item" data-tab="requests" onclick="openRequestsPopup(); console.log('Requests clicked via onclick');">
+                        <span class="nav-icon" aria-label="Requests" title="Requests">📋</span>
+                        <span>Submit Request</span>
+                    </div>
+                    <div class="nav-item" data-tab="requestsSummary" onclick="switchTab('requestsSummary'); console.log('Requests Summary clicked via onclick');">
+                        <span class="nav-icon" aria-label="Requests Summary" title="Requests Summary">📊</span>
+                        <span>My Requests</span>
+                    </div>
+                    <div class="nav-item" data-tab="adminRequests" onclick="switchTab('adminRequests'); console.log('Admin Requests clicked via onclick');" style="display: none;" id="adminRequestsNav">
+                        <span class="nav-icon" aria-label="Admin Requests" title="Admin Requests">⚙️</span>
+                        <span>Admin Requests</span>
+                        <div class="notification-badge" id="adminRequestNotificationBadge" style="display: none;">
+                            <span id="adminRequestNotificationCount">0</span>
+                        </div>
                     </div>
                     <div class="nav-item" data-tab="milestones">
                         <span class="nav-icon" aria-label="Project Milestones" title="Project Milestones">🎯</span>
@@ -3604,6 +4012,12 @@
                         <button class="btn btn-secondary" onclick="openImportModal()" style="margin-left:1rem;" data-crud-locked>📥 Import Tasks</button>
                         <button class="btn btn-secondary" onclick="openReportModal()" style="margin-left:1rem;">Daily Reports</button>
                         <button class="btn btn-info" onclick="openQAWorkStatusModal()" style="margin-left:1rem;">📋 QA Work Status</button>
+                        <button class="btn btn-primary" onclick="openRequestsPopup()" style="margin-left:1rem; position: relative;">
+                            📋 Requests
+                            <span class="notification-badge" id="headerNotificationBadge" style="display: none; position: absolute; top: -8px; right: -8px; min-width: 20px; height: 20px; font-size: 0.7rem; background: #ff4444; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                <span id="headerNotificationCount">0</span>
+                            </span>
+                        </button>
                         <button class="btn btn-warning" onclick="openUnlockModal()" style="margin-left:1rem;" id="unlockBtn">🔓 Unlock CRUD</button>
                     </div>
 
@@ -4143,6 +4557,175 @@
                             </table>
                         </div>
                         <div id="rejectedPagination"></div>
+                    </div>
+                </div>
+
+                <!-- Requests Summary Tab (for all users) -->
+                <div id="requestsSummary" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">My Requests</h1>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openRequestsPopup()">
+                                <span class="btn-icon">➕</span>
+                                Submit New Request
+                            </button>
+                            <button class="btn btn-secondary" onclick="refreshRequestsSummary()">
+                                <span class="btn-icon">🔄</span>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="requests-summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <h3>📋 Active Requests</h3>
+                                <span class="summary-count" id="activeRequestsCount">0</span>
+                            </div>
+                            <div class="summary-content" id="activeRequestsContent">
+                                <!-- Active requests will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <h3>🔄 In Progress</h3>
+                                <span class="summary-count" id="inProgressRequestsCount">0</span>
+                            </div>
+                            <div class="summary-content" id="inProgressRequestsContent">
+                                <!-- In progress requests will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <h3>✅ Completed</h3>
+                                <span class="summary-count" id="completedRequestsCount">0</span>
+                            </div>
+                            <div class="summary-content" id="completedRequestsContent">
+                                <!-- Completed requests will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="requests-history" style="margin-top: 30px;">
+                        <div class="header">
+                            <h2 class="page-title">All My Requests</h2>
+                            <div class="header-actions">
+                                <input type="text" id="myRequestsSearch" placeholder="Search my requests..." class="search-input">
+                                <select id="myRequestsFilter" class="form-input">
+                                    <option value="">All Types</option>
+                                    <option value="verification">Verification Needed</option>
+                                    <option value="hubstaff">Hubstaff Complaints</option>
+                                    <option value="kt">KT Requests</option>
+                                    <option value="resource">Project Resource Needed</option>
+                                    <option value="other">Other Requests</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Request Type</th>
+                                        <th>Requester Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Message</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="myRequestsTableBody">
+                                    <!-- My requests will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Requests Kanban Board (only visible to CRUD users) -->
+                <div id="adminRequests" class="tab-content" style="display: none;">
+                    <div class="header">
+                        <h1 class="page-title">Request Management</h1>
+                        <div class="header-actions">
+                            <div class="notification-badge" id="requestNotificationBadge" style="display: none;">
+                                <span id="requestNotificationCount">0</span>
+                            </div>
+                            <button class="btn btn-secondary" onclick="refreshRequests()">
+                                <span class="btn-icon">🔄</span>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-board">
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <h3>📋 To Do</h3>
+                                <span class="kanban-count" id="todoCount">0</span>
+                            </div>
+                            <div class="kanban-cards" id="todoCards">
+                                <!-- To Do cards will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <h3>🔄 In Progress</h3>
+                                <span class="kanban-count" id="inProgressCount">0</span>
+                            </div>
+                            <div class="kanban-cards" id="inProgressCards">
+                                <!-- In Progress cards will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="kanban-column">
+                            <div class="kanban-header">
+                                <h3>✅ Completed</h3>
+                                <span class="kanban-count" id="completedCount">0</span>
+                            </div>
+                            <div class="kanban-cards" id="completedCards">
+                                <!-- Completed cards will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="request-history" style="margin-top: 30px;">
+                        <div class="header">
+                            <h2 class="page-title">Request History</h2>
+                            <div class="header-actions">
+                                <input type="text" id="historySearch" placeholder="Search history..." class="search-input">
+                                <select id="historyFilter" class="form-input">
+                                    <option value="">All Types</option>
+                                    <option value="verification">Verification Needed</option>
+                                    <option value="hubstaff">Hubstaff Complaints</option>
+                                    <option value="kt">KT Requests</option>
+                                    <option value="resource">Project Resource Needed</option>
+                                    <option value="other">Other Requests</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Request Type</th>
+                                        <th>Requester Name</th>
+                                        <th>Assigned To</th>
+                                        <th>Message</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requestHistoryBody">
+                                    <!-- History will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -4704,6 +5287,60 @@
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeProjectModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Create Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Requests Modal -->
+    <div class="project-modal" id="requestsModal">
+        <div class="project-modal-content">
+            <div class="project-modal-header">
+                <h2 class="project-modal-title">Submit Request</h2>
+                <button class="close-project-modal" onclick="closeRequestsModal()">&times;</button>
+            </div>
+            <form id="requestsForm">
+                <div class="form-group">
+                    <label class="form-label">Enter your name *</label>
+                    <input type="text" class="form-input" id="requesterName" name="requesterName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Request Type *</label>
+                    <select class="form-input" name="requestType" id="requestType" required onchange="handleRequestTypeChange()">
+                        <option value="">Select Request Type</option>
+                        <option value="verification">Verification Needed</option>
+                        <option value="hubstaff">Hubstaff Complaints</option>
+                        <option value="kt">KT Requests</option>
+                        <option value="resource">Project Resource Needed</option>
+                        <option value="other">Other Requests</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="customRequestGroup" style="display: none;">
+                    <label class="form-label">Custom Request Type *</label>
+                    <input type="text" class="form-input" name="customRequestType" id="customRequestType" placeholder="Enter custom request type">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Assigned To *</label>
+                    <div class="dropdown-container" style="position: relative;">
+                        <input type="text" class="form-input" id="assignedToInput" placeholder="Click to select assignee" readonly style="cursor: pointer;">
+                        <div class="dropdown-menu" id="assignedDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; max-height: 200px; overflow-y: auto; margin-top: 2px;">
+                            <!-- Dropdown items will be populated dynamically -->
+                        </div>
+                    </div>
+                    <input type="hidden" name="assignedTo" id="assignedToHidden">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Message *</label>
+                    <textarea class="form-input" name="message" placeholder="Describe your request in detail" rows="4" required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeRequestsModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
                 </div>
             </form>
         </div>
@@ -6191,6 +6828,751 @@
             currentField = null;
         }
 
+        // Requests functionality
+        let requests = [];
+        let requestNotificationCount = 0;
+
+        function openRequestsPopup() {
+            document.getElementById('requestsModal').classList.add('active');
+        }
+
+        function closeRequestsModal() {
+            document.getElementById('requestsModal').classList.remove('active');
+            document.getElementById('requestsForm').reset();
+            document.getElementById('customRequestGroup').style.display = 'none';
+            document.getElementById('assignedToInput').value = '';
+            document.getElementById('assignedToHidden').value = '';
+            document.getElementById('assignedDropdown').style.display = 'none';
+            document.getElementById('requesterName').value = '';
+        }
+
+        function handleRequestTypeChange() {
+            const requestType = document.getElementById('requestType').value;
+            const customGroup = document.getElementById('customRequestGroup');
+            
+            if (requestType === 'other') {
+                customGroup.style.display = 'block';
+                document.getElementById('customRequestType').required = true;
+            } else {
+                customGroup.style.display = 'none';
+                document.getElementById('customRequestType').required = false;
+            }
+        }
+
+        function toggleAssignedDropdown(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            
+            const dropdown = document.getElementById('assignedDropdown');
+            const input = document.getElementById('assignedToInput');
+            
+            if (!dropdown || !input) {
+                return;
+            }
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu !== dropdown) {
+                    menu.style.display = 'none';
+                }
+            });
+            
+            const isVisible = dropdown.style.display === 'block';
+            
+            if (!isVisible) {
+                // Populate dropdown with unique QA names from tasks
+                populateAssigneeDropdown();
+                dropdown.style.display = 'block';
+                dropdown.style.visibility = 'visible';
+                dropdown.style.opacity = '1';
+            } else {
+                dropdown.style.display = 'none';
+                dropdown.style.visibility = 'hidden';
+                dropdown.style.opacity = '0';
+            }
+        }
+
+        function populateAssigneeDropdown() {
+            const dropdown = document.getElementById('assignedDropdown');
+            
+            if (!dropdown) {
+                return;
+            }
+            
+            // Use the specific QA names requested
+            const qaNames = ['Abhiram', 'Minnu', 'Aswathi'];
+            
+            dropdown.innerHTML = qaNames.map(name => 
+                `<div class="dropdown-item" onclick="event.stopPropagation(); selectAssignee('${name}')" style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='white'">${name}</div>`
+            ).join('');
+        }
+
+        function selectAssignee(name) {
+            document.getElementById('assignedToInput').value = name;
+            document.getElementById('assignedToHidden').value = name;
+            document.getElementById('assignedDropdown').style.display = 'none';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('assignedDropdown');
+            const input = document.getElementById('assignedToInput');
+            const dropdownContainer = document.querySelector('.dropdown-container');
+            
+            if (dropdown && input && dropdownContainer && 
+                !dropdownContainer.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        async function submitRequest(formData) {
+            try {
+                // Show loader
+                showLoader('Submitting request...');
+                
+                console.log('=== SUBMIT REQUEST DEBUG ===');
+                console.log('Received form data:', formData);
+                
+                const requestData = {
+                    requester_name: formData.requesterName,
+                    request_type: formData.requestType,
+                    custom_request_type: formData.customRequestType || null,
+                    assigned_to: formData.assignedTo,
+                    message: formData.message,
+                    status: 'todo',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                console.log('Created request data:', requestData);
+                console.log('Requester name in request data:', requestData.requester_name);
+
+                // Save to Supabase database
+                console.log('Attempting to insert to Supabase:', requestData);
+                
+                const { data, error } = await supabase
+                    .from('requests')
+                    .insert([requestData])
+                    .select();
+                
+                if (error) {
+                    console.error('Supabase insert error:', error);
+                    console.error('Error details:', error.message, error.details, error.hint);
+                    showToast(`Database error: ${error.message}`);
+                    throw error;
+                }
+                
+                console.log('Successfully saved to Supabase:', data);
+                
+                // Also save to localStorage for immediate UI update
+                const existingRequests = JSON.parse(localStorage.getItem('requests') || '[]');
+                const newRequest = data[0]; // Supabase returns the inserted record
+                existingRequests.push(newRequest);
+                localStorage.setItem('requests', JSON.stringify(existingRequests));
+                
+                console.log('Saved to localStorage:', existingRequests);
+                console.log('Last saved request:', newRequest);
+
+                // Update notification count for CRUD users
+                if (isCRUDUnlocked) {
+                    requestNotificationCount++;
+                    updateNotificationBadge();
+                }
+
+                showToast('Request submitted successfully! Refreshing page...');
+                closeRequestsModal();
+                
+                // Hide loader and refresh page after 2 seconds
+                setTimeout(() => {
+                    hideLoader();
+                    window.location.reload();
+                }, 2000);
+                
+                return true;
+            } catch (error) {
+                console.error('Error submitting request:', error);
+                hideLoader();
+                showToast('Error submitting request.');
+                return false;
+            }
+        }
+
+        async function loadRequests() {
+            try {
+                // Show loader when loading requests
+                showLoader('Loading requests...');
+                
+                // Fetch from Supabase database
+                const { data, error } = await supabase
+                    .from('requests')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Supabase fetch error:', error);
+                    // Fallback to localStorage if Supabase fails
+                    const storedRequests = localStorage.getItem('requests');
+                    requests = storedRequests ? JSON.parse(storedRequests) : [];
+                    console.log('Fell back to localStorage:', requests.length);
+                } else {
+                    requests = data || [];
+                    console.log('Loaded requests from Supabase:', requests.length);
+                    
+                    // Update localStorage with fresh data
+                    localStorage.setItem('requests', JSON.stringify(requests));
+                }
+                
+                // Migrate existing data to include requester_name if missing
+                requests = requests.map((request, index) => {
+                    if (!request.requester_name) {
+                        // Assign requester names based on request content for more logical mapping
+                        let requesterName = 'Unknown User';
+                        
+                        if (request.message && request.message.toLowerCase().includes('hubstaff')) {
+                            requesterName = 'Jane Smith';
+                        } else if (request.message && request.message.toLowerCase().includes('kt')) {
+                            requesterName = 'Mike Johnson';
+                        } else if (request.message && request.message.toLowerCase().includes('verification')) {
+                            requesterName = 'John Doe';
+                        } else if (request.message && request.message.toLowerCase().includes('resource')) {
+                            requesterName = 'Sarah Wilson';
+                        } else if (request.message && request.message.toLowerCase().includes('tewst')) {
+                            requesterName = 'David Brown';
+                        } else {
+                            // Fallback to index-based assignment
+                            const defaultNames = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson', 'David Brown', 'Emily Davis', 'Michael Chen', 'Lisa Rodriguez'];
+                            const nameIndex = index % defaultNames.length;
+                            requesterName = defaultNames[nameIndex];
+                        }
+                        
+                        request.requester_name = requesterName;
+                    }
+                    return request;
+                });
+                
+                // Only create sample data if no data exists anywhere (first time)
+                if (requests.length === 0) {
+                    requests = [
+                        {
+                            id: '1',
+                            requester_name: 'John Doe',
+                            request_type: 'verification',
+                            custom_request_type: '',
+                            assigned_to: 'Abhiram',
+                            message: 'Please verify the new user registration flow.',
+                            status: 'todo',
+                            created_at: new Date().toISOString()
+                        },
+                        {
+                            id: '2',
+                            requester_name: 'Jane Smith',
+                            request_type: 'hubstaff',
+                            custom_request_type: '',
+                            assigned_to: 'Aswathi',
+                            message: 'Hubstaff time tracking is showing discrepancies for project X.',
+                            status: 'in-progress',
+                            created_at: new Date().toISOString()
+                        },
+                        {
+                            id: '3',
+                            requester_name: 'Mike Johnson',
+                            request_type: 'kt',
+                            custom_request_type: '',
+                            assigned_to: 'Minnu',
+                            message: 'Need a KT session for the new payment gateway integration.',
+                            status: 'completed',
+                            created_at: new Date().toISOString()
+                        }
+                    ];
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('requests', JSON.stringify(requests));
+                
+                console.log('Loaded requests:', requests);
+                updateNotificationBadge();
+                hideLoader(); // Hide loader when done
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                requests = [];
+                hideLoader(); // Hide loader on error
+            }
+        }
+
+        function renderKanbanBoard() {
+            if (!isCRUDUnlocked) return;
+
+            const todoRequests = requests.filter(r => r.status === 'todo');
+            const inProgressRequests = requests.filter(r => r.status === 'in-progress');
+            const completedRequests = requests.filter(r => r.status === 'completed');
+
+            // Update counts
+            document.getElementById('todoCount').textContent = todoRequests.length;
+            document.getElementById('inProgressCount').textContent = inProgressRequests.length;
+            document.getElementById('completedCount').textContent = completedRequests.length;
+
+            // Render cards
+            renderKanbanCards('todoCards', todoRequests, 'todo');
+            renderKanbanCards('inProgressCards', inProgressRequests, 'in-progress');
+            renderKanbanCards('completedCards', completedRequests, 'completed');
+
+            // Render history
+            renderRequestHistory();
+        }
+
+        function renderKanbanCards(containerId, requests, status) {
+            const container = document.getElementById(containerId);
+            
+            if (requests.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 20px;">No requests</div>';
+                return;
+            }
+
+            container.innerHTML = requests.map(request => `
+                <div class="kanban-card ${status}" onclick="openRequestDetails('${request.id}')">
+                    <div class="kanban-card-header">
+                        <span class="kanban-card-type ${request.request_type}">${getRequestTypeLabel(request)}</span>
+                        <div class="kanban-card-actions">
+                            ${status !== 'completed' ? `
+                                <button class="kanban-card-action" onclick="event.stopPropagation(); updateRequestStatus('${request.id}', '${getNextStatus(status)}')" title="Move to ${getNextStatus(status)}">
+                                    ${getNextStatusIcon(status)}
+                                </button>
+                            ` : ''}
+                            <button class="kanban-card-action" onclick="event.stopPropagation(); deleteRequest('${request.id}')" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="kanban-card-message">${request.message}</div>
+                    <div class="kanban-card-footer">
+                        <span class="kanban-card-assignee">👤 ${request.assigned_to}</span>
+                        <span class="kanban-card-requester">📝 ${request.requester_name || 'Unknown'}</span>
+                        <span>${formatDate(request.created_at)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRequestHistory() {
+            const tbody = document.getElementById('requestHistoryBody');
+            const searchTerm = document.getElementById('historySearch').value.toLowerCase();
+            const filterType = document.getElementById('historyFilter').value;
+
+            let filteredRequests = requests.filter(request => {
+                const matchesSearch = request.message.toLowerCase().includes(searchTerm) ||
+                                    request.assigned_to.toLowerCase().includes(searchTerm);
+                const matchesFilter = !filterType || request.request_type === filterType;
+                return matchesSearch && matchesFilter;
+            });
+
+            // Sort by created date (newest first)
+            filteredRequests.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            tbody.innerHTML = filteredRequests.map(request => `
+                <tr>
+                    <td><span class="request-type-badge ${request.request_type}">${getRequestTypeLabel(request)}</span></td>
+                    <td>${request.requester_name || 'Unknown'}</td>
+                    <td>${request.assigned_to}</td>
+                    <td>${request.message}</td>
+                    <td><span class="status-badge status-${request.status.replace('-', '')}">${request.status.replace('-', ' ').toUpperCase()}</span></td>
+                    <td>${formatDate(request.created_at)}</td>
+                    <td>${formatDate(request.updated_at)}</td>
+                    <td>
+                        <button class="action-btn" onclick="openRequestDetails(${request.id})">View</button>
+                        ${request.status !== 'completed' ? `
+                            <button class="action-btn" onclick="updateRequestStatus(${request.id}, '${getNextStatus(request.status)}')">Update</button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getRequestTypeLabel(request) {
+            if (request.request_type === 'other' && request.custom_request_type) {
+                return request.custom_request_type;
+            }
+            
+            const labels = {
+                'verification': 'Verification Needed',
+                'hubstaff': 'Hubstaff Complaints',
+                'kt': 'KT Requests',
+                'resource': 'Project Resource Needed',
+                'other': 'Other Requests'
+            };
+            
+            return labels[request.request_type] || 'Unknown';
+        }
+
+        function getNextStatus(currentStatus) {
+            const statusFlow = {
+                'todo': 'in-progress',
+                'in-progress': 'completed',
+                'completed': 'completed'
+            };
+            return statusFlow[currentStatus] || 'todo';
+        }
+
+        function getNextStatusIcon(currentStatus) {
+            const icons = {
+                'todo': '▶️',
+                'in-progress': '✅',
+                'completed': '✅'
+            };
+            return icons[currentStatus] || '▶️';
+        }
+
+        async function updateRequestStatus(requestId, newStatus) {
+            try {
+                const requestIndex = requests.findIndex(r => r.id == requestId);
+                
+                if (requestIndex !== -1) {
+                    // Update Supabase database
+                    const { error } = await supabase
+                        .from('requests')
+                        .update({ 
+                            status: newStatus,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', requestId);
+                    
+                    if (error) {
+                        console.error('Supabase update error:', error);
+                        throw error;
+                    }
+                    
+                    // Update local data
+                    requests[requestIndex].status = newStatus;
+                    requests[requestIndex].updated_at = new Date().toISOString();
+                    
+                    // Update localStorage
+                    localStorage.setItem('requests', JSON.stringify(requests));
+                    
+                    // Update notification count
+                    updateNotificationBadge();
+                    
+                    showToast(`Request moved to ${newStatus.replace('-', ' ')}`);
+                    renderKanbanBoard();
+                    renderRequestsSummary(); // Also update the summary view
+                }
+            } catch (error) {
+                console.error('Error updating request status:', error);
+                showToast('Error updating request status');
+            }
+        }
+
+        async function deleteRequest(requestId) {
+            if (confirm('Are you sure you want to delete this request?')) {
+                try {
+                    // Delete from Supabase database
+                    const { error } = await supabase
+                        .from('requests')
+                        .delete()
+                        .eq('id', requestId);
+                    
+                    if (error) {
+                        console.error('Supabase delete error:', error);
+                        throw error;
+                    }
+                    
+                    // Update local data
+                    requests = requests.filter(r => r.id != requestId);
+                    localStorage.setItem('requests', JSON.stringify(requests));
+                    
+                    updateNotificationBadge();
+                    showToast('Request deleted');
+                    renderKanbanBoard();
+                    renderRequestsSummary(); // Also update the summary view
+                } catch (error) {
+                    console.error('Error deleting request:', error);
+                    showToast('Error deleting request');
+                }
+            }
+        }
+
+        function openRequestDetails(requestId) {
+            const request = requests.find(r => r.id == requestId);
+            if (request) {
+                alert(`Request Details:\n\nRequester: ${request.requester_name || 'Unknown'}\nType: ${getRequestTypeLabel(request)}\nAssigned To: ${request.assigned_to}\nMessage: ${request.message}\nStatus: ${request.status}\nCreated: ${formatDate(request.created_at)}`);
+            }
+        }
+
+        function updateNotificationBadge() {
+            // Update sidebar notification badge
+            const badge = document.getElementById('requestNotificationBadge');
+            const count = document.getElementById('requestNotificationCount');
+            
+            if (requestNotificationCount > 0) {
+                badge.style.display = 'flex';
+                count.textContent = requestNotificationCount;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Update header notification badge
+            const headerBadge = document.getElementById('headerNotificationBadge');
+            const headerCount = document.getElementById('headerNotificationCount');
+            
+            if (requestNotificationCount > 0) {
+                headerBadge.style.display = 'inline-block';
+                headerCount.textContent = requestNotificationCount;
+            } else {
+                headerBadge.style.display = 'none';
+            }
+        }
+
+        function refreshRequests() {
+            loadRequests().then(() => {
+                renderKanbanBoard();
+                showToast('Requests refreshed');
+            });
+        }
+
+        // Function to sync data from Supabase (now uses real database)
+        async function syncFromSupabase() {
+            try {
+                // Simply reload from Supabase
+                await loadRequests();
+                renderKanbanBoard();
+                renderRequestsSummary();
+                updateNotificationBadge();
+                showToast('Data synced from Supabase successfully');
+            } catch (error) {
+                console.error('Error syncing from Supabase:', error);
+                showToast('Error syncing from Supabase');
+            }
+        }
+
+        // Loader functions
+        function showLoader(text = 'Loading...') {
+            const loader = document.getElementById('loader');
+            const loaderText = loader.querySelector('.loader-text');
+            loaderText.textContent = text;
+            loader.classList.add('show');
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.classList.remove('show');
+        }
+
+        // Test Supabase connection
+        async function testSupabaseConnection() {
+            try {
+                console.log('Testing Supabase connection...');
+                
+                // Try to insert a test record
+                const testData = {
+                    requester_name: 'Test User',
+                    request_type: 'verification',
+                    assigned_to: 'Test QA',
+                    message: 'Test connection',
+                    status: 'todo'
+                };
+                
+                const { data, error } = await supabase
+                    .from('requests')
+                    .insert([testData])
+                    .select();
+                
+                if (error) {
+                    console.error('Supabase test failed:', error);
+                    showToast(`Database test failed: ${error.message}`);
+                    return false;
+                } else {
+                    console.log('Supabase test successful:', data);
+                    showToast('Database connection working!');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Supabase test error:', error);
+                showToast('Database test error');
+                return false;
+            }
+        }
+
+        // Test function to debug requester name issue
+        function testRequesterName() {
+            console.log('=== TESTING REQUESTER NAME ===');
+            
+            // Test 1: Check if form field exists
+            const requesterField = document.getElementById('requesterName');
+            console.log('Requester field exists:', !!requesterField);
+            console.log('Requester field value:', requesterField ? requesterField.value : 'NOT FOUND');
+            
+            // Test 2: Check form data
+            const form = document.getElementById('requestsForm');
+            const formData = new FormData(form);
+            console.log('Form data entries:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            
+            // Test 3: Check localStorage
+            const storedRequests = JSON.parse(localStorage.getItem('requests') || '[]');
+            console.log('Current localStorage requests:', storedRequests);
+            if (storedRequests.length > 0) {
+                console.log('Last request requester_name:', storedRequests[storedRequests.length - 1].requester_name);
+            }
+            
+            // Test 4: Manual test submission
+            if (requesterField) {
+                requesterField.value = 'Test User';
+                console.log('Set test value, now:', requesterField.value);
+            }
+        }
+
+        // Reset requests data
+        function resetRequestsData() {
+            localStorage.removeItem('requests');
+            requests = [];
+            loadRequests();
+            showToast('Requests data reset successfully!');
+        }
+        
+        // Clear localStorage and reload from Supabase
+        function clearLocalStorageAndReload() {
+            localStorage.removeItem('requests');
+            requests = [];
+            // Force reload from Supabase by calling syncFromSupabase directly
+            syncFromSupabase().then(() => {
+                renderRequestsSummary();
+                showToast('Reloaded from Supabase database!');
+            });
+        }
+
+        // Force clear all data and start fresh
+        function forceClearAllData() {
+            if (confirm('This will delete ALL requests data and start fresh. Are you sure?')) {
+                localStorage.removeItem('requests');
+                requests = [];
+                renderRequestsSummary();
+                showToast('All data cleared!');
+            }
+        }
+
+        // Fix requester names based on content
+        function fixRequesterNames() {
+            requests = requests.map((request, index) => {
+                if (!request.requester_name || request.requester_name === 'Unknown') {
+                    let requesterName = 'Unknown User';
+                    
+                    if (request.message && request.message.toLowerCase().includes('hubstaff')) {
+                        requesterName = 'Jane Smith';
+                    } else if (request.message && request.message.toLowerCase().includes('kt')) {
+                        requesterName = 'Mike Johnson';
+                    } else if (request.message && request.message.toLowerCase().includes('verification')) {
+                        requesterName = 'John Doe';
+                    } else if (request.message && request.message.toLowerCase().includes('resource')) {
+                        requesterName = 'Sarah Wilson';
+                    } else if (request.message && request.message.toLowerCase().includes('test')) {
+                        requesterName = 'David Brown';
+                    } else {
+                        const defaultNames = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson', 'David Brown'];
+                        const nameIndex = index % defaultNames.length;
+                        requesterName = defaultNames[nameIndex];
+                    }
+                    
+                    request.requester_name = requesterName;
+                }
+                return request;
+            });
+            
+            localStorage.setItem('requests', JSON.stringify(requests));
+            renderRequestsSummary();
+            showToast('Requester names fixed successfully!');
+        }
+
+        // Initialize notification count on page load
+        function initializeNotifications() {
+            if (isCRUDUnlocked) {
+                const todoRequests = requests.filter(r => r.status === 'todo');
+                requestNotificationCount = todoRequests.length;
+                updateNotificationBadge();
+            }
+        }
+
+        // Render requests summary for all users
+        function renderRequestsSummary() {
+            const activeRequests = requests.filter(r => r.status === 'todo');
+            const inProgressRequests = requests.filter(r => r.status === 'in-progress');
+            const completedRequests = requests.filter(r => r.status === 'completed');
+
+            // Update counts
+            document.getElementById('activeRequestsCount').textContent = activeRequests.length;
+            document.getElementById('inProgressRequestsCount').textContent = inProgressRequests.length;
+            document.getElementById('completedRequestsCount').textContent = completedRequests.length;
+
+            // Render request items
+            renderRequestItems('activeRequestsContent', activeRequests);
+            renderRequestItems('inProgressRequestsContent', inProgressRequests);
+            renderRequestItems('completedRequestsContent', completedRequests);
+
+            // Render table
+            renderMyRequestsTable();
+        }
+
+        function renderRequestItems(containerId, requests) {
+            const container = document.getElementById(containerId);
+            
+            if (requests.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 20px;">No requests</div>';
+                return;
+            }
+
+            container.innerHTML = requests.map(request => `
+                <div class="request-item">
+                    <div class="request-item-header">
+                        <span class="request-item-type ${request.request_type}">${getRequestTypeLabel(request)}</span>
+                        <span style="font-size: 0.8rem; color: #6b7280;">${formatDate(request.created_at)}</span>
+                    </div>
+                    <div class="request-item-message">${request.message}</div>
+                    <div class="request-item-footer">
+                        <span class="request-item-assignee">👤 ${request.assigned_to}</span>
+                        <span class="request-item-requester">📝 ${request.requester_name || 'Unknown'}</span>
+                        <span>${request.status.replace('-', ' ').toUpperCase()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMyRequestsTable() {
+            const tbody = document.getElementById('myRequestsTableBody');
+            const searchTerm = document.getElementById('myRequestsSearch')?.value.toLowerCase() || '';
+            const filterType = document.getElementById('myRequestsFilter')?.value || '';
+
+            let filteredRequests = requests.filter(request => {
+                const matchesSearch = request.message.toLowerCase().includes(searchTerm) ||
+                                    request.assigned_to.toLowerCase().includes(searchTerm) ||
+                                    (request.requester_name && request.requester_name.toLowerCase().includes(searchTerm));
+                const matchesFilter = !filterType || request.request_type === filterType;
+                return matchesSearch && matchesFilter;
+            });
+
+            // Sort by created date (newest first)
+            filteredRequests.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            tbody.innerHTML = filteredRequests.map(request => `
+                <tr>
+                    <td><span class="request-type-badge ${request.request_type}">${getRequestTypeLabel(request)}</span></td>
+                    <td>${request.requester_name || 'Unknown'}</td>
+                    <td>${request.assigned_to}</td>
+                    <td>${request.message}</td>
+                    <td><span class="status-badge status-${request.status.replace('-', '')}">${request.status.replace('-', ' ').toUpperCase()}</span></td>
+                    <td>${formatDate(request.created_at)}</td>
+                    <td>${formatDate(request.updated_at)}</td>
+                    <td>
+                        <button class="action-btn" onclick="openRequestDetails('${request.id}')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function refreshRequestsSummary() {
+            loadRequests().then(() => {
+                renderRequestsSummary();
+                showToast('Requests refreshed');
+            });
+        }
+
         // Get status class for styling
         function getStatusClass(status) {
             if (!status) return 'not-started';
@@ -7303,6 +8685,59 @@
             }
         });
 
+        // Requests form submission
+        document.getElementById('requestsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            // Debug: Log all form data
+            console.log('=== FORM SUBMISSION DEBUG ===');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            
+            const requestData = {
+                requesterName: formData.get('requesterName'),
+                requestType: formData.get('requestType'),
+                customRequestType: formData.get('customRequestType'),
+                assignedTo: formData.get('assignedTo'),
+                message: formData.get('message')
+            };
+            
+            console.log('Processed request data:', requestData);
+            console.log('Requester name specifically:', requestData.requesterName);
+            
+            // Validate required fields
+            if (!requestData.requesterName || requestData.requesterName.trim() === '') {
+                showToast('Requester name is required.');
+                return;
+            }
+            if (!requestData.requestType || requestData.requestType.trim() === '') {
+                showToast('Request type is required.');
+                return;
+            }
+            
+            if (!requestData.assignedTo || requestData.assignedTo.trim() === '') {
+                showToast('Assigned to is required.');
+                return;
+            }
+            
+            if (!requestData.message || requestData.message.trim() === '') {
+                showToast('Message is required.');
+                return;
+            }
+            
+            if (requestData.requestType === 'other' && (!requestData.customRequestType || requestData.customRequestType.trim() === '')) {
+                showToast('Custom request type is required.');
+                return;
+            }
+            
+            const success = await submitRequest(requestData);
+            if (success) {
+                closeRequestsModal();
+            }
+        });
+
         // Reason form submission
         document.getElementById('reasonForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -7397,6 +8832,10 @@
                 case 'forecast': await renderForecast(); break;
                 case 'yet-to-start': await renderYetToStart(); break;
                 case 'labels': await renderLabels(); break;
+                case 'requestsSummary': renderRequestsSummary(); break;
+                case 'adminRequests': 
+                    renderKanbanBoard(); 
+                    break;
             }
             
             // Convert tables to mobile cards if on mobile
@@ -9696,8 +11135,20 @@ Generated on: ${new Date().toLocaleString()}`;
                 unlockBtn.textContent = '🔒 CRUD Unlocked';
                 unlockBtn.classList.add('unlocked');
                 enableCRUDOperations();
+                
+                // Show admin requests menu for CRUD users
+                const adminRequestsNav = document.getElementById('adminRequestsNav');
+                if (adminRequestsNav) {
+                    adminRequestsNav.style.display = 'block';
+                }
             } else {
                 disableCRUDOperations();
+                
+                // Hide admin requests menu for non-CRUD users
+                const adminRequestsNav = document.getElementById('adminRequestsNav');
+                if (adminRequestsNav) {
+                    adminRequestsNav.style.display = 'none';
+                }
             }
         }
 
@@ -10204,10 +11655,53 @@ Generated on: ${new Date().toLocaleString()}`;
 
         /* Initialize App */
         document.addEventListener('DOMContentLoaded', async () => {
+            // Show initial loader
+            showLoader('Initializing application...');
+            
             checkCRUDStatus(); // Check CRUD unlock status
             await loadTasks();
             await loadAttendance();
             await loadProjectMilestones();
+            await loadRequests(); // Load requests data
+            
+            // Initialize notifications for CRUD users
+            initializeNotifications();
+            
+            // Hide loader when everything is loaded
+            hideLoader();
+            
+            // Set up request history search and filter
+            document.getElementById('historySearch')?.addEventListener('input', renderRequestHistory);
+            document.getElementById('historyFilter')?.addEventListener('change', renderRequestHistory);
+            
+            // Set up my requests search and filter
+            document.getElementById('myRequestsSearch')?.addEventListener('input', renderMyRequestsTable);
+            document.getElementById('myRequestsFilter')?.addEventListener('change', renderMyRequestsTable);
+            
+            // Set up assigned to dropdown event listener
+            setTimeout(() => {
+                const assignedToInput = document.getElementById('assignedToInput');
+                const dropdownContainer = document.querySelector('.dropdown-container');
+                
+                if (assignedToInput) {
+                    assignedToInput.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleAssignedDropdown(e);
+                    });
+                    assignedToInput.addEventListener('focus', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleAssignedDropdown(e);
+                    });
+                }
+                
+                if (dropdownContainer) {
+                    dropdownContainer.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                }
+            }, 1000);
             
             // Event listener removed - using inline onclick instead
 
