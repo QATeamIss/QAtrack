@@ -11883,12 +11883,14 @@ Generated on: ${new Date().toLocaleString()}`;
                 // Get today's date in YYYY-MM-DD format
                 const today = new Date().toISOString().split('T')[0];
                 
-                // Fetch tasks for selected QA from database for today only
+                // Fetch tasks for selected QA from database that are active or due soon
                 const { data: qaTasks, error } = await supabase
                     .from('tasks')
                     .select('*')
                     .or(`assigned_to.eq.${selectedQA},assigned_to2.eq.${selectedQA}`)
-                    .or(`start_date.eq.${today},end_date.eq.${today},actual_end_date.eq.${today}`);
+                    .in('status', ['Yet to Start', 'In Progress', 'Completed'])
+                    .lte('start_date', today)
+                    .gte('end_date', today);
                 
                 if (error) {
                     console.error('Error fetching tasks for QA:', error);
@@ -11897,11 +11899,11 @@ Generated on: ${new Date().toLocaleString()}`;
                 }
                 
                 if (!qaTasks || qaTasks.length === 0) {
-                    showToast('No tasks found for selected QA for today');
+                    showToast('No active tasks found for selected QA');
                     return;
                 }
 
-            // Group tasks by status (all tasks are for today)
+            // Group tasks by status (all tasks are active/current)
             const completedTasks = qaTasks.filter(task => task.status === 'Completed');
             const rejectedTasks = qaTasks.filter(task => task.status === 'Rejected');
             const overdueTasks = qaTasks.filter(task => {
