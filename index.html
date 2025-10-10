@@ -531,6 +531,7 @@
             font-size: 2.5rem;
             font-weight: 800;
             background: linear-gradient(45deg, #1e293b, #4a5568);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -769,6 +770,37 @@
 
         .stat-trend.neutral {
             color: #64748b;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.05);
+            margin-left: auto;
+        }
+
+        .trend-indicator.positive {
+            background: rgba(22, 163, 74, 0.1);
+            color: #16a34a;
+        }
+
+        .trend-indicator.negative {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+        }
+
+        .trend-indicator.neutral {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748b;
+        }
+
+        .trend-arrow {
+            font-size: 0.7rem;
         }
 
         /* Dashboard Charts Section */
@@ -1951,9 +1983,6 @@
                 background: var(--bg-primary);
             }
         }
-            letter-spacing: 1px;
-            color: #64748b;
-        }
 
         /* Task Table - Light Mode */
         .table-container {
@@ -2855,7 +2884,7 @@
         /* Calendar View - Light Mode */
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 0.3fr 0.3fr;
             gap: 0.75rem;
             margin-top: 2rem;
             width: 100%;
@@ -2963,8 +2992,7 @@
             color: #334155;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            max-height: 220px;
+            cursor: pointer;
         }
 
         .calendar-day-header {
@@ -2978,6 +3006,42 @@
 
         .calendar-day:hover {
             background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Weekend Highlighting */
+        .calendar-day.weekend {
+            background: rgba(248, 250, 252, 0.8);
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .calendar-day.weekend:hover {
+            background: rgba(241, 245, 249, 0.9);
+        }
+
+        /* Today's Date Highlight */
+        .calendar-day.today {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .calendar-day.today .day-number {
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        .calendar-day.today:hover {
+            background: rgba(59, 130, 246, 0.15);
         }
 
         .day-number {
@@ -2985,7 +3049,41 @@
             font-size: 1rem;
             margin: 0.5rem 0 0.3rem 0;
             color: #1e293b;
-            padding-left: 0.5rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Compact Task Display */
+        .day-tasks {
+            max-height: 150px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: max-height 0.3s ease;
+            flex: 1;
+            padding-right: 4px;
+        }
+
+        .day-tasks.expanded {
+            max-height: none;
+        }
+
+        .task-summary {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1e40af;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 0.25rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .task-summary:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-1px);
         }
 
         .task-item {
@@ -2998,24 +3096,47 @@
             cursor: pointer;
             transition: all 0.2s ease;
             overflow: visible;
-            text-overflow: unset;
-            white-space: normal;
-            line-height: 1.4;
-            word-break: break-word;
-            display: block;
-            box-shadow: 0 1px 4px rgba(99,102,241,0.07);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-assignee-avatars {
+            display: flex;
+            gap: 0.25rem;
+            margin-left: auto;
+        }
+
+        .assignee-avatar-small {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+        }
+
+        .task-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .task-assignee {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-left: auto;
         }
 
         .task-item:hover {
             background: #c7d2fe;
-        }
-
-        .task-assignee {
-            font-size: 0.75em;
-            opacity: 0.8;
-            display: block;
-            margin-top: 0.15em;
-            word-break: break-word;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .calendar-task-completed {
@@ -3068,6 +3189,683 @@
             color: #dc3545 !important;       /* Red text */
             border: 2px solid #dc3545 !important;  /* Red border */
             font-weight: bold !important;
+        }
+
+        /* Enhanced Status Icons */
+        .task-status-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+
+        .task-status-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-completed {
+            background: #16a34a;
+            color: white;
+        }
+
+        .status-completed::before {
+            content: '✓';
+            background: none;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .status-beingdeveloped {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status-beingdeveloped::before {
+            content: '⚙';
+            background: none;
+            font-size: 8px;
+        }
+
+        .status-readyforqa {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .status-readyforqa::before {
+            content: '🔍';
+            background: none;
+            font-size: 8px;
+        }
+
+        .status-assignedtoqa {
+            background: #6366f1;
+            color: white;
+        }
+
+        .status-assignedtoqa::before {
+            content: '👤';
+            background: none;
+            font-size: 8px;
+        }
+
+        .status-inprogress {
+            background: #f59e42;
+            color: white;
+        }
+
+        .status-inprogress::before {
+            content: '▶';
+            background: none;
+            font-size: 8px;
+        }
+
+        .status-onhold {
+            background: #ef4444;
+            color: white;
+        }
+
+        .status-onhold::before {
+            content: '⏸';
+            background: none;
+            font-size: 8px;
+        }
+
+        .status-yettostart {
+            background: #64748b;
+            color: white;
+        }
+
+        .status-yettostart::before {
+            content: '⏳';
+            background: none;
+            font-size: 8px;
+        }
+
+        .status-forecast {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .status-forecast::before {
+            content: '📅';
+            background: none;
+            font-size: 8px;
+        }
+
+        .status-rejected {
+            background: #a21caf;
+            color: white;
+        }
+
+        .status-rejected::before {
+            content: '✗';
+            background: none;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .status-overdue {
+            background: #ffc107;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            animation: pulse 2s infinite;
+        }
+
+        .status-overdue::before {
+            content: '⚠';
+            background: none;
+            font-size: 8px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* Enhanced Date Picker Styles */
+        .date-picker-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .date-picker-input {
+            padding-right: 3rem;
+            cursor: pointer;
+            background: white;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .date-picker-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .date-picker-button {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .date-picker-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .date-picker-popup {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 280px;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .date-picker-popup.show {
+            display: block;
+        }
+
+        .date-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .date-picker-nav {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .date-picker-nav:hover {
+            background-color: #f3f4f6;
+        }
+
+        .date-picker-month-year {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #374151;
+        }
+
+        .date-picker-calendar {
+            padding: 1rem;
+        }
+
+        .date-picker-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .date-picker-weekday {
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+            padding: 0.5rem 0;
+        }
+
+        .date-picker-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem;
+        }
+
+        .date-picker-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .date-picker-day:hover {
+            background-color: #f3f4f6;
+        }
+
+        .date-picker-day.selected {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .date-picker-day.today {
+            background-color: #fef3c7;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .date-picker-day.other-month {
+            color: #d1d5db;
+        }
+
+        .date-picker-day.weekend {
+            color: #ef4444;
+        }
+
+        .date-picker-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .date-picker-today,
+        .date-picker-clear {
+            background: none;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .date-picker-today:hover {
+            background-color: #f3f4f6;
+        }
+
+        .date-picker-clear:hover {
+            background-color: #fef2f2;
+            border-color: #fca5a5;
+            color: #dc2626;
+        }
+
+        /* Enhanced Single Day View Toggle */
+        .view-mode-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .view-mode-toggle-container:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .view-mode-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 32px;
+        }
+
+        .view-mode-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .view-mode-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: 0.3s;
+            border-radius: 32px;
+        }
+
+        .view-mode-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .view-mode-toggle input:checked + .view-mode-slider {
+            background-color: #3b82f6;
+        }
+
+        .view-mode-toggle input:checked + .view-mode-slider:before {
+            transform: translateX(28px);
+        }
+
+        .view-mode-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .view-mode-icons {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.2rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+        }
+
+        /* Enhanced Assignee Filter Styles */
+        .assignee-filter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-width: 300px;
+        }
+
+        .assignee-search-wrapper {
+            position: relative;
+        }
+
+        .assignee-search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .assignee-search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .assignee-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            margin-top: 0.25rem;
+        }
+
+        .assignee-suggestions.show {
+            display: block;
+        }
+
+        .assignee-suggestion {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .assignee-suggestion:hover {
+            background-color: #f8fafc;
+        }
+
+        .assignee-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .assignee-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .assignee-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            min-height: 2rem;
+        }
+
+        .assignee-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .assignee-badge-remove {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .assignee-badge-remove:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .assignee-clear-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            align-self: flex-start;
+        }
+
+        .assignee-clear-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Calendar Legend */
+        .calendar-legend {
+            background: rgba(248, 250, 252, 0.8);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .legend-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 0.75rem 0;
+            text-align: center;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            min-height: 40px;
+        }
+
+        .legend-item:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        /* Calendar Analytics */
+        .calendar-analytics {
+            background: rgba(248, 250, 252, 0.8);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .analytics-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .quick-action-btn:hover {
+            background: #f8fafc;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        .action-icon {
+            font-size: 1.2rem;
+        }
+
+        .action-label {
+            font-weight: 600;
         }
 
         /* Toast Notification */
@@ -3295,6 +4093,85 @@
             .btn { padding: 0.8rem 1.2rem; width: 100%; }
             .form-actions { flex-direction: column-reverse; }
             .calendar-grid { grid-template-columns: repeat(2, 1fr); overflow-x: auto; }
+            
+            /* Mobile Calendar Enhancements */
+            .calendar-analytics {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .analytics-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .stat-card {
+                padding: 0.75rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .quick-actions {
+                gap: 0.5rem;
+            }
+            
+            .quick-action-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .action-label {
+                display: none;
+            }
+            
+            .calendar-legend {
+                padding: 0.75rem;
+            }
+            
+            .legend-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .legend-item {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .date-picker-container {
+                width: 100%;
+            }
+            
+            .view-mode-toggle-container {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .assignee-filter-container {
+                width: 100%;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header > div {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         /* Add color classes for assignee headers */
@@ -5476,6 +6353,10 @@
                             <div class="stat-trend neutral">
                                 <span>📈</span>
                                 <span>All projects tracked</span>
+                                <div class="trend-indicator neutral" id="totalTrend">
+                                    <span class="trend-arrow">→</span>
+                                    <span id="totalTrendText">0%</span>
+                                </div>
                             </div>
                         </div>
                         <div class="stats-card enhanced clickable animate-in" onclick="filterDashboardByType('active')">
@@ -5492,6 +6373,10 @@
                             <div class="stat-trend positive">
                                 <span>🔥</span>
                                 <span>In progress</span>
+                                <div class="trend-indicator positive" id="activeTrend">
+                                    <span class="trend-arrow">↗</span>
+                                    <span id="activeTrendText">0%</span>
+                                </div>
                             </div>
                         </div>
                         <div class="stats-card enhanced clickable animate-in" onclick="filterDashboardByType('completed')">
@@ -5508,6 +6393,10 @@
                             <div class="stat-trend positive">
                                 <span>🎉</span>
                                 <span>Successfully delivered</span>
+                                <div class="trend-indicator positive" id="completedTrend">
+                                    <span class="trend-arrow">↗</span>
+                                    <span id="completedTrendText">0%</span>
+                                </div>
                             </div>
                         </div>
                         <div class="stats-card enhanced clickable animate-in" onclick="filterDashboardByType('overdue')">
@@ -5524,6 +6413,10 @@
                             <div class="stat-trend negative">
                                 <span>⏰</span>
                                 <span>Needs attention</span>
+                                <div class="trend-indicator negative" id="overdueTrend">
+                                    <span class="trend-arrow">↘</span>
+                                    <span id="overdueTrendText">0%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -5732,63 +6625,95 @@
                 </div>
 
                 <div id="schedule" class="tab-content" style="display: none;">
+                    <div class="calendar-analytics">
+                        <div class="analytics-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="totalTasksCount">0</div>
+                                    <div class="stat-label">Total Tasks</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="completedTasksCount">0</div>
+                                    <div class="stat-label">Completed</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⏰</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="overdueTasksCount">0</div>
+                                    <div class="stat-label">Overdue</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🔄</div>
+                                <div class="stat-content">
+                                    <div class="stat-number" id="inProgressTasksCount">0</div>
+                                    <div class="stat-label">In Progress</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" onclick="switchTab('dashboard')">
+                                <span class="action-icon">📈</span>
+                                <span class="action-label">Dashboard</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="switchTab('tracker')">
+                                <span class="action-icon">📋</span>
+                                <span class="action-label">Tracker</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="switchTab('summary')">
+                                <span class="action-icon">📊</span>
+                                <span class="action-label">Summary</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="showTaskModal()">
+                                <span class="action-icon">➕</span>
+                                <span class="action-label">Add Task</span>
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="header">
                         <h1 class="page-title">Work Schedule</h1>
                         <div style="display: flex; gap: 1rem; margin-left:auto;">
-                            <input type="date" class="form-input" id="scheduleDateFilter" onchange="filterByDate()" style="width: auto;">
-                            <button class="btn btn-secondary" id="viewModeToggle" onclick="
-                                console.log('=== BUTTON CLICKED ===');
-                                console.log('Current time:', new Date().toISOString());
-                                
-                                const singleDayView = document.getElementById('singleDayView');
-                                const calendarView = document.getElementById('calendarView');
-                                const toggleButton = document.getElementById('viewModeToggle');
-                                
-                                console.log('Elements found:', {
-                                    singleDayView: !!singleDayView,
-                                    calendarView: !!calendarView,
-                                    toggleButton: !!toggleButton
-                                });
-                                
-                                if (singleDayView && calendarView && toggleButton) {
-                                    console.log('Current display states:', {
-                                        singleDayDisplay: singleDayView.style.display,
-                                        calendarDisplay: calendarView.style.display
-                                    });
-                                    
-                                    if (singleDayView.style.display === 'none') {
-                                        // Switch to single day view
-                                        console.log('Switching to single day view...');
-                                        singleDayView.style.display = 'block';
-                                        calendarView.style.display = 'none';
-                                        toggleButton.textContent = '📅 Calendar View';
-                                        isCalendarView = false;
-                                        console.log('Switched to single day view');
-                                        if (typeof renderSingleDayView === 'function') {
-                                            renderSingleDayView();
-                                        } else {
-                                            console.error('renderSingleDayView function not found');
-                                        }
-                                    } else {
-                                        // Switch to calendar view
-                                        console.log('Switching to calendar view...');
-                                        singleDayView.style.display = 'none';
-                                        calendarView.style.display = 'block';
-                                        toggleButton.textContent = '📅 Single Day View';
-                                        isCalendarView = true;
-                                        console.log('Switched to calendar view');
-                                        if (typeof renderCalendarView === 'function') {
-                                            renderCalendarView();
-                                        } else {
-                                            console.error('renderCalendarView function not found');
-                                        }
-                                    }
-                                } else {
-                                    console.error('Required elements not found:', {singleDayView, calendarView, toggleButton});
-                                }
-                                console.log('=== BUTTON CLICK COMPLETE ===');
-                            " style="cursor: pointer;">📅 Calendar View</button>
-                            <input type="text" class="search-box" id="assignedToSearch" placeholder="Filter by assignee...">
+                            <div class="date-picker-container">
+                                <input type="text" class="form-input date-picker-input" id="scheduleDateFilter" placeholder="Select date..." readonly>
+                                <button class="date-picker-button" onclick="toggleDatePicker()">📅</button>
+                                <div class="date-picker-popup" id="datePickerPopup">
+                                    <div class="date-picker-header">
+                                        <button class="date-picker-nav" onclick="changeMonth(-1)">‹</button>
+                                        <span class="date-picker-month-year" id="datePickerMonthYear"></span>
+                                        <button class="date-picker-nav" onclick="changeMonth(1)">›</button>
+                                    </div>
+                                    <div class="date-picker-calendar" id="datePickerCalendar"></div>
+                                    <div class="date-picker-footer">
+                                        <button class="date-picker-today" onclick="selectToday()">Today</button>
+                                        <button class="date-picker-clear" onclick="clearDate()">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="view-mode-toggle-container">
+                                <div class="view-mode-icons">
+                                    <span>📅</span>
+                                    <span>📋</span>
+                                </div>
+                                <label class="view-mode-toggle">
+                                    <input type="checkbox" id="viewModeToggle" onchange="toggleViewMode()">
+                                    <span class="view-mode-slider"></span>
+                                </label>
+                                <span class="view-mode-label" id="viewModeLabel">Calendar View</span>
+                            </div>
+                            <div class="assignee-filter-container">
+                                <div class="assignee-search-wrapper">
+                                    <input type="text" class="search-box assignee-search-input" id="assignedToSearch" placeholder="Filter by assignee..." autocomplete="off">
+                                    <div class="assignee-suggestions" id="assigneeSuggestions"></div>
+                                </div>
+                                <div class="assignee-badges" id="assigneeBadges"></div>
+                                <button class="assignee-clear-btn" id="assigneeClearBtn" onclick="clearAssigneeFilter()" style="display: none;">Clear All</button>
+                            </div>
                         </div>
                     </div>
                     
@@ -5802,47 +6727,50 @@
                             </div>
                             <button class="btn btn-secondary" onclick="navigateDay(1)">Next Day →</button>
                     </div>
-                    <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-completed" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Completed
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-beingdeveloped" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Being Developed
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-readyforqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Ready for QA
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-assignedtoqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Assigned to QA
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-inprogress" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            In Progress
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-onhold" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            On Hold
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-yettostart" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Yet to Start
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-forecast" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Forecast
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-rejected" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Rejected
-                        </span>
-                        <span style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="task-item calendar-task-overdue" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                            Overdue
-                        </span>
+                    <div class="calendar-legend">
+                        <h3 class="legend-title">Task Status Legend</h3>
+                        <div class="legend-grid">
+                            <div class="legend-item">
+                                <span class="task-status-icon status-completed"></span>
+                                <span class="legend-label">Completed</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-beingdeveloped"></span>
+                                <span class="legend-label">Being Developed</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-readyforqa"></span>
+                                <span class="legend-label">Ready for QA</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-assignedtoqa"></span>
+                                <span class="legend-label">Assigned to QA</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-inprogress"></span>
+                                <span class="legend-label">In Progress</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-onhold"></span>
+                                <span class="legend-label">On Hold</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-yettostart"></span>
+                                <span class="legend-label">Yet to Start</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-forecast"></span>
+                                <span class="legend-label">Forecast</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-rejected"></span>
+                                <span class="legend-label">Rejected</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="task-status-icon status-overdue"></span>
+                                <span class="legend-label">Overdue</span>
+                            </div>
+                        </div>
                     </div>
                     <div id="singleDayTasks" class="single-day-tasks"></div>
                 </div>
@@ -5854,47 +6782,50 @@
                             <div id="calendarMonthHeader" style="font-size:1.3rem;font-weight:700;text-align:center;"></div>
                             <button class="btn btn-secondary" onclick="navigateMonth(1)">Next Month →</button>
                         </div>
-                        <div style="display:flex;gap:1rem;justify-content:center;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-completed" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Completed
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-beingdeveloped" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Being Developed
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-readyforqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Ready for QA
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-assignedtoqa" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Assigned to QA
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-inprogress" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                In Progress
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-onhold" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                On Hold
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-yettostart" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Yet to Start
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-forecast" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Forecast
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-rejected" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Rejected
-                            </span>
-                            <span style="display:flex;align-items:center;gap:0.5rem;">
-                                <span class="task-item calendar-task-overdue" style="width:1.5em;height:1.5em;display:inline-block;padding:0;margin:0;"></span>
-                                Overdue
-                            </span>
+                        <div class="calendar-legend">
+                            <h3 class="legend-title">Task Status Legend</h3>
+                            <div class="legend-grid">
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-completed"></span>
+                                    <span class="legend-label">Completed</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-beingdeveloped"></span>
+                                    <span class="legend-label">Being Developed</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-readyforqa"></span>
+                                    <span class="legend-label">Ready for QA</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-assignedtoqa"></span>
+                                    <span class="legend-label">Assigned to QA</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-inprogress"></span>
+                                    <span class="legend-label">In Progress</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-onhold"></span>
+                                    <span class="legend-label">On Hold</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-yettostart"></span>
+                                    <span class="legend-label">Yet to Start</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-forecast"></span>
+                                    <span class="legend-label">Forecast</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-rejected"></span>
+                                    <span class="legend-label">Rejected</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="task-status-icon status-overdue"></span>
+                                    <span class="legend-label">Overdue</span>
+                                </div>
+                            </div>
                         </div>
                     <div class="calendar-grid" id="calendarGrid"></div>
                     </div>
@@ -10661,7 +11592,10 @@
                     <div class="single-day-task-card" onclick="editTask(${task.id})">
                         <div class="task-card-header">
                             <h3 class="task-card-title">${task.projectName}</h3>
-                            <span class="task-card-status calendar-task-${statusClass}">${statusText}</span>
+                            <span class="task-card-status calendar-task-${statusClass}">
+                                <span class="task-status-icon status-${statusClass}"></span>
+                                ${statusText}
+                            </span>
                         </div>
                         <div class="task-card-details">
                             <p><strong>Phase:</strong> ${task.subPhase || 'N/A'}</p>
@@ -10721,8 +11655,16 @@
 
             // Generate calendar days with basic structure first
             for (let day = 1; day <= totalDays; day++) {
+                const date = new Date(calendarYear, calendarMonth, day);
+                const isToday = date.toDateString() === new Date().toDateString();
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                
+                let dayClasses = 'calendar-day';
+                if (isToday) dayClasses += ' today';
+                if (isWeekend) dayClasses += ' weekend';
+                
                 html += `
-                    <div class="calendar-day">
+                    <div class="${dayClasses}" onclick="showSingleDayView(${day}, ${calendarMonth}, ${calendarYear})">
                         <div class="day-number">${day}</div>
                         <div class="day-tasks">
                             <!-- Tasks will be added here -->
@@ -10749,7 +11691,7 @@
             console.log('Total tasks available:', tasks ? tasks.length : 'undefined');
 
             // Filter tasks by month and assignee
-            const assignedToFilter = document.getElementById('assignedToSearch')?.value?.toLowerCase() || '';
+            const assignedToFilter = selectedAssignees.size > 0 ? selectedAssignees : new Set();
             console.log('assignedToFilter:', assignedToFilter);
             
             const tasksToShow = tasks ? tasks.filter(task => {
@@ -10766,10 +11708,10 @@
                     (taskStart <= new Date(calendarYear, calendarMonth + 1, 0) &&
                      taskEnd >= new Date(calendarYear, calendarMonth, 1));
                 if (!inMonth) return false;
-                if (!assignedToFilter) return true;
+                if (assignedToFilter.size === 0) return true;
                 return (
-                    task.assignedTo?.toLowerCase().includes(assignedToFilter) ||
-                    task.assignedTo2?.toLowerCase().includes(assignedToFilter)
+                    assignedToFilter.has(task.assignedTo) ||
+                    assignedToFilter.has(task.assignedTo2)
                 );
             }) : [];
             
@@ -10864,19 +11806,40 @@
                     if (dayElement) {
                         const dayTasksDiv = dayElement.querySelector('.day-tasks');
                         if (dayTasksDiv) {
-                            dayTasksDiv.innerHTML = dayTasks.map(task => {
+                            const maxVisibleTasks = 3;
+                            const visibleTasks = dayTasks.slice(0, maxVisibleTasks);
+                            const hiddenCount = dayTasks.length - maxVisibleTasks;
+                            
+                            let tasksHtml = visibleTasks.map(task => {
                             const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
                                 const statusClass = task._isOverdue ? 'overdue' : task.status.toLowerCase().replace(/ /g, '');
                                 const statusText = task._isOverdue ? 'Overdue' : task.status;
                             return `
                                     <div class="task-item calendar-task-${statusClass}" 
                                          title="${task.projectName} (${statusText}) - ${assignees}"
-                                     onclick="editTask(${task.id})">
-                                    ${task.projectName}
-                                    <span class="task-assignee">${assignees}</span>
+                                     onclick="event.stopPropagation(); editTask(${task.id})">
+                                        <span class="task-status-icon status-${statusClass}"></span>
+                                        <div class="task-assignee-avatars">
+                                            ${[task.assignedTo, task.assignedTo2].filter(Boolean).map(assignee => 
+                                                `<span class="assignee-avatar-small">${getInitials(assignee)}</span>`
+                                            ).join('')}
+                                        </div>
+                                        <span class="task-name">${task.projectName}</span>
                                 </div>
                             `;
                             }).join('');
+                            
+                            if (hiddenCount > 0) {
+                                tasksHtml += `
+                                    <div class="task-summary" onclick="event.stopPropagation(); toggleDayTasks(${day})">
+                                        +${hiddenCount} more tasks
+                                    </div>
+                                `;
+                                // Store all tasks for expansion
+                                dayElement.setAttribute('data-all-tasks', JSON.stringify(dayTasks));
+                            }
+                            
+                            dayTasksDiv.innerHTML = tasksHtml;
                             console.log(`Added ${dayTasks.length} tasks to day ${day}`);
                         } else {
                             console.log(`No .day-tasks div found for day ${day}`);
@@ -10957,28 +11920,425 @@
             isCalendarView = !isCalendarView;
             const singleDayView = document.getElementById('singleDayView');
             const calendarView = document.getElementById('calendarView');
-            const toggleButton = document.getElementById('viewModeToggle');
+            const toggleCheckbox = document.getElementById('viewModeToggle');
+            const toggleLabel = document.getElementById('viewModeLabel');
             
-            console.log('Elements found:', { singleDayView, calendarView, toggleButton });
+            console.log('Elements found:', { singleDayView, calendarView, toggleCheckbox, toggleLabel });
             
-            if (!singleDayView || !calendarView || !toggleButton) {
-                console.error('Required elements not found:', { singleDayView, calendarView, toggleButton });
+            if (!singleDayView || !calendarView || !toggleCheckbox || !toggleLabel) {
+                console.error('Required elements not found:', { singleDayView, calendarView, toggleCheckbox, toggleLabel });
                 return;
             }
             
             if (isCalendarView) {
                 singleDayView.style.display = 'none';
                 calendarView.style.display = 'block';
-                toggleButton.textContent = '📅 Single Day View';
+                toggleLabel.textContent = 'Single Day View';
                 console.log('Switched to calendar view');
             } else {
                 singleDayView.style.display = 'block';
                 calendarView.style.display = 'none';
-                toggleButton.textContent = '📅 Calendar View';
+                toggleLabel.textContent = 'Calendar View';
                 console.log('Switched to single day view');
             }
             
             renderSchedule();
+        }
+
+        // Date Picker Functions
+        let datePickerCurrentMonth = new Date().getMonth();
+        let datePickerCurrentYear = new Date().getFullYear();
+        let selectedDate = null;
+
+        function toggleDatePicker() {
+            const popup = document.getElementById('datePickerPopup');
+            if (popup.classList.contains('show')) {
+                popup.classList.remove('show');
+            } else {
+                popup.classList.add('show');
+                renderDatePicker();
+            }
+        }
+
+        function renderDatePicker() {
+            const monthYearElement = document.getElementById('datePickerMonthYear');
+            const calendarElement = document.getElementById('datePickerCalendar');
+            
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            
+            monthYearElement.textContent = `${months[datePickerCurrentMonth]} ${datePickerCurrentYear}`;
+            
+            const firstDay = new Date(datePickerCurrentYear, datePickerCurrentMonth, 1);
+            const lastDay = new Date(datePickerCurrentYear, datePickerCurrentMonth + 1, 0);
+            const firstDayOfWeek = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+            
+            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            let html = `
+                <div class="date-picker-weekdays">
+                    ${weekdays.map(day => `<div class="date-picker-weekday">${day}</div>`).join('')}
+                </div>
+                <div class="date-picker-days">
+            `;
+            
+            // Add blank days for offset
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                html += `<div class="date-picker-day other-month"></div>`;
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= totalDays; day++) {
+                const date = new Date(datePickerCurrentYear, datePickerCurrentMonth, day);
+                const isToday = date.toDateString() === new Date().toDateString();
+                const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                
+                let classes = 'date-picker-day';
+                if (isToday) classes += ' today';
+                if (isSelected) classes += ' selected';
+                if (isWeekend) classes += ' weekend';
+                
+                html += `<div class="${classes}" onclick="selectDate(${day})">${day}</div>`;
+            }
+            
+            html += '</div>';
+            calendarElement.innerHTML = html;
+        }
+
+        function changeMonth(direction) {
+            datePickerCurrentMonth += direction;
+            if (datePickerCurrentMonth < 0) {
+                datePickerCurrentMonth = 11;
+                datePickerCurrentYear--;
+            } else if (datePickerCurrentMonth > 11) {
+                datePickerCurrentMonth = 0;
+                datePickerCurrentYear++;
+            }
+            renderDatePicker();
+        }
+
+        function selectDate(day) {
+            selectedDate = new Date(datePickerCurrentYear, datePickerCurrentMonth, day);
+            const input = document.getElementById('scheduleDateFilter');
+            input.value = selectedDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            // Close popup
+            document.getElementById('datePickerPopup').classList.remove('show');
+            
+            // Trigger date filter
+            currentScheduleDate = selectedDate;
+            renderSchedule();
+        }
+
+        function selectToday() {
+            const today = new Date();
+            datePickerCurrentMonth = today.getMonth();
+            datePickerCurrentYear = today.getFullYear();
+            selectDate(today.getDate());
+        }
+
+        function clearDate() {
+            selectedDate = null;
+            document.getElementById('scheduleDateFilter').value = '';
+            document.getElementById('datePickerPopup').classList.remove('show');
+            currentScheduleDate = new Date();
+            renderSchedule();
+        }
+
+        // Close date picker when clicking outside
+        document.addEventListener('click', function(event) {
+            const datePickerContainer = document.querySelector('.date-picker-container');
+            if (datePickerContainer && !datePickerContainer.contains(event.target)) {
+                document.getElementById('datePickerPopup').classList.remove('show');
+            }
+        });
+
+        // Enhanced Assignee Filter Functions
+        let selectedAssignees = new Set();
+        let allAssignees = new Set();
+
+        function initializeAssigneeFilter() {
+            const searchInput = document.getElementById('assignedToSearch');
+            const suggestionsDiv = document.getElementById('assigneeSuggestions');
+            
+            if (!searchInput || !suggestionsDiv) return;
+
+            // Collect all unique assignees from tasks
+            if (tasks && tasks.length > 0) {
+                tasks.forEach(task => {
+                    if (task.assignedTo) allAssignees.add(task.assignedTo);
+                    if (task.assignedTo2) allAssignees.add(task.assignedTo2);
+                });
+            }
+
+            // Add event listeners
+            searchInput.addEventListener('input', handleAssigneeSearch);
+            searchInput.addEventListener('focus', showAssigneeSuggestions);
+            searchInput.addEventListener('blur', hideAssigneeSuggestionsDelayed);
+            
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(event) {
+                const assigneeContainer = document.querySelector('.assignee-filter-container');
+                if (assigneeContainer && !assigneeContainer.contains(event.target)) {
+                    hideAssigneeSuggestions();
+                }
+            });
+        }
+
+        function handleAssigneeSearch(event) {
+            const query = event.target.value.toLowerCase();
+            const suggestionsDiv = document.getElementById('assigneeSuggestions');
+            
+            if (!query.trim()) {
+                showAllAssigneeSuggestions();
+                return;
+            }
+
+            const filteredAssignees = Array.from(allAssignees).filter(assignee =>
+                assignee.toLowerCase().includes(query) && !selectedAssignees.has(assignee)
+            );
+
+            renderAssigneeSuggestions(filteredAssignees);
+        }
+
+        function showAssigneeSuggestions() {
+            const suggestionsDiv = document.getElementById('assigneeSuggestions');
+            if (suggestionsDiv) {
+                showAllAssigneeSuggestions();
+                suggestionsDiv.classList.add('show');
+            }
+        }
+
+        function hideAssigneeSuggestions() {
+            const suggestionsDiv = document.getElementById('assigneeSuggestions');
+            if (suggestionsDiv) {
+                suggestionsDiv.classList.remove('show');
+            }
+        }
+
+        function hideAssigneeSuggestionsDelayed() {
+            setTimeout(hideAssigneeSuggestions, 200);
+        }
+
+        function showAllAssigneeSuggestions() {
+            const unselectedAssignees = Array.from(allAssignees).filter(assignee => 
+                !selectedAssignees.has(assignee)
+            );
+            renderAssigneeSuggestions(unselectedAssignees);
+        }
+
+        function renderAssigneeSuggestions(assignees) {
+            const suggestionsDiv = document.getElementById('assigneeSuggestions');
+            if (!suggestionsDiv) return;
+
+            if (assignees.length === 0) {
+                suggestionsDiv.innerHTML = '<div class="assignee-suggestion" style="color: #6b7280; font-style: italic;">No assignees found</div>';
+                return;
+            }
+
+            suggestionsDiv.innerHTML = assignees.map(assignee => `
+                <div class="assignee-suggestion" onclick="selectAssignee('${assignee.replace(/'/g, "\\'")}')">
+                    <div class="assignee-avatar">${getInitials(assignee)}</div>
+                    <span>${assignee}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectAssignee(assignee) {
+            selectedAssignees.add(assignee);
+            document.getElementById('assignedToSearch').value = '';
+            hideAssigneeSuggestions();
+            renderAssigneeBadges();
+            updateAssigneeFilter();
+        }
+
+        function removeAssignee(assignee) {
+            selectedAssignees.delete(assignee);
+            renderAssigneeBadges();
+            updateAssigneeFilter();
+        }
+
+        function clearAssigneeFilter() {
+            selectedAssignees.clear();
+            document.getElementById('assignedToSearch').value = '';
+            renderAssigneeBadges();
+            updateAssigneeFilter();
+        }
+
+        function renderAssigneeBadges() {
+            const badgesDiv = document.getElementById('assigneeBadges');
+            const clearBtn = document.getElementById('assigneeClearBtn');
+            
+            if (!badgesDiv) return;
+
+            if (selectedAssignees.size === 0) {
+                badgesDiv.innerHTML = '';
+                if (clearBtn) clearBtn.style.display = 'none';
+                return;
+            }
+
+            badgesDiv.innerHTML = Array.from(selectedAssignees).map(assignee => `
+                <div class="assignee-badge">
+                    <div class="assignee-avatar">${getInitials(assignee)}</div>
+                    <span>${assignee}</span>
+                    <button class="assignee-badge-remove" onclick="removeAssignee('${assignee.replace(/'/g, "\\'")}')">×</button>
+                </div>
+            `).join('');
+
+            if (clearBtn) clearBtn.style.display = 'block';
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
+        }
+
+        function updateAssigneeFilter() {
+            // Update the original search functionality
+            const searchInput = document.getElementById('assignedToSearch');
+            if (searchInput) {
+                // Trigger the existing filter logic
+                if (typeof renderSchedule === 'function') {
+                    renderSchedule();
+                }
+            }
+        }
+
+        function updateAnalyticsStats() {
+            if (!tasks || tasks.length === 0) return;
+
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(task => task.status === 'Completed').length;
+            const overdueTasks = tasks.filter(task => {
+                if (task.status === 'Completed') return false;
+                if (!task.endDate) return false;
+                const endDate = new Date(task.endDate);
+                const endTime = task.endTime || '18:30';
+                const [hours, minutes] = endTime.split(':');
+                endDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                return new Date() > endDate;
+            }).length;
+            const inProgressTasks = tasks.filter(task => 
+                task.status === 'In Progress' || 
+                task.status === 'Being Developed' || 
+                task.status === 'Ready for QA' || 
+                task.status === 'Assigned to QA'
+            ).length;
+
+            // Update the stat elements
+            const totalElement = document.getElementById('totalTasksCount');
+            const completedElement = document.getElementById('completedTasksCount');
+            const overdueElement = document.getElementById('overdueTasksCount');
+            const inProgressElement = document.getElementById('inProgressTasksCount');
+
+            if (totalElement) totalElement.textContent = totalTasks;
+            if (completedElement) completedElement.textContent = completedTasks;
+            if (overdueElement) overdueElement.textContent = overdueTasks;
+            if (inProgressElement) inProgressElement.textContent = inProgressTasks;
+        }
+
+        function toggleDayTasks(day) {
+            const firstDayOfWeek = new Date(calendarYear, calendarMonth, 1).getDay();
+            const dayElementIndex = day + 7 + firstDayOfWeek;
+            const dayElement = document.querySelector(`.calendar-day:nth-child(${dayElementIndex})`);
+            
+            if (!dayElement) return;
+            
+            const dayTasksDiv = dayElement.querySelector('.day-tasks');
+            const allTasksData = dayElement.getAttribute('data-all-tasks');
+            
+            if (!dayTasksDiv || !allTasksData) return;
+            
+            const isExpanded = dayTasksDiv.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse back to compact view
+                const allTasks = JSON.parse(allTasksData);
+                const maxVisibleTasks = 3;
+                const visibleTasks = allTasks.slice(0, maxVisibleTasks);
+                const hiddenCount = allTasks.length - maxVisibleTasks;
+                
+                let tasksHtml = visibleTasks.map(task => {
+                    const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
+                    const statusClass = task._isOverdue ? 'overdue' : task.status.toLowerCase().replace(/ /g, '');
+                    return `
+                        <div class="task-item calendar-task-${statusClass}" 
+                             title="${task.projectName} (${task._isOverdue ? 'Overdue' : task.status}) - ${assignees}"
+                             onclick="editTask(${task.id})">
+                            <span class="task-status-icon status-${statusClass}"></span>
+                            <div class="task-assignee-avatars">
+                                ${[task.assignedTo, task.assignedTo2].filter(Boolean).map(assignee => 
+                                    `<span class="assignee-avatar-small">${getInitials(assignee)}</span>`
+                                ).join('')}
+                            </div>
+                            <span class="task-name">${task.projectName}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                if (hiddenCount > 0) {
+                    tasksHtml += `
+                        <div class="task-summary" onclick="toggleDayTasks(${day})">
+                            +${hiddenCount} more tasks
+                        </div>
+                    `;
+                }
+                
+                dayTasksDiv.innerHTML = tasksHtml;
+                dayTasksDiv.classList.remove('expanded');
+            } else {
+                // Expand to show all tasks
+                const allTasks = JSON.parse(allTasksData);
+                const tasksHtml = allTasks.map(task => {
+                    const assignees = [task.assignedTo, task.assignedTo2].filter(Boolean).join(', ');
+                    const statusClass = task._isOverdue ? 'overdue' : task.status.toLowerCase().replace(/ /g, '');
+                    return `
+                        <div class="task-item calendar-task-${statusClass}" 
+                             title="${task.projectName} (${task._isOverdue ? 'Overdue' : task.status}) - ${assignees}"
+                             onclick="editTask(${task.id})">
+                            <span class="task-status-icon status-${statusClass}"></span>
+                            <div class="task-assignee-avatars">
+                                ${[task.assignedTo, task.assignedTo2].filter(Boolean).map(assignee => 
+                                    `<span class="assignee-avatar-small">${getInitials(assignee)}</span>`
+                                ).join('')}
+                            </div>
+                            <span class="task-name">${task.projectName}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                dayTasksDiv.innerHTML = tasksHtml;
+                dayTasksDiv.classList.add('expanded');
+            }
+        }
+
+        // Function to show single day view when a calendar day is clicked
+        async function showSingleDayView(day, month, year) {
+            // Set the current schedule date to the clicked date
+            currentScheduleDate = new Date(year, month, day);
+            
+            // Switch to single day view
+            const viewModeToggle = document.getElementById('viewModeToggle');
+            if (viewModeToggle && !viewModeToggle.checked) {
+                viewModeToggle.checked = true;
+                await toggleViewMode();
+            }
+            
+            // Update the date picker to show the selected date
+            const datePickerInput = document.getElementById('scheduleDateFilter');
+            if (datePickerInput) {
+                datePickerInput.value = currentScheduleDate.toISOString().split('T')[0];
+            }
+            
+            // Render the single day view
+            await renderSingleDayView();
         }
 
         // Make functions globally accessible
@@ -10986,7 +12346,19 @@
         window.renderSchedule = renderSchedule;
         window.renderCalendarView = renderCalendarView;
         window.renderSingleDayView = renderSingleDayView;
+        window.showSingleDayView = showSingleDayView;
         window.switchTab = switchTab;
+        window.toggleDatePicker = toggleDatePicker;
+        window.changeMonth = changeMonth;
+        window.selectDate = selectDate;
+        window.selectToday = selectToday;
+        window.clearDate = clearDate;
+        window.selectAssignee = selectAssignee;
+        window.removeAssignee = removeAssignee;
+        window.clearAssigneeFilter = clearAssigneeFilter;
+        window.initializeAssigneeFilter = initializeAssigneeFilter;
+        window.toggleDayTasks = toggleDayTasks;
+        window.updateAnalyticsStats = updateAnalyticsStats;
 
         // Simple test function
         function testToggle() {
@@ -11122,6 +12494,10 @@
 
         // Initialize Dashboard Charts
         function initializeDashboardCharts() {
+            console.log('Initializing dashboard charts...');
+            console.log('Tasks available:', tasks ? tasks.length : 'undefined');
+            console.log('Sample tasks:', tasks ? tasks.slice(0, 3) : 'none');
+            
             createStatusChart();
             createResourceChart();
             createTrendChart();
@@ -11132,6 +12508,13 @@
         function createStatusChart() {
             const ctx = document.getElementById('statusChart');
             if (!ctx) return;
+
+            console.log('Creating status chart, tasks available:', tasks ? tasks.length : 'undefined');
+            
+            if (!tasks || tasks.length === 0) {
+                console.log('No tasks available for status chart');
+                return;
+            }
 
             const statusData = {
                 'Yet to Start': tasks.filter(t => t.status === 'Yet to Start').length,
@@ -11144,12 +12527,22 @@
                 'Rejected': tasks.filter(t => t.status === 'Rejected').length
             };
 
+            console.log('Status data:', statusData);
+
+            // Filter out zero values for cleaner chart
+            const filteredData = Object.entries(statusData).filter(([key, value]) => value > 0);
+            
+            if (filteredData.length === 0) {
+                console.log('No data to display in status chart');
+                return;
+            }
+
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: Object.keys(statusData),
+                    labels: filteredData.map(([key]) => key),
                     datasets: [{
-                        data: Object.values(statusData),
+                        data: filteredData.map(([key, value]) => value),
                         backgroundColor: [
                             '#6b7280', '#f59e0b', '#3b82f6', '#8b5cf6',
                             '#ef4444', '#dc2626', '#10b981', '#7c3aed'
@@ -11175,8 +12568,19 @@
             const ctx = document.getElementById('resourceChart');
             if (!ctx) return;
 
+            console.log('Creating resource chart, tasks available:', tasks ? tasks.length : 'undefined');
+
             const qaNames = ['Abhiram', 'Minnu', 'Aswathi'];
             const taskCounts = getQATaskCounts(qaNames);
+            
+            console.log('Resource chart data:', { qaNames, taskCounts });
+
+            // Check if we have any data
+            const totalTasks = taskCounts.reduce((sum, count) => sum + count, 0);
+            if (totalTasks === 0) {
+                console.log('No tasks found for resource allocation chart');
+                return;
+            }
 
             new Chart(ctx, {
                 type: 'bar',
@@ -11208,7 +12612,10 @@
                     },
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
                         }
                     }
                 }
@@ -11300,11 +12707,85 @@
 
         // Helper function to get QA task counts
         function getQATaskCounts(qaNames) {
+            if (!tasks || tasks.length === 0) return [0, 0, 0];
+            
             return qaNames.map(name => {
-                return tasks.filter(task => 
-                    task.assigned_to === name || task.assigned_to2 === name
-                ).length;
+                return tasks.filter(task => {
+                    // Check both camelCase and snake_case field names
+                    const assignedTo1 = task.assignedTo || task.assigned_to;
+                    const assignedTo2 = task.assignedTo2 || task.assigned_to2;
+                    return assignedTo1 === name || assignedTo2 === name;
+                }).length;
             });
+        }
+
+        // Calculate trend indicators for dashboard cards
+        async function updateTrendIndicators(currentTasks) {
+            const now = new Date();
+            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+            
+            // Get tasks from last month
+            const lastMonthTasks = currentTasks.filter(task => {
+                const taskDate = task.created_at ? new Date(task.created_at) : 
+                               task.start_date ? new Date(task.start_date) : null;
+                return taskDate && taskDate >= lastMonth && taskDate < now;
+            });
+            
+            // Calculate current month stats
+            const currentStats = calculateStats(currentTasks.map(task => ({
+                ...task,
+                endDate: task.end_date
+            })));
+            
+            // Calculate last month stats
+            const lastMonthStats = calculateStats(lastMonthTasks.map(task => ({
+                ...task,
+                endDate: task.end_date
+            })));
+            
+            // Calculate trends
+            const trends = {
+                total: calculateTrendPercentage(currentStats.total, lastMonthStats.total),
+                active: calculateTrendPercentage(currentStats.active, lastMonthStats.active),
+                completed: calculateTrendPercentage(currentStats.completed, lastMonthStats.completed),
+                overdue: calculateTrendPercentage(currentStats.overdue, lastMonthStats.overdue)
+            };
+            
+            // Update trend indicators
+            updateTrendIndicator('totalTrend', 'totalTrendText', trends.total);
+            updateTrendIndicator('activeTrend', 'activeTrendText', trends.active);
+            updateTrendIndicator('completedTrend', 'completedTrendText', trends.completed);
+            updateTrendIndicator('overdueTrend', 'overdueTrendText', trends.overdue);
+        }
+        
+        function calculateTrendPercentage(current, previous) {
+            if (previous === 0) return current > 0 ? 100 : 0;
+            return Math.round(((current - previous) / previous) * 100);
+        }
+        
+        function updateTrendIndicator(indicatorId, textId, percentage) {
+            const indicator = document.getElementById(indicatorId);
+            const textElement = document.getElementById(textId);
+            
+            if (!indicator || !textElement) return;
+            
+            const absPercentage = Math.abs(percentage);
+            textElement.textContent = `${absPercentage}%`;
+            
+            // Update arrow and color
+            const arrow = indicator.querySelector('.trend-arrow');
+            if (arrow) {
+                if (percentage > 0) {
+                    arrow.textContent = '↗';
+                    indicator.className = 'trend-indicator positive';
+                } else if (percentage < 0) {
+                    arrow.textContent = '↘';
+                    indicator.className = 'trend-indicator negative';
+                } else {
+                    arrow.textContent = '→';
+                    indicator.className = 'trend-indicator neutral';
+                }
+            }
         }
 
         // Table Sorting Functionality
@@ -11872,6 +13353,9 @@
             document.getElementById('completedTasks').textContent = stats.completed;
             document.getElementById('overdueTasks').textContent = stats.overdue;
 
+            // Calculate and update trend indicators
+            await updateTrendIndicators(statsTasks);
+
             // Set table title based on filter
             const tableTitle = document.getElementById('dashboardTableTitle');
             let titleText = "Recent Tasks";
@@ -11949,8 +13433,10 @@
                 }
             }
             
-            // Initialize dashboard charts
+            // Initialize dashboard charts after tasks are loaded
+            setTimeout(() => {
             initializeDashboardCharts();
+            }, 100);
         }
 
         async function renderTracker() {
@@ -13968,6 +15454,12 @@ Generated on: ${new Date().toLocaleString()}`;
             // Initialize enhanced search and filters
             initializeEnhancedSearch();
             
+            // Initialize assignee filter
+            initializeAssigneeFilter();
+            
+            // Update analytics stats
+            updateAnalyticsStats();
+            
             // Hide loader when everything is loaded
             hideLoader();
             
@@ -14013,8 +15505,8 @@ Generated on: ${new Date().toLocaleString()}`;
                     projectName: 'Mobile App Launch',
                     subPhase: 'Regression Testing',
                     pc: 'John Doe',
-                    assignedTo: 'Alice',
-                    assignedTo2: 'Eve',
+                    assignedTo: 'Abhiram',
+                    assignedTo2: 'Minnu',
                     status: 'In Progress',
                     sprint: 'Sprint 23.4',
                     bugCount: '3',
@@ -14029,7 +15521,7 @@ Generated on: ${new Date().toLocaleString()}`;
                     projectName: 'API Security Audit',
                     subPhase: 'Penetration Testing',
                     pc: 'Jane Wilson',
-                    assignedTo: 'Bob',
+                    assignedTo: 'Aswathi',
                     assignedTo2: '',
                     status: 'Completed',
                     sprint: 'Sprint 23.3',
@@ -14045,7 +15537,7 @@ Generated on: ${new Date().toLocaleString()}`;
                     projectName: 'Website Redesign',
                     subPhase: 'Cross-browser Check',
                     pc: 'John Doe',
-                    assignedTo: 'Charlie',
+                    assignedTo: 'Abhiram',
                     assignedTo2: '',
                     status: 'Yet to Start',
                     sprint: 'Sprint 23.5',
@@ -14054,6 +15546,86 @@ Generated on: ${new Date().toLocaleString()}`;
                     endDate: '2025-08-05',
                     comments: '',
                     deviationReason: '',
+                    createdAt: new Date().toISOString(),
+                    completedAt: null
+                }, {
+                    id: Date.now() + 3,
+                    projectName: 'E-commerce Platform',
+                    subPhase: 'User Acceptance Testing',
+                    pc: 'Mike Johnson',
+                    assignedTo: 'Minnu',
+                    assignedTo2: 'Aswathi',
+                    status: 'Being Developed',
+                    sprint: 'Sprint 23.6',
+                    bugCount: '2',
+                    startDate: '2025-08-10',
+                    endDate: '2025-08-15',
+                    comments: 'Testing checkout flow.',
+                    deviationReason: '',
+                    createdAt: new Date().toISOString(),
+                    completedAt: null
+                }, {
+                    id: Date.now() + 4,
+                    projectName: 'Payment Gateway Integration',
+                    subPhase: 'Security Testing',
+                    pc: 'Sarah Davis',
+                    assignedTo: 'Abhiram',
+                    assignedTo2: '',
+                    status: 'Ready for QA',
+                    sprint: 'Sprint 23.7',
+                    bugCount: '0',
+                    startDate: '2025-08-20',
+                    endDate: '2025-08-25',
+                    comments: 'Ready for QA review.',
+                    deviationReason: '',
+                    createdAt: new Date().toISOString(),
+                    completedAt: null
+                }, {
+                    id: Date.now() + 5,
+                    projectName: 'User Dashboard',
+                    subPhase: 'Functional Testing',
+                    pc: 'Tom Wilson',
+                    assignedTo: 'Minnu',
+                    assignedTo2: '',
+                    status: 'Assigned to QA',
+                    sprint: 'Sprint 23.8',
+                    bugCount: '1',
+                    startDate: '2025-08-30',
+                    endDate: '2025-09-05',
+                    comments: 'Testing user interactions.',
+                    deviationReason: '',
+                    createdAt: new Date().toISOString(),
+                    completedAt: null
+                }, {
+                    id: Date.now() + 6,
+                    projectName: 'Database Migration',
+                    subPhase: 'Performance Testing',
+                    pc: 'Lisa Brown',
+                    assignedTo: 'Aswathi',
+                    assignedTo2: 'Abhiram',
+                    status: 'On Hold',
+                    sprint: 'Sprint 23.9',
+                    bugCount: '0',
+                    startDate: '2025-09-10',
+                    endDate: '2025-09-15',
+                    comments: 'Waiting for infrastructure approval.',
+                    deviationReason: 'Infrastructure delay',
+                    createdAt: new Date().toISOString(),
+                    completedAt: null
+                }, {
+                    id: Date.now() + 7,
+                    projectName: 'Mobile App Update',
+                    subPhase: 'Compatibility Testing',
+                    pc: 'David Lee',
+                    assignedTo: 'Minnu',
+                    assignedTo2: '',
+                    status: 'Rejected',
+                    sprint: 'Sprint 24.0',
+                    bugCount: '5',
+                    startDate: '2025-09-20',
+                    endDate: '2025-09-25',
+                    comments: 'Multiple compatibility issues found.',
+                    deviationReason: 'Critical bugs found',
                     createdAt: new Date().toISOString(),
                     completedAt: null
                 }];
@@ -14087,12 +15659,23 @@ Generated on: ${new Date().toLocaleString()}`;
 
 
             await renderCurrentTab();
+            
+            // Initialize charts after everything is loaded
+            setTimeout(() => {
+                if (currentTab === 'dashboard') {
+                    initializeDashboardCharts();
+                }
+            }, 200);
         });
 
         // QA Work Status Functions
         async function openQAWorkStatusModal() {
             document.getElementById('qaWorkStatusModal').classList.add('active');
-            await populateQASelect();
+            
+            // Wait a bit to ensure tasks are loaded, then populate QA select
+            setTimeout(async () => {
+                await populateQASelect();
+            }, 100);
         }
 
         function closeQAWorkStatusModal() {
@@ -14104,48 +15687,52 @@ Generated on: ${new Date().toLocaleString()}`;
 
         async function populateQASelect() {
             const select = document.getElementById('qaWorkStatusSelect');
+            if (!select) return;
+            
             select.innerHTML = '<option value="">Choose a QA...</option>';
             
             try {
-                // Fetch fresh QA data from database
-                const { data: qaData, error } = await supabase
-                    .from('tasks')
-                    .select('assigned_to, assigned_to2')
-                    .or('assigned_to.not.is.null,assigned_to2.not.is.null');
+                console.log('Populating QA select, tasks available:', tasks ? tasks.length : 'undefined');
                 
-                if (error) {
-                    console.error('Error fetching QA data:', error);
-                    showToast('Error loading QA list');
-                    return;
-                }
-                
-                // Get unique QA names from both assigned_to and assigned_to2 fields
-                const allQANames = [];
-                qaData.forEach(task => {
-                    if (task.assigned_to && task.assigned_to.trim()) {
-                        // Split by comma and clean each name
-                        const names = task.assigned_to.split(',').map(name => name.trim()).filter(name => name);
-                        allQANames.push(...names);
-                    }
-                    if (task.assigned_to2 && task.assigned_to2.trim()) {
-                        // Split by comma and clean each name
-                        const names = task.assigned_to2.split(',').map(name => name.trim()).filter(name => name);
-                        allQANames.push(...names);
-                    }
-                });
-                
-                const uniqueQANames = [...new Set(allQANames)];
-                uniqueQANames.sort();
-                
-                if (uniqueQANames.length === 0) {
+                if (!tasks || tasks.length === 0) {
+                    console.log('No tasks available for QA selection');
                     const option = document.createElement('option');
                     option.value = '';
-                    option.textContent = 'No QAs found in database';
+                    option.textContent = 'No tasks found - please add some tasks first';
                     option.disabled = true;
                     select.appendChild(option);
                     return;
                 }
                 
+                // Get unique QA names from the local tasks array
+                const qaNames = new Set();
+                tasks.forEach(task => {
+                    if (task.assignedTo && task.assignedTo.trim()) {
+                        qaNames.add(task.assignedTo.trim());
+                    }
+                    if (task.assignedTo2 && task.assignedTo2.trim()) {
+                        qaNames.add(task.assignedTo2.trim());
+                    }
+                });
+                
+                const uniqueQANames = Array.from(qaNames).sort();
+                console.log('QA names found from tasks:', uniqueQANames);
+                
+                if (uniqueQANames.length === 0) {
+                    console.log('No QAs found in tasks, using fallback QA names');
+                    // Fallback QA names if no tasks are found
+                    const fallbackQANames = ['Abhiram', 'Minnu', 'Aswathi'];
+                    fallbackQANames.forEach(qaName => {
+                        const option = document.createElement('option');
+                        option.value = qaName;
+                        option.textContent = qaName;
+                        select.appendChild(option);
+                    });
+                    console.log('Added fallback QA names:', fallbackQANames);
+                    return;
+                }
+                
+                // Add QA names to dropdown
                 uniqueQANames.forEach(qaName => {
                     const option = document.createElement('option');
                     option.value = qaName;
@@ -14153,11 +15740,15 @@ Generated on: ${new Date().toLocaleString()}`;
                     select.appendChild(option);
                 });
                 
-                console.log('Populated QA select with:', uniqueQANames);
+                console.log('Successfully populated QA select with:', uniqueQANames);
                 
             } catch (error) {
                 console.error('Error in populateQASelect:', error);
-                showToast('Error loading QA list');
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Error loading QA names';
+                option.disabled = true;
+                select.appendChild(option);
             }
             
             // Enable/disable generate button based on selection
