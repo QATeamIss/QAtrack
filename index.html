@@ -110,6 +110,146 @@
             flex-direction: column;
         }
 
+        /* Enhanced Navigation Sections */
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.75rem;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-section-toggle {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-section-toggle:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-section-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .nav-section-items {
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .nav-section-items.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            margin: 0.25rem 0;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: white;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .nav-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            margin-left: auto;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .nav-badge.new {
+            background: #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        /* Collapsed sidebar adjustments */
+        .sidebar.collapsed .nav-section-title {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-section-items {
+            max-height: none !important;
+            opacity: 1 !important;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 1rem 0.5rem;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+            font-size: 1.3rem;
+        }
+
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .nav-badge {
+            display: none;
+        }
+
         .sidebar.collapsed {
             width: 80px;
             padding: 2rem 1rem;
@@ -544,10 +684,958 @@
             background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.3) 100%);
         }
 
+        /* Enhanced Stats Cards with Progress Indicators */
+        .stats-card.enhanced {
+            text-align: left;
+            padding: 1.5rem;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stat-info {
+            flex: 1;
+            margin-left: 1rem;
+        }
+
         .stat-number {
-            font-size: 3rem;
-            font-weight: 800;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: #1e293b;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.75rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .stat-trend.positive {
+            color: #10b981;
+        }
+
+        .stat-trend.negative {
+            color: #ef4444;
+        }
+
+        .stat-trend.neutral {
+            color: #64748b;
+        }
+
+        /* Dashboard Charts Section */
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-content {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Enhanced Table Styles */
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .modern-table thead {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+        }
+
+        .modern-table th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modern-table th:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modern-table th.sortable {
+            user-select: none;
+        }
+
+        .modern-table th.sortable::after {
+            content: '↕️';
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            font-size: 0.75rem;
+        }
+
+        .modern-table th.sort-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        .modern-table th.sort-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        .modern-table tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .modern-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .modern-table tbody tr:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modern-table td {
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            color: #475569;
+            vertical-align: middle;
+        }
+
+        /* User Avatar Styles */
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        /* Status Badge Styles */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.in-progress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.pending {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-badge.overdue {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .status-badge.rejected {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        /* Tooltip Styles */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 1000;
             margin-bottom: 0.5rem;
+        }
+
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1e293b;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after,
+        .tooltip:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Bug Count Styles */
+        .bug-count {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .bug-count.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .bug-count.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .bug-count.low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* Enhanced Search and Filter Styles */
+        .enhanced-filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            color: #64748b;
+            font-size: 1.1rem;
+            z-index: 1;
+        }
+
+        .enhanced-search-box {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .enhanced-search-box:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .search-clear:hover {
+            background: #e2e8f0;
+            color: #374151;
+        }
+
+        .advanced-filters {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-toggle {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-toggle:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        .filter-count {
+            background: #3b82f6;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            margin-left: 0.5rem;
+        }
+
+        .filter-panel {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-panel.active {
+            display: block;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .filter-select,
+        .filter-input {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* Mobile-First Responsive Design */
+        @media (max-width: 768px) {
+            /* Single Column Layout */
+            .enhanced-filter-section {
+                gap: 0.75rem;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Mobile Dashboard Layout */
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .toast.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon {
+            color: #10b981;
+        }
+
+        .toast.error .toast-icon {
+            color: #ef4444;
+        }
+
+        .toast.warning .toast-icon {
+            color: #f59e0b;
+        }
+
+        .toast.info .toast-icon {
+            color: #3b82f6;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(0, 0, 0, 0.1);
+            transition: width linear;
+        }
+
+        .toast.success .toast-progress {
+            background: #10b981;
+        }
+
+        .toast.error .toast-progress {
+            background: #ef4444;
+        }
+
+        .toast.warning .toast-progress {
+            background: #f59e0b;
+        }
+
+        .toast.info .toast-progress {
+            background: #3b82f6;
+        }
+
+        /* Mobile Toast Adjustments */
+        @media (max-width: 768px) {
+            .toast-container {
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+            
+            .toast {
+                padding: 0.875rem 1rem;
+            }
+            
+            .toast-icon {
+                font-size: 1.25rem;
+            }
+            
+            .toast-title {
+                font-size: 0.8rem;
+            }
+            
+            .toast-message {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Typography and Spacing Standards */
+        :root {
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --font-weight-extrabold: 800;
+            
+            --border-radius-sm: 6px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+            
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Enhanced Typography */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: var(--font-weight-bold);
+            line-height: 1.2;
+            margin-bottom: var(--spacing-md);
+            color: #1e293b;
+        }
+
+        h1 { font-size: var(--font-size-4xl); }
+        h2 { font-size: var(--font-size-3xl); }
+        h3 { font-size: var(--font-size-2xl); }
+        h4 { font-size: var(--font-size-xl); }
+        h5 { font-size: var(--font-size-lg); }
+        h6 { font-size: var(--font-size-base); }
+
+        .page-title {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-xl);
+            color: #1e293b;
+        }
+
+        /* Enhanced Spacing System */
+        .container {
+            padding: var(--spacing-xl);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .section-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* Enhanced Button Spacing */
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--border-radius-md);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            min-height: 44px; /* Touch-friendly minimum */
+        }
+
+        .btn-sm {
+            padding: var(--spacing-xs) var(--spacing-md);
+            font-size: var(--font-size-xs);
+            min-height: 36px;
+        }
+
+        .btn-lg {
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: var(--font-size-lg);
+            min-height: 52px;
+        }
+
+        /* Enhanced Card Spacing */
+        .card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .card-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-body {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .card-footer {
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid #f1f5f9;
+        }
+
+        /* Enhanced Form Spacing */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            color: #374151;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            font-size: var(--font-size-base);
+            border: 1px solid #d1d5db;
+            border-radius: var(--border-radius-md);
+            transition: all 0.2s ease;
+            min-height: 44px; /* Touch-friendly */
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Enhanced Table Spacing */
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .table-header {
+            padding: var(--spacing-lg);
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        /* Enhanced Grid Spacing */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+        /* Enhanced Flexbox Utilities */
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-sm { gap: var(--spacing-sm); }
+        .gap-md { gap: var(--spacing-md); }
+        .gap-lg { gap: var(--spacing-lg); }
+        .gap-xl { gap: var(--spacing-xl); }
+
+        /* Enhanced Margin and Padding Utilities */
+        .m-0 { margin: 0; }
+        .m-sm { margin: var(--spacing-sm); }
+        .m-md { margin: var(--spacing-md); }
+        .m-lg { margin: var(--spacing-lg); }
+        .m-xl { margin: var(--spacing-xl); }
+
+        .p-0 { padding: 0; }
+        .p-sm { padding: var(--spacing-sm); }
+        .p-md { padding: var(--spacing-md); }
+        .p-lg { padding: var(--spacing-lg); }
+        .p-xl { padding: var(--spacing-xl); }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-sm { margin-bottom: var(--spacing-sm); }
+        .mb-md { margin-bottom: var(--spacing-md); }
+        .mb-lg { margin-bottom: var(--spacing-lg); }
+        .mb-xl { margin-bottom: var(--spacing-xl); }
+
+        .mt-0 { margin-top: 0; }
+        .mt-sm { margin-top: var(--spacing-sm); }
+        .mt-md { margin-top: var(--spacing-md); }
+        .mt-lg { margin-top: var(--spacing-lg); }
+        .mt-xl { margin-top: var(--spacing-xl); }
+
+        .stat-number {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-extrabold);
+            margin-bottom: var(--spacing-sm);
             color: #1e293b;
             line-height: 1;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -557,6 +1645,312 @@
             font-size: 1.1rem;
             opacity: 0.9;
             text-transform: uppercase;
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                padding: var(--spacing-lg);
+            }
+            
+            .dashboard-charts {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+            
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            
+            .main-content {
+                margin-left: 240px;
+                width: calc(100% - 240px);
+            }
+            
+            .main-content.sidebar-collapsed {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+            
+            .page-title {
+                font-size: var(--font-size-2xl);
+            }
+            
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* Mobile Layout */
+            .sidebar {
+                width: 100%;
+                height: 100vh;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: var(--spacing-md);
+            }
+            
+            .main-content.sidebar-collapsed {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            /* Mobile Header */
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--spacing-md);
+                margin-bottom: var(--spacing-lg);
+            }
+            
+            .page-title {
+                font-size: var(--font-size-xl);
+                text-align: center;
+            }
+            
+            /* Mobile Cards */
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+            
+            .stats-card {
+                padding: var(--spacing-lg);
+            }
+            
+            .stat-number {
+                font-size: var(--font-size-3xl);
+            }
+            
+            /* Mobile Tables */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .modern-table {
+                min-width: 600px;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--spacing-md);
+            }
+            
+            /* Mobile Search and Filters */
+            .enhanced-filter-section {
+                padding: var(--spacing-md);
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Mobile Charts */
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+            
+            .chart-container {
+                padding: var(--spacing-md);
+            }
+            
+            .chart-content {
+                height: 250px;
+            }
+            
+            /* Mobile Navigation */
+            .sidebar-toggle {
+                display: block;
+                position: fixed;
+                top: var(--spacing-md);
+                left: var(--spacing-md);
+                z-index: 1001;
+            }
+            
+            .nav-item {
+                padding: var(--spacing-md);
+                margin: var(--spacing-xs) 0;
+            }
+            
+            .nav-icon {
+                font-size: var(--font-size-lg);
+            }
+            
+            /* Mobile Forms */
+            .form-input,
+            .form-select,
+            .form-textarea {
+                font-size: var(--font-size-base);
+                min-height: 48px; /* Larger touch targets on mobile */
+            }
+            
+            /* Mobile Buttons */
+            .btn {
+                min-height: 48px;
+                font-size: var(--font-size-base);
+            }
+            
+            .btn-sm {
+                min-height: 44px;
+            }
+            
+            .btn-lg {
+                min-height: 56px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Small Mobile */
+            .container {
+                padding: var(--spacing-md);
+            }
+            
+            .page-title {
+                font-size: var(--font-size-lg);
+            }
+            
+            .stats-card {
+                padding: var(--spacing-md);
+            }
+            
+            .stat-number {
+                font-size: var(--font-size-2xl);
+            }
+            
+            .chart-content {
+                height: 200px;
+            }
+            
+            .modern-table th,
+            .modern-table td {
+                padding: var(--spacing-sm);
+                font-size: var(--font-size-xs);
+            }
+            
+            .nav-item {
+                padding: var(--spacing-sm);
+            }
+            
+            .nav-text {
+                font-size: var(--font-size-sm);
+            }
+        }
+
+        /* Touch-Friendly Enhancements */
+        @media (hover: none) and (pointer: coarse) {
+            /* Touch devices */
+            .btn:hover {
+                transform: none;
+            }
+            
+            .nav-item:hover {
+                transform: none;
+            }
+            
+            .stats-card:hover {
+                transform: none;
+            }
+            
+            .modern-table tbody tr:hover {
+                transform: none;
+            }
+            
+            /* Larger touch targets */
+            .btn {
+                min-height: 48px;
+            }
+            
+            .nav-item {
+                min-height: 48px;
+            }
+            
+            .form-input,
+            .form-select {
+                min-height: 48px;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .stat-number {
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #1e293b;
+                --bg-secondary: #334155;
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --border-color: #475569;
+            }
+            
+            body {
+                background: var(--bg-primary);
+                color: var(--text-primary);
+            }
+            
+            .card,
+            .table-container,
+            .enhanced-filter-section {
+                background: var(--bg-secondary);
+                border-color: var(--border-color);
+            }
+            
+            .modern-table thead {
+                background: var(--bg-primary);
+            }
+        }
             letter-spacing: 1px;
             color: #64748b;
         }
@@ -3910,94 +5304,139 @@
             </div>
             <div class="sidebar-nav">
                 <div class="nav-items">
+                    <!-- Main Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">
+                            <span>MAIN</span>
+                            <button class="nav-section-toggle" onclick="toggleNavSection('main')">▼</button>
+                        </div>
+                        <div class="nav-section-items" id="main-section">
                     <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard'); console.log('Dashboard clicked via onclick');">
                         <span class="nav-icon" aria-label="Dashboard" title="Dashboard">📊</span>
-                        <span>Dashboard</span>
+                                <span class="nav-text">Dashboard</span>
                     </div>
                     <div class="nav-item" data-tab="tracker" onclick="switchTab('tracker'); console.log('Tracker clicked via onclick');">
                         <span class="nav-icon" aria-label="Tracker" title="Tracker">📋</span>
-                        <span>Tracker</span>
+                                <span class="nav-text">Task Tracker</span>
                     </div>
                     <div class="nav-item" data-tab="schedule" onclick="switchTab('schedule'); console.log('Schedule clicked via onclick');">
                         <span class="nav-icon" aria-label="Schedule" title="Schedule">📅</span>
-                        <span>Schedule</span>
+                                <span class="nav-text">Schedule</span>
                     </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">
+                            <span>ANALYTICS</span>
+                            <button class="nav-section-toggle" onclick="toggleNavSection('analytics')">▼</button>
+                        </div>
+                        <div class="nav-section-items" id="analytics-section">
                     <div class="nav-item" data-tab="summary" onclick="switchTab('summary'); console.log('Summary clicked via onclick');">
                         <span class="nav-icon" aria-label="Summary" title="Summary">📈</span>
-                        <span>Summary</span>
+                                <span class="nav-text">Reports</span>
                     </div>
                     <div class="nav-item" data-tab="analytics" onclick="switchTab('analytics'); console.log('Analytics clicked via onclick');">
                         <span class="nav-icon" aria-label="Analytics" title="Analytics">🔍</span>
-                        <span>Analytics</span>
+                                <span class="nav-text">Analytics</span>
                     </div>
                     <div class="nav-item" data-tab="attendance" onclick="switchTab('attendance'); console.log('Attendance clicked via onclick');">
                         <span class="nav-icon" aria-label="Attendance" title="Attendance">🗓️</span>
-                        <span>Attendance</span>
+                                <span class="nav-text">Attendance</span>
                     </div>
+                        </div>
+                    </div>
+
+                    <!-- Projects Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">
+                            <span>PROJECTS</span>
+                            <button class="nav-section-toggle" onclick="toggleNavSection('projects')">▼</button>
+                        </div>
+                        <div class="nav-section-items" id="projects-section">
                     <div class="nav-item" data-tab="allprojects" onclick="switchTab('allprojects'); console.log('Completed clicked via onclick');">
                         <span class="nav-icon" aria-label="Completed" title="Completed">✅</span>
-                        <span>Completed</span>
+                                <span class="nav-text">Completed</span>
                     </div>
                     <div class="nav-item" data-tab="rejected" onclick="switchTab('rejected'); console.log('Rejected clicked via onclick');">
                         <span class="nav-icon" aria-label="Rejected" title="Rejected">❌</span>
-                        <span>Rejected</span>
+                                <span class="nav-text">Rejected</span>
                     </div>
+                            <div class="nav-item" data-tab="milestones">
+                                <span class="nav-icon" aria-label="Project Milestones" title="Project Milestones">🎯</span>
+                                <span class="nav-text">Milestones</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requests Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">
+                            <span>REQUESTS</span>
+                            <button class="nav-section-toggle" onclick="toggleNavSection('requests')">▼</button>
+                        </div>
+                        <div class="nav-section-items" id="requests-section">
                     <div class="nav-item" data-tab="requests" onclick="openRequestsPopup(); console.log('Requests clicked via onclick');">
-                        <span class="nav-icon" aria-label="Requests" title="Requests">📋</span>
-                        <span>Submit Request</span>
+                                <span class="nav-icon" aria-label="Submit Request" title="Submit Request">➕</span>
+                                <span class="nav-text">Submit Request</span>
                     </div>
                     <div class="nav-item" data-tab="requestsSummary" onclick="switchTab('requestsSummary'); console.log('Requests Summary clicked via onclick');">
-                        <span class="nav-icon" aria-label="Requests Summary" title="Requests Summary">📊</span>
-                        <span>My Requests</span>
+                                <span class="nav-icon" aria-label="My Requests" title="My Requests">📋</span>
+                                <span class="nav-text">My Requests</span>
                     </div>
                     <div class="nav-item" data-tab="adminRequests" onclick="switchTab('adminRequests'); console.log('Admin Requests clicked via onclick');" style="display: none;" id="adminRequestsNav">
                         <span class="nav-icon" aria-label="Admin Requests" title="Admin Requests">⚙️</span>
-                        <span>Admin Requests</span>
-                        <div class="notification-badge" id="adminRequestNotificationBadge" style="display: none;">
+                                <span class="nav-text">Admin Requests</span>
+                                <div class="nav-badge new" id="adminRequestNotificationBadge" style="display: none;">
                             <span id="adminRequestNotificationCount">0</span>
                         </div>
                     </div>
-                    <div class="nav-item" data-tab="milestones">
-                        <span class="nav-icon" aria-label="Project Milestones" title="Project Milestones">🎯</span>
-                        <span>Project Milestones</span>
                     </div>
-                    <div class="nav-item dropdown-container" data-tab="labels">
-                        <span class="nav-icon" aria-label="Labels" title="Labels">🏷️</span>
-                        <span>Labels Table</span>
-                        <div class="dropdown-menu">
-                            <div class="dropdown-item" data-tab="forecast">
-                                <span class="nav-icon">📊</span>
-                                <span>Forecast</span>
-                            </div>
-                            <div class="dropdown-item" data-tab="yet-to-start">
-                                <span class="nav-icon">⏳</span>
-                                <span>Yet to Start</span>
-                            </div>
-                            <div class="dropdown-item" data-tab="ready-for-qa">
-                                <span class="nav-icon">🔍</span>
-                                <span>Ready for QA</span>
-                            </div>
-                            <div class="dropdown-item" data-tab="in-progress">
-                                <span class="nav-icon">⚡</span>
-                                <span>In Progress</span>
-                            </div>
-                            <div class="dropdown-item" data-tab="completed">
-                                <span class="nav-icon">✅</span>
-                                <span>Completed</span>
-                            </div>
-                            <div class="dropdown-item" data-tab="rejected">
-                                <span class="nav-icon">❌</span>
-                                <span>Rejected</span>
-                            </div>
+                    </div>
+
+                    <!-- Labels Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">
+                            <span>LABELS</span>
+                            <button class="nav-section-toggle" onclick="toggleNavSection('labels')">▼</button>
                         </div>
-                    </div>
+                        <div class="nav-section-items" id="labels-section">
+                            <div class="nav-item" data-tab="forecast" onclick="switchTab('forecast');">
+                                <span class="nav-icon">📊</span>
+                                <span class="nav-text">Forecast</span>
+                            </div>
+                            <div class="nav-item" data-tab="yet-to-start" onclick="switchTab('yet-to-start');">
+                                <span class="nav-icon">⏳</span>
+                                <span class="nav-text">Yet to Start</span>
+                            </div>
+                            <div class="nav-item" data-tab="ready-for-qa" onclick="switchTab('ready-for-qa');">
+                                <span class="nav-icon">🔍</span>
+                                <span class="nav-text">Ready for QA</span>
+                            </div>
+                            <div class="nav-item" data-tab="in-progress" onclick="switchTab('in-progress');">
+                                <span class="nav-icon">⚡</span>
+                                <span class="nav-text">In Progress</span>
+                            </div>
+                            </div>
+                            </div>
+
+                    <!-- QA Guidelines Section -->
+                    <div class="nav-section">
+                        <div class="nav-section-title">
+                            <span>GUIDELINES</span>
+                            <button class="nav-section-toggle" onclick="toggleNavSection('guidelines')">▼</button>
+                        </div>
+                        <div class="nav-section-items" id="guidelines-section">
                     <div class="nav-item" data-tab="qa-rejection-criteria">
                         <span class="nav-icon" aria-label="QA Rejection Criteria" title="QA Rejection Criteria">🚫</span>
-                        <span>QA Rejection Criteria</span>
+                                <span class="nav-text">Rejection Criteria</span>
                     </div>
                     <div class="nav-item" data-tab="qa-guidelines">
                         <span class="nav-icon" aria-label="QA Team Guidelines" title="QA Team Guidelines">📋</span>
-                        <span>QA Team Guidelines</span>
+                                <span class="nav-text">Team Guidelines</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4021,31 +5460,137 @@
                         <button class="btn btn-warning" onclick="openUnlockModal()" style="margin-left:1rem;" id="unlockBtn">🔓 Unlock CRUD</button>
                     </div>
 
+                    <!-- Enhanced Stats Cards with Progress Indicators -->
                     <div class="cards-grid">
-                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('all')">
+                        <div class="stats-card enhanced clickable animate-in" onclick="filterDashboardByType('all')">
+                            <div class="stat-header">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-info">
                             <div class="stat-number" id="totalTasks">0</div>
                             <div class="stat-label">Total Tasks</div>
                         </div>
-                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('active')">
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="totalProgress" style="width: 100%"></div>
+                            </div>
+                            <div class="stat-trend neutral">
+                                <span>📈</span>
+                                <span>All projects tracked</span>
+                            </div>
+                        </div>
+                        <div class="stats-card enhanced clickable animate-in" onclick="filterDashboardByType('active')">
+                            <div class="stat-header">
+                                <div class="stat-icon">⚡</div>
+                                <div class="stat-info">
                             <div class="stat-number" id="activeTasks">0</div>
                             <div class="stat-label">Active Tasks</div>
                         </div>
-                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('completed')">
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill warning" id="activeProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="stat-trend positive">
+                                <span>🔥</span>
+                                <span>In progress</span>
+                            </div>
+                        </div>
+                        <div class="stats-card enhanced clickable animate-in" onclick="filterDashboardByType('completed')">
+                            <div class="stat-header">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-info">
                             <div class="stat-number" id="completedTasks">0</div>
                             <div class="stat-label">Completed</div>
                         </div>
-                        <div class="stats-card clickable animate-in" onclick="filterDashboardByType('overdue')">
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="completedProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="stat-trend positive">
+                                <span>🎉</span>
+                                <span>Successfully delivered</span>
+                            </div>
+                        </div>
+                        <div class="stats-card enhanced clickable animate-in" onclick="filterDashboardByType('overdue')">
+                            <div class="stat-header">
+                                <div class="stat-icon">⚠️</div>
+                                <div class="stat-info">
                             <div class="stat-number" id="overdueTasks">0</div>
                             <div class="stat-label">Overdue</div>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill danger" id="overdueProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="stat-trend negative">
+                                <span>⏰</span>
+                                <span>Needs attention</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="table-container">
-                        <div class="table-header">
-                            <h3 id="dashboardTableTitle">Recent Tasks</h3>
-                            <div class="filter-group">
-                                <input type="text" class="search-box" placeholder="Search tasks..." id="searchInput">
-                                <input type="date" class="date-filter" id="dateFilter" placeholder="Filter by due date">
+                    <!-- Dashboard Charts Section -->
+                    <div class="dashboard-charts">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Project Status Distribution</h3>
+                                <div class="chart-controls">
+                                    <select class="form-select" id="chartTimeRange" onchange="updateCharts()">
+                                        <option value="7">Last 7 days</option>
+                                        <option value="30" selected>Last 30 days</option>
+                                        <option value="90">Last 90 days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                            <div class="chart-legend" id="statusChartLegend"></div>
+                        </div>
+
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Resource Allocation</h3>
+                                <div class="chart-controls">
+                                    <button class="btn btn-sm btn-secondary" onclick="exportChart('resource')">Export</button>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="resourceChart"></canvas>
+                            </div>
+                            <div class="chart-legend" id="resourceChartLegend"></div>
+                        </div>
+
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Task Completion Trend</h3>
+                                <div class="chart-controls">
+                                    <button class="btn btn-sm btn-secondary" onclick="exportChart('trend')">Export</button>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                            <div class="chart-legend" id="trendChartLegend"></div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Search and Filter Section -->
+                    <div class="enhanced-filter-section">
+                        <div class="search-container">
+                            <div class="search-input-wrapper">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" class="enhanced-search-box" placeholder="Search projects, assignees, dates..." id="searchInput">
+                                <button class="search-clear" onclick="clearSearch()" title="Clear search">×</button>
+                            </div>
+                        </div>
+                        
+                        <div class="advanced-filters">
+                            <button class="filter-toggle" onclick="toggleAdvancedFilters()">
+                                <span>⚙️ Advanced Filters</span>
+                                <span class="filter-count" id="activeFilterCount">0</span>
+                            </button>
+                            
+                            <div class="action-buttons">
                                 <button class="btn btn-info" onclick="openQAReportModal()">
                                     <span class="btn-icon">📊</span>
                                     QA Report
@@ -4056,18 +5601,86 @@
                                 </button>
                             </div>
                         </div>
+                        
+                        <div class="filter-panel" id="advancedFilterPanel">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="filter-label">Status</label>
+                                    <select class="filter-select" id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="Yet to Start">Yet to Start</option>
+                                        <option value="Being Developed">Being Developed</option>
+                                        <option value="Ready for QA">Ready for QA</option>
+                                        <option value="Assigned to QA">Assigned to QA</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="On Hold">On Hold</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Rejected">Rejected</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label">Assignee</label>
+                                    <select class="filter-select" id="assigneeFilter">
+                                        <option value="">All Assignees</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label">Phase</label>
+                                    <select class="filter-select" id="phaseFilter">
+                                        <option value="">All Phases</option>
+                                        <option value="UI/UX">UI/UX</option>
+                                        <option value="Development">Development</option>
+                                        <option value="Testing">Testing</option>
+                                        <option value="QA">QA</option>
+                                        <option value="Deployment">Deployment</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label">Date Range</label>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <input type="date" class="filter-input" id="dateFromFilter" placeholder="From">
+                                        <input type="date" class="filter-input" id="dateToFilter" placeholder="To">
+                                    </div>
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label">Bug Count</label>
+                                    <select class="filter-select" id="bugCountFilter">
+                                        <option value="">All</option>
+                                        <option value="0">No Bugs</option>
+                                        <option value="1-5">1-5 Bugs</option>
+                                        <option value="6-10">6-10 Bugs</option>
+                                        <option value="10+">10+ Bugs</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="filter-actions">
+                                <button class="btn btn-secondary" onclick="clearAllFilters()">Clear All</button>
+                                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3 id="dashboardTableTitle">Recent Tasks</h3>
+                        </div>
                         <div class="table-scroll-container">
-                            <table id="tasksTable">
+                            <table id="tasksTable" class="modern-table">
                                 <thead>
                                     <tr>
-                                        <th>Project</th>
-                                        <th>Phase</th>
-                                        <th>Assigned To</th>
-                                        <th>Status</th>
-                                        <th>From Date</th>
-                                        <th>Due Date</th>
-                                        <th>Actual End Date</th>
-                                        <th>Bug Count</th>
+                                        <th class="sortable" data-column="project" title="Click to sort by project name">Project</th>
+                                        <th class="sortable" data-column="phase" title="Click to sort by phase">Phase</th>
+                                        <th class="sortable" data-column="assigned" title="Click to sort by assignee">Assigned To</th>
+                                        <th class="sortable" data-column="status" title="Click to sort by status">Status</th>
+                                        <th class="sortable" data-column="fromDate" title="Click to sort by start date">From Date</th>
+                                        <th class="sortable" data-column="dueDate" title="Click to sort by due date">Due Date</th>
+                                        <th class="sortable" data-column="endDate" title="Click to sort by end date">Actual End Date</th>
+                                        <th class="sortable" data-column="bugCount" title="Click to sort by bug count">Bug Count</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -5108,6 +6721,9 @@
                 </div>
             </div>
         </main>
+        
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
     </div>
 
     <!-- Hidden containers for screenshot reports -->
@@ -8770,6 +10386,26 @@
             closeRejectedProjectsModal();
         });
 
+        // Toggle navigation section collapse/expand
+        function toggleNavSection(sectionId) {
+            const section = document.getElementById(sectionId + '-section');
+            const toggle = document.querySelector(`[onclick="toggleNavSection('${sectionId}')"]`);
+            
+            if (section && toggle) {
+                const isCollapsed = section.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    section.classList.remove('collapsed');
+                    toggle.textContent = '▼';
+                    toggle.classList.remove('collapsed');
+                } else {
+                    section.classList.add('collapsed');
+                    toggle.textContent = '▶';
+                    toggle.classList.add('collapsed');
+                }
+            }
+        }
+
         function switchTab(tab) {
             console.log('=== switchTab called with:', tab, '===');
             
@@ -9484,6 +11120,662 @@
             return { total, completed, active, overdue };
         }
 
+        // Initialize Dashboard Charts
+        function initializeDashboardCharts() {
+            createStatusChart();
+            createResourceChart();
+            createTrendChart();
+            updateProgressBars();
+        }
+
+        // Create Status Distribution Chart
+        function createStatusChart() {
+            const ctx = document.getElementById('statusChart');
+            if (!ctx) return;
+
+            const statusData = {
+                'Yet to Start': tasks.filter(t => t.status === 'Yet to Start').length,
+                'Being Developed': tasks.filter(t => t.status === 'Being Developed').length,
+                'Ready for QA': tasks.filter(t => t.status === 'Ready for QA').length,
+                'Assigned to QA': tasks.filter(t => t.status === 'Assigned to QA').length,
+                'In Progress': tasks.filter(t => t.status === 'In Progress').length,
+                'On Hold': tasks.filter(t => t.status === 'On Hold').length,
+                'Completed': tasks.filter(t => t.status === 'Completed').length,
+                'Rejected': tasks.filter(t => t.status === 'Rejected').length
+            };
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(statusData),
+                    datasets: [{
+                        data: Object.values(statusData),
+                        backgroundColor: [
+                            '#6b7280', '#f59e0b', '#3b82f6', '#8b5cf6',
+                            '#ef4444', '#dc2626', '#10b981', '#7c3aed'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create Resource Allocation Chart
+        function createResourceChart() {
+            const ctx = document.getElementById('resourceChart');
+            if (!ctx) return;
+
+            const qaNames = ['Abhiram', 'Minnu', 'Aswathi'];
+            const taskCounts = getQATaskCounts(qaNames);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: qaNames,
+                    datasets: [{
+                        label: 'Tasks Assigned',
+                        data: taskCounts,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(16, 185, 129, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(16, 185, 129, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create Task Completion Trend Chart
+        function createTrendChart() {
+            const ctx = document.getElementById('trendChart');
+            if (!ctx) return;
+
+            // Generate sample trend data for the last 7 days
+            const dates = [];
+            const completed = [];
+            const total = [];
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                completed.push(Math.floor(Math.random() * 10) + 5);
+                total.push(Math.floor(Math.random() * 15) + 10);
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Completed',
+                        data: completed,
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Total',
+                        data: total,
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update Progress Bars
+        function updateProgressBars() {
+            const total = tasks.length;
+            const active = tasks.filter(t => ['In Progress', 'Being Developed', 'Ready for QA', 'Assigned to QA'].includes(t.status)).length;
+            const completed = tasks.filter(t => t.status === 'Completed').length;
+            const overdue = tasks.filter(t => {
+                if (!t.expected_end_date) return false;
+                return new Date(t.expected_end_date) < new Date() && t.status !== 'Completed';
+            }).length;
+
+            // Update progress bars
+            document.getElementById('activeProgress').style.width = total > 0 ? `${(active / total) * 100}%` : '0%';
+            document.getElementById('completedProgress').style.width = total > 0 ? `${(completed / total) * 100}%` : '0%';
+            document.getElementById('overdueProgress').style.width = total > 0 ? `${(overdue / total) * 100}%` : '0%';
+        }
+
+        // Update Charts
+        function updateCharts() {
+            createStatusChart();
+            createResourceChart();
+            createTrendChart();
+            updateProgressBars();
+        }
+
+        // Export Chart
+        function exportChart(chartType) {
+            // Implementation for chart export
+            showToast(`${chartType} chart exported successfully!`, 'success');
+        }
+
+        // Helper function to get QA task counts
+        function getQATaskCounts(qaNames) {
+            return qaNames.map(name => {
+                return tasks.filter(task => 
+                    task.assigned_to === name || task.assigned_to2 === name
+                ).length;
+            });
+        }
+
+        // Table Sorting Functionality
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc';
+
+        function initializeTableSorting() {
+            const sortableHeaders = document.querySelectorAll('.sortable');
+            sortableHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.column;
+                    sortTable(column);
+                });
+            });
+        }
+
+        function sortTable(column) {
+            const table = document.getElementById('tasksTable');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            // Determine sort direction
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortDirection = 'asc';
+                currentSortColumn = column;
+            }
+
+            // Sort rows
+            rows.sort((a, b) => {
+                const aValue = getCellValue(a, column);
+                const bValue = getCellValue(b, column);
+                
+                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Update sort indicators
+            updateSortIndicators(column);
+        }
+
+        function getCellValue(row, column) {
+            const columnIndex = getColumnIndex(column);
+            const cell = row.cells[columnIndex];
+            if (!cell) return '';
+
+            // Handle different data types
+            const text = cell.textContent.trim();
+            
+            if (column.includes('Date')) {
+                return new Date(text) || new Date(0);
+            }
+            
+            if (column === 'bugCount') {
+                return parseInt(text) || 0;
+            }
+            
+            return text.toLowerCase();
+        }
+
+        function getColumnIndex(column) {
+            const columnMap = {
+                'project': 0,
+                'phase': 1,
+                'assigned': 2,
+                'status': 3,
+                'fromDate': 4,
+                'dueDate': 5,
+                'endDate': 6,
+                'bugCount': 7
+            };
+            return columnMap[column] || 0;
+        }
+
+        function updateSortIndicators(activeColumn) {
+            const headers = document.querySelectorAll('.sortable');
+            headers.forEach(header => {
+                header.classList.remove('sort-asc', 'sort-desc');
+                if (header.dataset.column === activeColumn) {
+                    header.classList.add(currentSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+            });
+        }
+
+        // Enhanced table row generation with avatars and status badges
+        function generateTableRow(task) {
+            const statusClass = getStatusBadgeClass(task.status);
+            const bugCountClass = getBugCountClass(task.bug_count);
+            const avatarInitials = getAvatarInitials(task.assigned_to);
+            
+            return `
+                <tr>
+                    <td data-label="Project">
+                        <div class="tooltip" data-tooltip="${task.project_name || 'No project name'}">
+                            ${task.project_name || '-'}
+                        </div>
+                    </td>
+                    <td data-label="Phase">
+                        <div class="tooltip" data-tooltip="${task.sub_phase || 'No phase specified'}">
+                            ${task.sub_phase || '-'}
+                        </div>
+                    </td>
+                    <td data-label="Assigned To">
+                        <div class="user-avatar">
+                            <div class="avatar">${avatarInitials}</div>
+                            <span>${task.assigned_to || 'Unassigned'}</span>
+                        </div>
+                    </td>
+                    <td data-label="Status">
+                        <span class="status-badge ${statusClass}">${task.status || 'Unknown'}</span>
+                    </td>
+                    <td data-label="From Date">${formatDate(task.start_date)}</td>
+                    <td data-label="Due Date">${formatDate(task.expected_end_date)}</td>
+                    <td data-label="End Date">${formatDate(task.actual_end_date)}</td>
+                    <td data-label="Bug Count">
+                        <span class="bug-count ${bugCountClass}">${task.bug_count || 0}</span>
+                    </td>
+                    <td data-label="Actions">
+                        <button class="btn btn-sm btn-primary" onclick="editTask('${task.id}')" title="Edit Task">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTask('${task.id}')" title="Delete Task">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function getAvatarInitials(name) {
+            if (!name) return '??';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function getStatusBadgeClass(status) {
+            const statusMap = {
+                'Completed': 'completed',
+                'In Progress': 'in-progress',
+                'Yet to Start': 'pending',
+                'On Hold': 'pending',
+                'Rejected': 'rejected',
+                'Overdue': 'overdue'
+            };
+            return statusMap[status] || 'pending';
+        }
+
+        function getBugCountClass(count) {
+            const num = parseInt(count) || 0;
+            if (num >= 10) return 'high';
+            if (num >= 5) return 'medium';
+            return 'low';
+        }
+
+        // Enhanced Search and Filter Functions
+        let activeFilters = {
+            search: '',
+            status: '',
+            assignee: '',
+            phase: '',
+            dateFrom: '',
+            dateTo: '',
+            bugCount: ''
+        };
+
+        function initializeEnhancedSearch() {
+            // Search input with debouncing
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        activeFilters.search = e.target.value;
+                        updateActiveFilters();
+                        performSearch();
+                    }, 300);
+                });
+            }
+
+            // Filter change listeners
+            initializeFilterListeners();
+        }
+
+        function initializeFilterListeners() {
+            const filters = ['statusFilter', 'assigneeFilter', 'phaseFilter', 'dateFromFilter', 'dateToFilter', 'bugCountFilter'];
+            
+            filters.forEach(filterId => {
+                const element = document.getElementById(filterId);
+                if (element) {
+                    element.addEventListener('change', () => {
+                        updateActiveFilters();
+                        applyFilters();
+                    });
+                }
+            });
+        }
+
+        function toggleAdvancedFilters() {
+            const panel = document.getElementById('advancedFilterPanel');
+            const toggle = document.querySelector('.filter-toggle');
+            
+            if (panel.classList.contains('active')) {
+                panel.classList.remove('active');
+                toggle.textContent = '⚙️ Advanced Filters';
+            } else {
+                panel.classList.add('active');
+                toggle.textContent = '⚙️ Hide Filters';
+            }
+        }
+
+        function updateActiveFilters() {
+            activeFilters = {
+                search: document.getElementById('searchInput')?.value || '',
+                status: document.getElementById('statusFilter')?.value || '',
+                assignee: document.getElementById('assigneeFilter')?.value || '',
+                phase: document.getElementById('phaseFilter')?.value || '',
+                dateFrom: document.getElementById('dateFromFilter')?.value || '',
+                dateTo: document.getElementById('dateToFilter')?.value || '',
+                bugCount: document.getElementById('bugCountFilter')?.value || ''
+            };
+
+            // Update filter count
+            const activeCount = Object.values(activeFilters).filter(value => value !== '').length;
+            const countElement = document.getElementById('activeFilterCount');
+            if (countElement) {
+                countElement.textContent = activeCount;
+                countElement.style.display = activeCount > 0 ? 'inline' : 'none';
+            }
+        }
+
+        function performSearch() {
+            // Trigger table re-render with current filters
+            if (currentTab === 'dashboard') {
+                renderDashboard();
+            }
+        }
+
+        function applyFilters() {
+            updateActiveFilters();
+            performSearch();
+        }
+
+        function clearAllFilters() {
+            // Clear all filter inputs
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('assigneeFilter').value = '';
+            document.getElementById('phaseFilter').value = '';
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            document.getElementById('bugCountFilter').value = '';
+
+            // Reset active filters
+            activeFilters = {
+                search: '',
+                status: '',
+                assignee: '',
+                phase: '',
+                dateFrom: '',
+                dateTo: '',
+                bugCount: ''
+            };
+
+            updateActiveFilters();
+            performSearch();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            activeFilters.search = '';
+            updateActiveFilters();
+            performSearch();
+        }
+
+        function filterTable(tasks) {
+            return tasks.filter(task => {
+                // Search filter
+                if (activeFilters.search) {
+                    const searchTerm = activeFilters.search.toLowerCase();
+                    const searchableText = [
+                        task.project_name,
+                        task.assigned_to,
+                        task.sub_phase,
+                        task.status
+                    ].join(' ').toLowerCase();
+                    
+                    if (!searchableText.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+
+                // Status filter
+                if (activeFilters.status && task.status !== activeFilters.status) {
+                    return false;
+                }
+
+                // Assignee filter
+                if (activeFilters.assignee && task.assigned_to !== activeFilters.assignee) {
+                    return false;
+                }
+
+                // Phase filter
+                if (activeFilters.phase && task.sub_phase !== activeFilters.phase) {
+                    return false;
+                }
+
+                // Date range filter
+                if (activeFilters.dateFrom) {
+                    const taskDate = new Date(task.start_date);
+                    const fromDate = new Date(activeFilters.dateFrom);
+                    if (taskDate < fromDate) return false;
+                }
+
+                if (activeFilters.dateTo) {
+                    const taskDate = new Date(task.start_date);
+                    const toDate = new Date(activeFilters.dateTo);
+                    if (taskDate > toDate) return false;
+                }
+
+                // Bug count filter
+                if (activeFilters.bugCount) {
+                    const bugCount = parseInt(task.bug_count) || 0;
+                    const filterValue = activeFilters.bugCount;
+                    
+                    if (filterValue === '0' && bugCount !== 0) return false;
+                    if (filterValue === '1-5' && (bugCount < 1 || bugCount > 5)) return false;
+                    if (filterValue === '6-10' && (bugCount < 6 || bugCount > 10)) return false;
+                    if (filterValue === '10+' && bugCount < 10) return false;
+                }
+
+                return true;
+            });
+        }
+
+        function populateAssigneeFilter() {
+            const assigneeFilter = document.getElementById('assigneeFilter');
+            if (!assigneeFilter) return;
+
+            // Get unique assignees from tasks
+            const assignees = [...new Set(tasks.map(task => task.assigned_to).filter(Boolean))];
+            
+            // Clear existing options except "All Assignees"
+            assigneeFilter.innerHTML = '<option value="">All Assignees</option>';
+            
+            // Add assignee options
+            assignees.sort().forEach(assignee => {
+                const option = document.createElement('option');
+                option.value = assignee;
+                option.textContent = assignee;
+                assigneeFilter.appendChild(option);
+            });
+        }
+
+        // Toast Notification Functions
+        function showToast(message, type = 'info', title = '', duration = 5000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+
+            const titles = {
+                success: 'Success',
+                error: 'Error',
+                warning: 'Warning',
+                info: 'Information'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || icons.info}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title || titles[type] || 'Notification'}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="removeToast(this)">×</button>
+                <div class="toast-progress" style="width: 100%;"></div>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+
+            // Auto remove after duration
+            const progressBar = toast.querySelector('.toast-progress');
+            if (progressBar) {
+                progressBar.style.transition = `width ${duration}ms linear`;
+                setTimeout(() => {
+                    progressBar.style.width = '0%';
+                }, 100);
+            }
+
+            setTimeout(() => {
+                removeToast(toast.querySelector('.toast-close'));
+            }, duration);
+        }
+
+        function removeToast(closeButton) {
+            const toast = closeButton.closest('.toast');
+            if (toast) {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }
+        }
+
+        // Enhanced action feedback functions
+        function showSuccessToast(message, title = 'Success') {
+            showToast(message, 'success', title);
+        }
+
+        function showErrorToast(message, title = 'Error') {
+            showToast(message, 'error', title);
+        }
+
+        function showWarningToast(message, title = 'Warning') {
+            showToast(message, 'warning', title);
+        }
+
+        function showInfoToast(message, title = 'Information') {
+            showToast(message, 'info', title);
+        }
+
+        // Action feedback for common operations
+        function showTaskCreatedToast(taskName) {
+            showSuccessToast(`Task "${taskName}" has been created successfully!`, 'Task Created');
+        }
+
+        function showTaskUpdatedToast(taskName) {
+            showSuccessToast(`Task "${taskName}" has been updated successfully!`, 'Task Updated');
+        }
+
+        function showTaskDeletedToast(taskName) {
+            showSuccessToast(`Task "${taskName}" has been deleted successfully!`, 'Task Deleted');
+        }
+
+        function showProjectCompletedToast(projectName) {
+            showSuccessToast(`Project "${projectName}" has been marked as completed!`, 'Project Completed');
+        }
+
+        function showFilterAppliedToast(filterCount) {
+            showInfoToast(`${filterCount} filter${filterCount !== 1 ? 's' : ''} applied to the results.`, 'Filters Applied');
+        }
+
+        function showExportSuccessToast(fileName) {
+            showSuccessToast(`Report "${fileName}" has been exported successfully!`, 'Export Complete');
+        }
+
+        function showDataSavedToast() {
+            showSuccessToast('Your changes have been saved successfully!', 'Data Saved');
+        }
+
+        function showValidationErrorToast(message) {
+            showErrorToast(message, 'Validation Error');
+        }
+
+        function showNetworkErrorToast() {
+            showErrorToast('Network error occurred. Please check your connection and try again.', 'Connection Error');
+        }
+
         async function renderDashboard() {
             // Fetch all filtered tasks (no range)
             let taskQuery = supabase
@@ -9656,6 +11948,9 @@
                     cards[0].classList.add('active');
                 }
             }
+            
+            // Initialize dashboard charts
+            initializeDashboardCharts();
         }
 
         async function renderTracker() {
@@ -11666,6 +13961,12 @@ Generated on: ${new Date().toLocaleString()}`;
             
             // Initialize notifications for CRUD users
             initializeNotifications();
+            
+            // Initialize table sorting
+            initializeTableSorting();
+            
+            // Initialize enhanced search and filters
+            initializeEnhancedSearch();
             
             // Hide loader when everything is loaded
             hideLoader();
