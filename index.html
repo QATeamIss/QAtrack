@@ -9422,6 +9422,8 @@
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 if (menu !== dropdown) {
                     menu.style.display = 'none';
+                    menu.style.visibility = 'hidden';
+                    menu.style.opacity = '0';
                 }
             });
             
@@ -9433,6 +9435,9 @@
                 dropdown.style.display = 'block';
                 dropdown.style.visibility = 'visible';
                 dropdown.style.opacity = '1';
+                
+                // Focus the dropdown for better accessibility
+                dropdown.focus();
             } else {
                 dropdown.style.display = 'none';
                 dropdown.style.visibility = 'hidden';
@@ -9451,14 +9456,47 @@
             const qaNames = ['Abhiram', 'Minnu', 'Aswathi'];
             
             dropdown.innerHTML = qaNames.map(name => 
-                `<div class="dropdown-item" onclick="event.stopPropagation(); selectAssignee('${name}')" style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='white'">${name}</div>`
+                `<div class="dropdown-item" data-name="${name}" style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='white'">${name}</div>`
             ).join('');
+            
+            // Add event listeners to dropdown items
+            dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    console.log('Dropdown item clicked:', this.textContent);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const name = this.getAttribute('data-name');
+                    console.log('Extracted name:', name);
+                    selectRequestAssignee(name);
+                });
+            });
         }
 
-        function selectAssignee(name) {
-            document.getElementById('assignedToInput').value = name;
-            document.getElementById('assignedToHidden').value = name;
-            document.getElementById('assignedDropdown').style.display = 'none';
+        function selectRequestAssignee(name) {
+            console.log('selectRequestAssignee called with:', name);
+            const input = document.getElementById('assignedToInput');
+            const hiddenInput = document.getElementById('assignedToHidden');
+            const dropdown = document.getElementById('assignedDropdown');
+            
+            console.log('Elements found:', { input, hiddenInput, dropdown });
+            
+            if (input && hiddenInput && dropdown) {
+                input.value = name;
+                hiddenInput.value = name;
+                dropdown.style.display = 'none';
+                dropdown.style.visibility = 'hidden';
+                dropdown.style.opacity = '0';
+                
+                console.log('Selection completed:', { inputValue: input.value, hiddenValue: hiddenInput.value });
+                
+                // Add visual feedback
+                input.style.borderColor = '#10b981';
+                setTimeout(() => {
+                    input.style.borderColor = '';
+                }, 1000);
+            } else {
+                console.error('Required elements not found');
+            }
         }
 
         // Close dropdown when clicking outside
@@ -15472,29 +15510,27 @@ Generated on: ${new Date().toLocaleString()}`;
             document.getElementById('myRequestsFilter')?.addEventListener('change', renderMyRequestsTable);
             
             // Set up assigned to dropdown event listener
-            setTimeout(() => {
-                const assignedToInput = document.getElementById('assignedToInput');
-                const dropdownContainer = document.querySelector('.dropdown-container');
+            const assignedToInput = document.getElementById('assignedToInput');
+            const dropdownContainer = document.querySelector('.dropdown-container');
+            
+            if (assignedToInput) {
+                // Remove any existing event listeners first
+                assignedToInput.removeEventListener('click', toggleAssignedDropdown);
+                assignedToInput.removeEventListener('focus', toggleAssignedDropdown);
                 
-                if (assignedToInput) {
-                    assignedToInput.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleAssignedDropdown(e);
-                    });
-                    assignedToInput.addEventListener('focus', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleAssignedDropdown(e);
-                    });
-                }
-                
-                if (dropdownContainer) {
-                    dropdownContainer.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                    });
-                }
-            }, 1000);
+                // Add single click event listener
+                assignedToInput.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleAssignedDropdown(e);
+                });
+            }
+            
+            if (dropdownContainer) {
+                dropdownContainer.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
             
             // Event listener removed - using inline onclick instead
 
